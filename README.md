@@ -1,2 +1,5 @@
-# Bozenka
-MultiPurpose telegram bot, wrote on python using Aiogram python library, made for training my skills in python. Name is from russian word 'Бозенька' and from english 'Bozo', what means clown
+<div align="center">
+### Bozenka
+MultiPurpose & cross-platform bot, wrote on python. Made for training mine skills.\
+Right now in active maintaned. In future planning multi-messengers support. Licensed under GPL-V3 license. \
+</div>
