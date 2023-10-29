@@ -1,16 +1,17 @@
 <div align="center">
 
-### Bozenka
-MultiPurpose & cross-platform bot, wrote on python. Made for training mine skills. \
-Right now in active maintaned. In future planning multi-messengers support. Licensed under GPL-V3 license.
+<img src="images/header.png">
+
+
+
 </div>
 
-### Features (telegram)
+### Features of Telegram instance
 
 - [ ] Group
   - [ ] Administration
     - [x] Ban & Unban commands
-    - [ ] Mute & Unmute commands
+    - [x] Mute & Unmute commands
     - [x] Pin & Unpin & Unpin all commands
     - [ ] Bad words & Spam filter
     - [ ] Setup command
@@ -35,9 +36,10 @@ Right now in active maintaned. In future planning multi-messengers support. Lice
     - [ ] H20
     - [ ] Work with inline keyboard
     - [ ] Using tutorial.
-    - [ ] Threads and Topic of dialog support
+    - [x] Threads and Topic of dialog support (Already by new aiogram)
   - [ ] Image generation
     - [ ] Using tutorial 
+    - [ ] Inline generation
 - [x] Code
   - [x] Logging support
   - [x] Features descriptions
@@ -46,8 +48,8 @@ Right now in active maintaned. In future planning multi-messengers support. Lice
   - [x] Database
 
 
-### Made with
+### This part of project made with
 
 - [x] [Aiogram python library](https://github.com/aiogram/aiogram) and with their community support.
 - [x] [GPT4Free](https://github.com/xtekky/gpt4free)
-- [x] [GPT4All](https://github.com/nomic-ai/gpt4all)
+- [x] With our love <3
