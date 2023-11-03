@@ -32,7 +32,7 @@ def count_time(counted_time: str) -> int:
 
 def cmd_register(command_list: list[Any], bot: Bot) -> list[Any]:
     """
-    Register commands for bot.
+    Registrate commands for telegram automatic tips
     """
     pass
 

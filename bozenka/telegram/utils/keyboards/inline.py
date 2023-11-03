@@ -1,3 +1,5 @@
+from typing import List, Any
+
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -10,7 +12,7 @@ Right now only on Russian language, multi-language planning soon.
 """
 
 
-def setup_keyboard(owner_id):
+def setup_keyboard(owner_id) -> InlineKeyboardMarkup:
     """
     Generate keybaord for /setup command
     :param owner_id:
@@ -26,7 +28,7 @@ def setup_keyboard(owner_id):
     return kb
 
 
-def delete_keyboard(admin_id):
+def delete_keyboard(admin_id) -> InlineKeyboardMarkup:
     """
     Basic keyboard for all messages from bot.
     By pressing this button, message from bot will get deleted.
@@ -39,7 +41,7 @@ def delete_keyboard(admin_id):
     return kb
 
 
-def gpt_categories_keyboard(user_id: int):
+def gpt_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
     """
     Create list keyboard list of gpt libraries, available in the bot
     :param user_id:
@@ -54,56 +56,65 @@ def gpt_categories_keyboard(user_id: int):
     return builder.as_markup()
 
 
-def generate_gpt4free_page(user_id, page):
+def items_list_generator(page: int, list_of_items, count_of_items: int) -> list[Any]:
+    """
+    Generate page, made for backend
+    """
+    items = []
+    max_pages = [len(list_of_items) // count_of_items - 1 if page - 1 == -1 else page - 1,
+                 0 if page + 1 >= len(list_of_items) // count_of_items else page + 1]
+    required_items = [item + page * count_of_items for item in range(count_of_items)]
+    for item, count in zip(list_of_items, range(1, len(list_of_items))):
+        if count not in required_items:
+            continue
+        items.append(item)
+    return items
+
+
+def generate_gpt4free_page(user_id: int, page: int) -> InlineKeyboardMarkup:
     """
     Generate page of gpt providers, can be used by user.
     :param user_id:
     :param page:
     :return:
     """
-    names = []
     providers = generate_gpt4free_providers()
+    names = items_list_generator(page, providers, 4)
     pages = [len(providers) // 4 - 1 if page - 1 == -1 else page - 1,
              0 if page + 1 >= len(providers) // 4 else page + 1]
-    for provider, count in zip(providers, range(1, len(providers))):
-        if count not in [0 + page * 4, 1 + page * 4, 2 + page * 4, 3 + page * 4]:
-            continue
-        names.append(provider)
     generated_page = InlineKeyboardMarkup(inline_keyboard=[
+        # First one provider
         [InlineKeyboardButton(text=names[0],
-                              callback_data=Gpt4FreeProvider
-                              (user_id=user_id,
-                               provider=names[0]).pack())],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[0]).pack())],
+        # Second one provider
         [InlineKeyboardButton(text=names[1],
-                              callback_data=Gpt4FreeProvider
-                              (user_id=user_id,
-                               provider=names[1]).pack())],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[1]).pack())],
+        # Third one provider
         [InlineKeyboardButton(text=names[2],
-                              callback_data=Gpt4FreeProvider
-                              (user_id=user_id,
-                               provider=names[2]).pack())],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[2]).pack())],
+        # Fourh one provider (if exist)
         [InlineKeyboardButton(text=names[3],
-                              callback_data=Gpt4FreeProvider
-                              (user_id=user_id,
-                               provider=names[3]).pack())] if len(names) == 4 else [],
-        [
-            InlineKeyboardButton(text=str(len(providers) // 4 if page == 0 else "1"),
-                                 callback_data=Gpt4FreePage(
-                                     page=str(len(providers) // 4 - 1 if page == 0 else "1"),
-                                     user_id=user_id).pack()),
-            InlineKeyboardButton(text="⬅️", callback_data=Gpt4FreePage(page=pages[0], user_id=user_id).pack()),
-            InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
-            InlineKeyboardButton(text="➡️", callback_data=Gpt4FreePage(page=pages[1], user_id=user_id).pack()),
-            InlineKeyboardButton(text=str(len(providers) // 4),
-                                 callback_data=Gpt4FreePage(
-                                     page=str(len(providers) // 4 - 1),
-                                     user_id=user_id).pack())
-        ]
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[3]).pack())] if len(
+            names) == 4 else [],
+        [InlineKeyboardButton(text=str(len(providers) // 4 if page == 0 else "1"),
+                              callback_data=Gpt4FreePage(
+                                  page=str(len(providers) // 4 - 1 if page == 0 else "1"),
+                                  user_id=user_id).pack()),
+         # Page right
+         InlineKeyboardButton(text="⬅️", callback_data=Gpt4FreePage(page=pages[0], user_id=user_id).pack()),
+         InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
+         # Page left
+         InlineKeyboardButton(text="➡️", callback_data=Gpt4FreePage(page=pages[1], user_id=user_id).pack()),
+         InlineKeyboardButton(text=str(len(providers) // 4),
+                              callback_data=Gpt4FreePage(
+                                  page=str(len(providers) // 4 - 1),
+                                  user_id=user_id).pack())
+         ]
     ])
     return generated_page
 
 
-def gpt4free_category_keyboard(user_id):
+def gpt4free_category_keyboard(user_id) -> InlineKeyboardMarkup:
     """
         Generating list of GPT4Free providers, can be used to generate text.
         Will be reworked.
@@ -118,7 +129,7 @@ def gpt4free_category_keyboard(user_id):
     return builder.as_markup()
 
 
-def gpt4free_models_keyboard(user_id, provider):
+def gpt4free_models_keyboard(user_id, provider) -> InlineKeyboardMarkup:
     """
         Generating list of GPT4Free provider's models, can be used to generate text.
         Will be also reworked.
@@ -146,7 +157,7 @@ def gpt4free_models_keyboard(user_id, provider):
     return builder.as_markup()
 
 
-def ban_keyboard(admin_id, ban_id):
+def ban_keyboard(admin_id, ban_id) -> InlineKeyboardMarkup:
     """
         Generating menu for /ban command.
         :param admin_id:
@@ -162,7 +173,7 @@ def ban_keyboard(admin_id, ban_id):
     return kb
 
 
-def unban_keyboard(admin_id, ban_id):
+def unban_keyboard(admin_id, ban_id) -> InlineKeyboardMarkup:
     """
         Generating menu for /unban command.
         :param admin_id:
@@ -179,7 +190,7 @@ def unban_keyboard(admin_id, ban_id):
     return kb
 
 
-def mute_keyboard(admin_id, ban_id):
+def mute_keyboard(admin_id, ban_id) -> InlineKeyboardMarkup:
     """
        Generating menu for /mute command.
        :param admin_id:
@@ -195,7 +206,7 @@ def mute_keyboard(admin_id, ban_id):
     return kb
 
 
-def unmute_keyboard(admin_id, ban_id):
+def unmute_keyboard(admin_id, ban_id) -> InlineKeyboardMarkup:
     """
         Generating menu for /unmute command.
         :param admin_id:
@@ -211,7 +222,7 @@ def unmute_keyboard(admin_id, ban_id):
     return kb
 
 
-def invite_keyboard(link: str, admin_id, chat_name):
+def invite_keyboard(link: str, admin_id, chat_name) -> InlineKeyboardMarkup:
     """
         Generating menu for /invite command. Should be reworked.
         :param link:
@@ -233,5 +244,5 @@ def invite_keyboard(link: str, admin_id, chat_name):
 
 about_keyboard = InlineKeyboardBuilder()
 about_keyboard.button(
-    text="Bozo Development", url="https://t.me/BozoDevelopement"
+    text="Bozo Development", url="https://t.me/BozoDevelopment"
 )

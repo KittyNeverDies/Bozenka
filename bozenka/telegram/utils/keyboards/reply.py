@@ -7,4 +7,5 @@ start_keyboard.row(
     KeyboardButton(text="Добавить в чат 🔌"),
     KeyboardButton(text="Функционал 🔨")
 )
+start_keyboard.adjust(1,2)
 start_keyboard.add(KeyboardButton(text="О разработчиках ℹ️"))

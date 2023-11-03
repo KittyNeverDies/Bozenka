@@ -13,7 +13,8 @@ async def close_topic(msg: Message, bot: Bot) -> None:
     :return:
     """
     await bot.close_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
-    await msg.answer(ru_cmds["topic_closed"].replace("user", msg.from_user.mention_html()),
+    await msg.answer("Удача ✅\n"
+                     f"Пользователь {msg.from_user.mention_html()} закрыл данное обсуждение.",
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
@@ -25,7 +26,8 @@ async def reopen_topic(msg: Message, bot: Bot) -> None:
     :return:
     """
     await bot.reopen_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
-    await msg.answer(ru_cmds["open_topic"].replace("user", msg.from_user.mention_html()),
+    await msg.answer("Удача ✅\n"
+                     f"Пользователь {msg.from_user.mention_html()} открыл данное обсуждение.",
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
@@ -37,7 +39,8 @@ async def close_general_topic(msg: Message, bot: Bot):
     :return:
     """
     await bot.close_general_forum_topic(chat_id=msg.chat.id)
-    await msg.answer(ru_cmds["close_general"].replace("user", msg.from_user.mention_html()),
+    await msg.answer("Удача ✅\n"
+                     f"Пользователь {msg.from_user.mention_html()} закрыл основное обсуждение",
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
@@ -49,7 +52,8 @@ async def reopen_general_topic(msg: Message, bot: Bot):
     :return:
     """
     await bot.reopen_general_forum_topic(chat_id=msg.chat.id)
-    await msg.answer(ru_cmds["open_general"].replace("user", msg.from_user.mention_html()),
+    await msg.answer("Удача ✅\n"
+                     f"Пользователь {msg.from_user.mention_html()} открыл основное обсуждение",
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
@@ -61,7 +65,8 @@ async def hide_general_topic(msg: Message, bot: Bot):
     :return:
     """
     await bot.hide_general_forum_topic(chat_id=msg.chat.id)
-    await msg.answer(ru_cmds["hide_general"].replace("user", msg.from_user.mention_html()),
+    await msg.answer("Удача ✅\n"
+                     f"Пользователь {msg.from_user.mention_html()} скрыл основное обсуждение",
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
@@ -73,11 +78,18 @@ async def unhide_general_topic(msg: Message, bot: Bot):
     :return:
     """
     await bot.unhide_general_forum_topic(chat_id=msg.chat.id)
-    await msg.answer(ru_cmds["show_general"].replace("user", msg.from_user.mention_html()),
+    await msg.answer("Удача ✅\n"
+                     f"Пользователь {msg.from_user.mention_html()} раскрыл основное обсуждение",
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
 async def rename_topic(msg: Message, bot: Bot, command: CommandObject):
+    """
+    /rename command function. Rename thread to a new name
+    :param msg: Message telegram object
+    :param bot: Object of telegram bot
+    :param command: Object of telegram command
+    :return:
+    """
     await msg.general_forum_topic_unhidden
     await bot.edit_forum_topic(name=command.text, chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
-

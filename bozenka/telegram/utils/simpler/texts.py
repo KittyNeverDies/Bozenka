@@ -167,6 +167,27 @@ ru_cmds = {
 
 }
 
+list_of_commands = {
+    ("start", "Command to start work with bozenka the bot"),
+    ('setup', 'Command to setup bozenka work in chat'),
+    ("ban", "Command to ban user in chat"),
+    ('unban', 'Command to unban user in chat'),
+    ('mute', 'Command to mute user in chat'),
+    ('unmute', 'Command to unmute user in chat'),
+    ('pin', 'Pin fast any message in chat'),
+    ('unpin', 'Unpin fast any message in chat'),
+    ('close', 'Close fast topic (not general) in chat'),
+    ('open', 'Open fast topic (not general) in chat'),
+    ('hide_general', 'Hide general topic in chat'),
+    ('show_general', 'Show general topic in chat'),
+    ("close_general", 'Closes general topic in chat'),
+    ("open_general", 'Opens general topic in chat'),
+    ('conversation', 'Starts conversation with gpt'),
+    ('invite', 'Generates invite into this chat'),
+    ('about', 'Sends information about bozenka'),
+    ('hi', 'Sends welcome message')
+}
+
 translations = {
     "ru": ru_cmds,
     "en": en_cmds

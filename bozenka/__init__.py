@@ -19,6 +19,6 @@ def launch_instances() -> None:
     db_url = generate_url()
     engine = get_async_engine(db_url)
     session_maker = get_sessions_maker(engine)
-    launch_telegram_instance(session_maker)
+    asyncio.run(launch_telegram_instance(session_maker))
 
     logging.log(msg="Launched all instances!", level=logging.INFO)
