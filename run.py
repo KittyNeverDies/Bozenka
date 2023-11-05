@@ -1,8 +1,10 @@
 import asyncio
 import logging
 
-from bozenka import launch_instances
+import g4f
+from gpt4all import GPT4All
 
+from bozenka import launch_instances
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

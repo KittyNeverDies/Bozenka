@@ -3,9 +3,8 @@ import logging
 
 import g4f
 
-from bozenka.telegram import launch_telegram_instance
+from bozenka.instances.telegram import launch_telegram_instance
 from bozenka.db import generate_url, get_async_engine, get_sessions_maker
-import threading
 
 
 def launch_instances() -> None:
