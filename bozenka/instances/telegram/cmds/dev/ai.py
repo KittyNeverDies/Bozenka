@@ -1,11 +1,24 @@
 import logging
+import os.path
 
 import g4f
 from gpt4all import GPT4All
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message as Message
-from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, gpt_answer_keyboard
-from bozenka.instances.telegram.utils.simpler import generate_gpt4free_providers, ru_cmds
+from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, response_keyboard
+from bozenka.instances.telegram.utils.simpler import generate_gpt4free_providers, ru_cmds, AnsweringGpt4All, \
+    AnsweringGPT4Free
+
+
+async def already_answering(msg: Message, state: FSMContext):
+    """
+    Giving response, if we already responsing it
+    :param msg:
+    :param state:
+    :return:
+    """
+    await msg.answer("Подождите пожалуйста, мы уже генерируем ответ для вас, подождите, когда мы ответим на ваш передыдущий вопрос",
+                     reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
 
 async def start_gpt_cmd(msg: Message, state: FSMContext):
@@ -44,10 +57,41 @@ async def g4a_generate_answer(msg: Message, state: FSMContext):
     :param state:
     :return:
     """
-    model = GPT4All("ggml-model-gpt4all-falcon-q4_0.bin")
-    model.list_models()
-    output = model.generate(msg.text, max_tokens=3, )
-    await msg.answer(text=output)
+    await state.set_state(AnsweringGpt4All.answering)
+
+    models = GPT4All.list_models()
+    info = await state.get_data()
+    answer = ""
+
+    main_msg = await msg.answer("Пожалуйста подождите, мы генерируем вам ответ ⏰\n"
+                                "Если что-то пойдет не так, мы вам сообщим 👌",
+                                reply_markup=response_keyboard(user_id=msg.from_user.id))
+
+    if not os.path.exists(
+            "D:\\Files\\Documents\\GitHub\\Bozenka\\bozenka\\gpt\\gpt4all\\models\\" + models[info["set_model"]][
+                "filename"]):
+        main_msg = await main_msg.edit_text(main_msg + "\nПодождите пожалуста, мы скачиваем модель...")
+
+    try:
+        # Setting Gpt4All model
+        model = GPT4All(model_name=models[info['set_model']]['filename'],
+                        model_path="D:\\Files\\Documents\\GitHub\\Bozenka\\bozenka\\gpt\\gpt4all\\models\\",
+                        allow_download=True)
+        # Setting our chat session if exist
+        model.current_chat_session = [] if not info.get("ready_to_answer") else info["ready_to_answer"]
+        # Generating answer
+        with model.chat_session():
+            answer = model.generate(msg.text)
+            await state.update_data(ready_to_answer=model.current_chat_session)
+
+    except Exception as S:
+        answer = "Простите, произошла ошибка 😔\nЕсли это продолжается, пожалуйста используйте /cancel"
+        logging.log(msg=f"Get an exception for generating answer={S}",
+                    level=logging.INFO)
+    finally:
+        await main_msg.edit_text(answer, reply_markup=response_keyboard(user_id=msg.from_user.id))
+
+    await state.set_state(AnsweringGpt4All.ready_to_answer)
 
 
 async def g4f_generate_answer(msg: Message, state: FSMContext):
@@ -57,10 +101,13 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
     :param state:
     :return:
     """
+    await state.set_state(AnsweringGPT4Free.answering)
+
     info = await state.get_data()
 
     providers = generate_gpt4free_providers()
-    reply = await msg.reply(ru_cmds["generate_answer"])
+    reply = await msg.reply("Пожалуйста подождите, мы генерируем ответ от провайдера ⏰\n"
+                            "Если что-то пойдет не так, мы вам сообщим 👌")
 
     current_messages = []
     if info.get("ready_to_answer"):
@@ -93,9 +140,10 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
         logging.log(msg=f"Get an exception for generating answer={S}",
                     level=logging.INFO)
     finally:
-        await reply.edit_text(text=response, reply_markup=gpt_answer_keyboard(user_id=msg.from_user.id))
+        await reply.edit_text(text=response, reply_markup=response_keyboard(user_id=msg.from_user.id))
         current_messages.append({"role": "assistant", "content": response})
         await state.update_data(ready_to_answer=current_messages)
+    await state.set_state(AnsweringGPT4Free.ready_to_answer)
 
 
 async def generate_image(msg: Message):

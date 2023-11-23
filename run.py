@@ -1,8 +1,5 @@
-import asyncio
 import logging
-
-import g4f
-from gpt4all import GPT4All
+import gpt4all
 
 from bozenka import launch_instances
 

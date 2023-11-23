@@ -26,7 +26,7 @@ class Gpt4FreeModelPage(CallbackData, prefix="g4mp"):
     provider: str
 
 
-class Gpt4freeResult(CallbackData, prefix="endselect"):
+class Gpt4freeResult(CallbackData, prefix="g4fe"):
     """
         Callback with information of selected g4f content
     """
@@ -58,12 +58,12 @@ class GptBackMenu(CallbackData, prefix="gbm"):
     user_id: int
     back_to: str
 
+
 class Gpt4AllSelect(CallbackData, prefix="g4s"):
     """
         Callback with information about selecting model
     """
     user_id: int
-    select: int
     model_index: int
 
 

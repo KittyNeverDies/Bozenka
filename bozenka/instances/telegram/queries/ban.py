@@ -3,7 +3,6 @@ import logging
 from aiogram import types
 
 from bozenka.instances.telegram.utils.callbacks_factory import BanData, UnbanData
-from bozenka.instances.telegram.utils.simpler import ru_cmds
 from aiogram.enums import ChatMemberStatus
 
 from bozenka.instances.telegram.utils.keyboards import ban_keyboard, unban_keyboard
