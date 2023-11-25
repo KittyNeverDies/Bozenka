@@ -3,12 +3,13 @@ __all__ = ["ban", "delete", "gpt"]
 from aiogram import Router, F
 
 from bozenka.instances.telegram.utils.callbacks_factory import *
-from bozenka.instances.telegram.queries.ban import inline_ban, inline_unban
+from bozenka.instances.telegram.queries.ban import *
 from bozenka.instances.telegram.queries.pins import *
 from bozenka.instances.telegram.queries.threads import *
-from bozenka.instances.telegram.queries.delete import inline_delete
-from bozenka.instances.telegram.queries.revoke import inline_revoke
+from bozenka.instances.telegram.queries.delete import *
+from bozenka.instances.telegram.queries.revoke import *
 from bozenka.instances.telegram.queries.gpt import *
+from bozenka.instances.telegram.queries.setup import *
 
 
 def register_queries(router: Router) -> None:
@@ -18,6 +19,7 @@ def register_queries(router: Router) -> None:
     :return:
     """
     logging.log(msg="Registering callback queries", level=logging.INFO)
+
     # Moderation
     # Ban / Unban buttons reactions
     router.callback_query.register(inline_ban, BanData.filter())
@@ -71,3 +73,9 @@ def register_queries(router: Router) -> None:
     # Stop dialog button under gpt message answer
     router.callback_query.register(inline_stop_dialog, GptStop.filter())
 
+    # /setup command related queries
+    # List of features based on category
+    router.callback_query.register(inline_setup_features, SetupCategory.filter())
+
+    # Menu of feature to enable or disable
+    router.callback_query.register(inline_feature, SetupFeature.filter())

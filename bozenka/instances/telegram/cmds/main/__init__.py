@@ -16,8 +16,10 @@ def register_main_cmd(router: Router) -> None:
     :param router:
     :return:
     """
-    #router.message.register(start_cmd, CommandStart)
-    router.message.register(setup_cmd, Command(commands=["setup"]))
     logging.log(msg="Registering main related commands", level=logging.INFO)
+    # Start command handler
+    # router.message.register(start_cmd, CommandStart)
+    router.message.register(setup_cmd, Command(commands=["setup"]))
+    # After adding to chat handler
     router.message.register(after_adding, F.content_type == ContentType.SUPERGROUP_CHAT_CREATED)
     router.message.register(after_adding, F.content_type == ContentType.GROUP_CHAT_CREATED)

@@ -1,7 +1,7 @@
 from typing import Any
 
 from aiogram.filters import Filter
-from aiogram.types import Message
+from aiogram.types import Message, ChatPermissions
 from aiogram.enums import ChatMemberStatus
 from bozenka.instances.telegram.utils.simpler import ru_cmds
 

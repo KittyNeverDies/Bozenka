@@ -7,7 +7,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from gpt4all import GPT4All
 
 from bozenka.instances.telegram.utils.callbacks_factory import *
-from bozenka.instances.telegram.utils.simpler import gpt_categories, gpt4free_providers, generate_gpt4free_providers
+from bozenka.instances.telegram.utils.simpler import gpt_categories, gpt4free_providers, generate_gpt4free_providers, \
+    generate_list_of_features
 
 """
 File, contains inline keyboard & menus and their work.
@@ -15,20 +16,41 @@ Right now only on Russian language, multi-language planning soon.
 """
 
 
-def setup_keyboard(owner_id) -> InlineKeyboardMarkup:
+def setup_keyboard() -> InlineKeyboardMarkup:
     """
-    Generate keybaord for /setup command
-    :param owner_id:
+    Generate keyboard for /setup command
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Администраторы 👮‍♂",
-                             callback_data=SetupCategory(owner_id=owner_id, category_name="Admins").pack())
-    ], [
-        InlineKeyboardButton(text="Пользователи 👤",
-                             callback_data=SetupCategory(owner_id=owner_id, category_name="Members").pack())
-    ]])
+                             callback_data=SetupCategory(category_name="Admins").pack())],
+        [InlineKeyboardButton(text="Пользователи 👤",
+                              callback_data=SetupCategory(category_name="Members").pack())],
+        [InlineKeyboardButton(text="В разработке 👨‍💻",
+                              callback_data=SetupCategory(category_name="Devs").pack())]])
     return kb
+
+
+def setup_category_keyboard(category: str) -> InlineKeyboardMarkup:
+    """
+    Generate keyboard for one of categories
+    :param category:
+    :return:
+    """
+    kb = InlineKeyboardBuilder()
+    list_of_features = generate_list_of_features(category)
+    for setting in list_of_features:
+        kb.row(InlineKeyboardButton(text=setting.name,
+                                    callback_data=SetupFeature(
+                                        feature_index=list_of_features.index(setting),
+                                        feature_category=category
+                                    ).pack()))
+    return kb.as_markup()
+
+
+def setup_feature_keyboard() -> InlineKeyboardMarkup:
+    pass
+
 
 
 def delete_keyboard(admin_id) -> InlineKeyboardMarkup:
@@ -120,7 +142,7 @@ def gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup
         # Under list buttons
         [InlineKeyboardButton(text="🔙 Вернуться к категориям",
                               callback_data=GptBackMenu(user_id=user_id, back_to="category").pack())],
-        [InlineKeyboardButton(text="Спасибо, не надо 🛑",
+        [InlineKeyboardButton(text="Спасибо, не надо ❌",
                               callback_data=GptStop(user_id=str(user_id)).pack())]])
     return generated_page
 
@@ -173,7 +195,7 @@ def gpt4free_models_keyboard(user_id: int, provider, page: int) -> InlineKeyboar
                                              callback_data=Gpt4freeResult
                                              (user_id=str(user_id), provider=provider, model="gpt-3.5-turbo").pack()))
     builder.row(InlineKeyboardButton(text="🔙 Вернуться к провайдерам", callback_data=GptBackMenu(user_id=user_id, back_to="providers").pack()))
-    builder.row(InlineKeyboardButton(text="Спасибо, не надо 🛑", callback_data=GptStop(user_id=str(user_id)).pack()))
+    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌", callback_data=GptStop(user_id=str(user_id)).pack()))
     return builder.as_markup()
 
 
@@ -195,7 +217,7 @@ def generate_gpt4all_page(user_id: int) -> InlineKeyboardMarkup:
         )
     builder.row(InlineKeyboardButton(text="🔙 Вернуться к списку",
                                      callback_data=GptBackMenu(user_id=user_id, back_to="category").pack()))
-    builder.row(InlineKeyboardButton(text="Спасибо, не надо 🛑",
+    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌",
                                      callback_data=GptStop(user_id=str(user_id)).pack()))
     return builder.as_markup()
 
@@ -211,7 +233,7 @@ def gpt4all_model_menu(user_id: int, index: int) -> InlineKeyboardMarkup:
                               callback_data=Gpt4AllSelect(user_id=user_id, model_index=str(index)).pack())],
         [InlineKeyboardButton(text="🔙 Вернуться к списку",
                               callback_data=GptBackMenu(user_id=user_id, back_to="g4amodels").pack())],
-        [InlineKeyboardButton(text="Спасибо, не надо 🛑",
+        [InlineKeyboardButton(text="Спасибо, не надо ❌",
                               callback_data=GptStop(user_id=str(user_id)).pack())]
     ])
     return kb
@@ -224,8 +246,8 @@ def response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     :param user_id:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack()),
-         InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
     ])
     return kb
 
