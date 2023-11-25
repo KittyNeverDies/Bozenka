@@ -22,7 +22,6 @@
     - [x] Hide general topic
     - [x] Rename topics
     - [x] Work with inline keyboard
-  
   - [ ] Users
     - [x] Show information about chat (/info)
     - [x] Welcome messages
