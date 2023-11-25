@@ -1,8 +1,7 @@
 <div align="center">
 
 <img src="images/header.png">
-
-
+[Telegram Channel](https://t.me/bozodevelopment/)
 
 </div>
 
