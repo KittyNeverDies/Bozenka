@@ -14,14 +14,14 @@
     - [x] Mute & Unmute commands
     - [x] Pin & Unpin & Unpin all commands
     - [ ] Bad words & Spam filter
-    - [ ] Setup command
+    - [ ] Setup command (Going to release)
     - [x] Welcome message to administrators after adding bot to chat.
     - [x] Work with inline keyboard
   - [x] Work with telegram topics
     - [x] Close & Open Topics
     - [x] Hide general topic
     - [x] Rename topics
-    - [ ] Work with inline keyboard
+    - [x] Work with inline keyboard
   
   - [ ] Users
     - [x] Show information about chat (/info)
@@ -30,7 +30,7 @@
     - [ ] Start command menu (/start)
 - [ ] Fun
   - [ ] GPT based text generation
-    - [ ] Gpt4All
+    - [x] Gpt4All
     - [x] Gpt4Free
     - [ ] RWKV
     - [ ] H20
@@ -50,6 +50,6 @@
 
 ### This part of project made with
 
-- [x] [Aiogram python library](https://github.com/aiogram/aiogram) and with their community support.
-- [x] [GPT4Free](https://github.com/xtekky/gpt4free)
-- [x] With our love <3
+-  [Aiogram python library](https://github.com/aiogram/aiogram) and with their community support.
+-  [GPT4Free](https://github.com/xtekky/gpt4free), [Gpt4All](https://github.com/nomic-ai/gpt4all), [SqlAlchemy](https://github.com/sqlalchemy/sqlalchemy/) python libraries
+- With our love & your support <3
