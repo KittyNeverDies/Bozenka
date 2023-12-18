@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any
 
 from aiogram import types, Bot
+from aiogram.exceptions import TelegramRetryAfter, TelegramNotFound
 from sqlalchemy import select, insert, Select, Insert, Update
 from aiogram.filters import CommandObject
 from aiogram.types import ChatPermissions
@@ -16,59 +17,44 @@ from bozenka.database import get_user, Users
 from bozenka.database.tables.telegram import get_settings, ChatSettings
 
 
-def count_time(counted_time: str) -> int:
+async def basic_ban(msg: types.Message, user: types.User, config: dict[str, None | str | bool], session: async_sessionmaker) -> None:
     """
-    Counts unix time, for seconds, minutes, hours, days, weeks
-    :param counted_time:
-    :return:
+    Bans a user by user_id and writes everything in database.
+    Protects from getting limited as flood
+    :param msg: Message telegram object
+    :param user: User telegram object to ban
+    :param config: Dictionary with information about ban
+    :param session: Session maker object of SqlAlchemy
+    :return: Nothing
     """
-    mute_times = {"d": int(time.time()) + int(counted_time[0]) * 60 * 60 * 24,
-                  "s": int(time.time()) + int(counted_time[0]),
-                  "m": int(time.time()) + int(counted_time[0]) * 60,
-                  "h": int(time.time()) + int(counted_time[0]) * 60 * 60,
-                  "w": int(time.time()) + int(counted_time[0]) * 60 * 60 * 24 * 7}
-    return mute_times[counted_time[1]]
+    try:
+        await msg.chat.ban(user.id, config["ban_time"], config["revert_msg"])
+        logging.log(
+            msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
+            level=logging.INFO)
+        if not await get_user(user_id=user.id, chat_id=msg.chat.id, session=session):
+            new_user = Users(
+                user_id=user.id,
+                chat_id=msg.chat.id,
+                is_banned=True,
+                ban_reason=None if config["reason"] == "" else config["reason"],
+                is_muted=None,
+                mute_reason=None
+            )
+            async with session() as session:
+                async with session.begin():
+                    await session.merge(new_user)
+        else:
+            async with session() as session:
+                async with session.begin():
+                    await session.execute(
+                        Update(Users)
+                        .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
+                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
 
+    except TelegramRetryAfter as ex:
+        time.sleep(ex.retry_after)
 
-def cmd_register(command_list: list[Any], bot: Bot) -> list[Any]:
-    """
-    Registrate commands for telegram automatic tips
-    """
-    pass
-
-
-class SolutionSimpler:
-    """
-    Making feature 'result in your direct message' easy and cleaner to complete.
-    Including logging and debugging.
-    """
-
-    @staticmethod
-    async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[
-        str, None | str | bool]:
-        """
-        Bans user, returns config, by config you can send special message.
-        :param msg:
-        :param cmd:
-        :param session:
-        :return:
-        """
-        config = {
-            "revert_msg": None,
-            "ban_time": None,
-            "reason": ""
-        }
-        if cmd.args:
-            data = re.split(" ", cmd.args, 2)
-            for item in data:
-                if re.match(r"^n\w", item) and not config["revert_msg"]:
-                    config["revert_msg"] = False
-                elif re.match(r"^ye\w", item) and not config["revert_msg"]:
-                    config["revert_msg"] = True
-                elif re.match(r"^\d[wdysmh]", item) and not config["ban_time"]:
-                    config["ban_time"] = datetime.utcfromtimestamp(count_time(item)).strftime('%Y-%m-%d %H:%M:%S')
-                else:
-                    config["reason"] += item + " "
         await msg.chat.ban(msg.reply_to_message.from_user.id, config["ban_time"], config["revert_msg"])
         logging.log(
             msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
@@ -92,16 +78,73 @@ class SolutionSimpler:
                     await session.execute(
                         Update(Users)
                         .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
-                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
-                    )
+                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
+
+    except TelegramNotFound:
+        logging.log(
+            msg=f"Can't ban user, something was not avaible or got disabled",
+            level=logging.INFO)
+
+
+def count_time(counted_time: str) -> int:
+    """
+    Counts unix time, for seconds, minutes, hours, days, weeks
+    :param counted_time: Time, needs to be converted
+    :return:
+    """
+    mute_times = {"d": int(time.time()) + int(counted_time[0]) * 60 * 60 * 24,
+                  "s": int(time.time()) + int(counted_time[0]),
+                  "m": int(time.time()) + int(counted_time[0]) * 60,
+                  "h": int(time.time()) + int(counted_time[0]) * 60 * 60,
+                  "w": int(time.time()) + int(counted_time[0]) * 60 * 60 * 24 * 7}
+    return mute_times[counted_time[1]]
+
+
+class SolutionSimpler:
+    """
+    Making feature 'result in your direct message' easy and cleaner to complete.
+    Including logging and debugging.
+    """
+
+    @staticmethod
+    async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
+        """
+        Bans user or user, returns config, by config you can send special message.
+        Support multibans & antiflood telegram protection
+        :param msg: Message telegram object
+        :param cmd: Object of telegram command
+        :param session: Session maker object of SqlAlchemy
+        :return:
+        """
+        config = {
+            "revert_msg": None,
+            "ban_time": None,
+            "reason": ""
+        }
+        if cmd.args:
+            data = re.split(" ", cmd.args, 2)
+            for item in data:
+                if re.match(r"^n\w", item) and not config["revert_msg"]:
+                    config["revert_msg"] = False
+                elif re.match(r"^ye\w", item) and not config["revert_msg"]:
+                    config["revert_msg"] = True
+                elif re.match(r"^\d[wdysmh]", item) and not config["ban_time"]:
+                    config["ban_time"] = datetime.utcfromtimestamp(count_time(item)).strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    config["reason"] += item + " "
+        if msg.entities and (mentions := [entity for entity in msg.entities if entity.type == 'mention']):
+            for banned in mentions:
+                await basic_ban(msg, banned.user, config, session)
+        if msg.reply_to_message.text:
+            await basic_ban(msg, msg.reply_to_message.from_user, config, session)
         return config
 
     @staticmethod
     async def unban_user(msg: types.Message, session: async_sessionmaker) -> None:
         """
-        Unbans user, returns nothing
-        :param session:
-        :param msg:
+        Unbans user by reply, returns nothing
+        :param msg: Message telegram object
+        :param session: Session maker object of SqlAlchemy
         :return:
         """
         await msg.chat.unban(msg.reply_to_message.from_user.id)
@@ -120,8 +163,8 @@ class SolutionSimpler:
     async def get_status(msg: types.Message, session: async_sessionmaker) -> dict[str, bool | None | Any]:
         """
         Get status of user, is it muted or banned.
-        :param msg:
-        :param session:
+        :param msg: Message telegram object
+        :param session: Session maker object of SqlAlchemy
         :return:
         """
         config = {
@@ -142,9 +185,9 @@ class SolutionSimpler:
     async def mute_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker):
         """
         Mutes user, returns config, by config you can send special message.
-        :param session:
-        :param cmd:
-        :param msg:
+        :param msg: Message telegram object
+        :param cmd: Object of telegram command
+        :param session: Session maker object of SqlAlchemy
         :return:
         """
         config = {
@@ -190,8 +233,8 @@ class SolutionSimpler:
     async def unmute_user(msg: types.Message, session: async_sessionmaker):
         """
         Unmutes user, returns nothing
-        :param session:
-        :param msg:
+        :param msg: Message telegram object
+        :param session: Session maker object of SqlAlchemy
         :return:
         """
 
@@ -213,7 +256,7 @@ class SolutionSimpler:
     async def pin_msg(msg: types.Message) -> None:
         """
         Pins replied message, returns nothing
-        :param msg:
+        :param msg: Message telegram object
         :return:
         """
         await msg.chat.pin_message(message_id=msg.reply_to_message.message_id)
@@ -225,7 +268,7 @@ class SolutionSimpler:
     async def unpin_msg(msg: types.Message) -> None:
         """
         Unpins replied message, if it pinned, always returns nothing.
-        :param msg:
+        :param msg: Message telegram object
         :return:
         """
         await msg.chat.unpin_message(message_id=msg.reply_to_message.message_id)
@@ -237,7 +280,7 @@ class SolutionSimpler:
     async def unpin_all_msg(msg: types.Message) -> None:
         """
         Unpins all pinned messages, returns nothing
-        :param msg:
+        :param msg: Message telegram object
         :return:
         """
         logging.log(
@@ -249,8 +292,8 @@ class SolutionSimpler:
     async def create_invite(msg: types.Message, cmd: CommandObject):
         """
         Creating invite, returning invite link
-        :param msg:
-        :param cmd:
+        :param msg: Message telegram object
+        :param cmd: Object of telegram command
         :return:
         """
         if cmd.args and re.match(r"^\d[wdysmh]", cmd.args):
@@ -265,9 +308,10 @@ class SolutionSimpler:
     @staticmethod
     async def auto_settings(msg: types.Message, session: async_sessionmaker):
         """
-        Creating setting automaticly
-        :param msg:
-        :param session:
+        Creating settings related to chat automaticly
+        after adding
+        :param msg: Message telegram object
+        :param session: Object of telegram command
         """
 
         chat_data = await get_settings(msg.chat.id, session)
@@ -276,4 +320,3 @@ class SolutionSimpler:
             async with session() as session:
                 async with session.begin():
                     await session.merge(new_chat_data)
-                    

@@ -17,29 +17,76 @@ async def ban(msg: Message, command: CommandObject, session_maker: async_session
     :return:
     """
     banned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
+
     if banned_user.status == ChatMemberStatus.KICKED:
-        await msg.answer("")
-        await msg.answer(ru_cmds["ban_6"], reply_markup=delete_keyboard(msg.from_user.id))
+        await msg.answer("Ошибка ❌\n"
+                         "Этот пользователь уже удален из группы", reply_markup=delete_keyboard(msg.from_user.id))
         return
+
     config = await SolutionSimpler.ban_user(msg, command, session_maker)
     if config["reason"] and config["ban_time"]:
-        await msg.answer("Удача ✅\n"
-                         f"Пользователь banned был заблокирован пользователем {msg.from_user.mention_html()}.\n"
-                         f"По причине {config['reason']}, до даты {config['ban_time']}",
-                         reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
+        if mentions := [entity for entity in msg.entities if entity.type == 'mention']:
+            mentions_list = ""
+
+            for mention in mentions:
+                mentions_list += f"{mention.user.mention_html()} "
+
+            if msg.reply_to_message.from_user:
+                mentions_list += f"{msg.reply_to_message.from_user.mention_html()} "
+
+            await msg.answer("Удача ✅\n"
+                             f"Пользователи {mentions_list}были заблокирован пользователем {msg.from_user.mention_html()}.\n"
+                             f"По причине {config['reason']}, до даты {config['ban_time']}",
+                             reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
+        else:
+            await msg.answer("Удача ✅\n"
+                             f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.from_user.mention_html()}.\n"
+                             f"По причине {config['reason']}, до даты {config['ban_time']}",
+                             reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
     elif config["reason"]:
-        await msg.answer(
-            "Удача ✅\n"
-            f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.reply_to_message.from_user.mention_html()}.\n"
-            f"По причине {config['reason']}.",
-            reply_markup=ban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
-        )
+        if mentions := [entity for entity in msg.entities if entity.type == 'mention']:
+            mentions_list = ""
+
+            for mention in mentions:
+                mentions_list += f"{mention.user.mention_html()} "
+
+            if msg.reply_to_message.from_user:
+                mentions_list += f"{msg.reply_to_message.from_user.mention_html()} "
+
+            await msg.answer(
+                "Удача ✅\n"
+                f"Пользователи {mentions_list}были заблокирован пользователем {msg.reply_to_message.from_user.mention_html()}.\n"
+                f"По причине {config['reason']}.",
+                reply_markup=ban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
+            )
+        else:
+            await msg.answer(
+                "Удача ✅\n"
+                f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.reply_to_message.from_user.mention_html()}.\n"
+                f"По причине {config['reason']}.",
+                reply_markup=ban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
+            )
     elif config["ban_time"]:
-        await msg.answer(
-            "Удача ✅\n"
-            f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.from_user.mention_html()}, до даты {config['ban_time']}",
-            reply_markup=ban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
-        )
+        if mentions := [entity for entity in msg.entities if entity.type == 'mention']:
+            mentions_list = ""
+            for mention in mentions:
+                mentions_list += f"{mention.user.mention_html()} "
+
+            if msg.reply_to_message.from_user:
+                mentions_list += f"{msg.reply_to_message.from_user.mention_html()} "
+
+            await msg.answer(
+                "Удача ✅\n"
+                f"Пользователи {msg.reply_to_message.from_user.mention_html()}были заблокирован пользователем {msg.from_user.mention_html()}\n"
+                f"До даты {config['ban_time']}.",
+                reply_markup=ban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
+            )
+        else:
+            await msg.answer(
+                "Удача ✅\n"
+                f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.from_user.mention_html()}, до даты {config['ban_time']}",
+                reply_markup=ban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
+            )
     else:
         await msg.answer(
             "Удача ✅\n"
@@ -55,7 +102,7 @@ async def unban(msg: Message, command: CommandObject, session_maker: async_sessi
     :param command: Object of telegram command
     :param session_maker: Session maker object of SqlAlchemy
     """
-    await SolutionSimpler.unban_user(msg, command, session_maker)
+    await SolutionSimpler.unban_user(msg, session_maker)
     unbanned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
     if unbanned_user.is_member and unbanned_user.status != ChatMemberStatus.KICKED:
         await msg.answer(

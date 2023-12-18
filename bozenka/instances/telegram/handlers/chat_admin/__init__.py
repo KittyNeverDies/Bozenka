@@ -33,7 +33,7 @@ def register_admin_cmd(router: Router) -> None:
     router.message.register(help_unpin, Command(commands=["unpin"]))
     # Ban / Unban commands handler
     router.message.register(ban, Command(commands="ban"),
-                            IsAdminFilter(True), F.reply_to_message.text)
+                            IsAdminFilter(True), F.reply_to_message.text or [entity for entity in F.entities if entity.type == 'mention'])
     router.message.register(unban, Command(commands="unban"),
                             IsAdminFilter(True), F.reply_to_message.text)
     # Mute / Unmute commands handler
