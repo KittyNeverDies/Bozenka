@@ -5,7 +5,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import BotCommand
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bozenka.instances.telegram.cmds import register_handlers
+from bozenka.instances.telegram.handlers import register_handlers
 from bozenka.instances.telegram.utils.simpler import list_of_commands
 
 

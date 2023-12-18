@@ -2,10 +2,10 @@
 from aiogram.types import KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-start_keyboard = ReplyKeyboardBuilder()
-start_keyboard.row(
+start_keyboard_builder = ReplyKeyboardBuilder()
+start_keyboard_builder.row(
     KeyboardButton(text="Добавить в чат 🔌"),
     KeyboardButton(text="Функционал 🔨")
 )
-start_keyboard.adjust(1,2)
-start_keyboard.add(KeyboardButton(text="О разработчиках ℹ️"))
+start_keyboard_builder.adjust(1, 2)
+start_keyboard_builder.add(KeyboardButton(text="О разработчиках ℹ️"))

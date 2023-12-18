@@ -1,10 +1,11 @@
+import os
 import logging
-import gpt4all
 
 from bozenka import launch_instances
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    os.system("pip install -r requirements.txt")
     logging.log(msg="Starting bozenka, lets go!", level=logging.INFO)
     try:
         launch_instances()

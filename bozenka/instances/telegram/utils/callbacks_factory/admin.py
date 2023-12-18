@@ -65,3 +65,13 @@ class UnpinMsg(CallbackData, prefix='up'):
     """
     user_id: int
     msg_id: int
+
+
+# Link revoke
+class RevokeCallbackData(CallbackData, prefix="mute"):
+    """
+        Callback with information to revoke invite link
+    """
+    admin_id: int
+    link: str
+

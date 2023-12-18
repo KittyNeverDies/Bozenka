@@ -12,10 +12,8 @@ from aiogram.enums import ChatMemberStatus
 from aiogram.types import ChatPermissions, ChatAdministratorRights
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-
-from bozenka.db import get_user, Users
-
-
+from bozenka.database import get_user, Users
+from bozenka.database.tables.telegram import get_settings, ChatSettings
 
 
 def count_time(counted_time: str) -> int:
@@ -44,8 +42,10 @@ class SolutionSimpler:
     Making feature 'result in your direct message' easy and cleaner to complete.
     Including logging and debugging.
     """
+
     @staticmethod
-    async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
+    async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[
+        str, None | str | bool]:
         """
         Bans user, returns config, by config you can send special message.
         :param msg:
@@ -261,3 +261,19 @@ class SolutionSimpler:
             msg=f"Created invite into chat by @{msg.from_user.full_name} chat_id={msg.chat.id}",
             level=logging.INFO)
         return link.invite_link
+
+    @staticmethod
+    async def auto_settings(msg: types.Message, session: async_sessionmaker):
+        """
+        Creating setting automaticly
+        :param msg:
+        :param session:
+        """
+
+        chat_data = await get_settings(msg.chat.id, session)
+        if not chat_data:
+            new_chat_data = ChatSettings(chat_id=msg.chat.id)
+            async with session() as session:
+                async with session.begin():
+                    await session.merge(new_chat_data)
+                    
