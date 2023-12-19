@@ -132,9 +132,6 @@ class SolutionSimpler:
                     config["ban_time"] = datetime.utcfromtimestamp(count_time(item)).strftime('%Y-%m-%d %H:%M:%S')
                 else:
                     config["reason"] += item + " "
-        if msg.entities and (mentions := [entity for entity in msg.entities if entity.type == 'mention']):
-            for banned in mentions:
-                await basic_ban(msg, banned.user, config, session)
         if msg.reply_to_message.text:
             await basic_ban(msg, msg.reply_to_message.from_user, config, session)
         return config
@@ -151,13 +148,14 @@ class SolutionSimpler:
         logging.log(
             msg=f"Unbanned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
             level=logging.INFO)
-        async with session() as session:
-            async with session.begin():
-                await session.execute(
-                    Update(Users)
-                    .values(is_banned=False, ban_reason=None)
-                    .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
-                )
+        if await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+            async with session() as session:
+                async with session.begin():
+                    await session.execute(
+                        Update(Users)
+                        .values(is_banned=False, ban_reason=None)
+                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
+                    )
 
     @staticmethod
     async def get_status(msg: types.Message, session: async_sessionmaker) -> dict[str, bool | None | Any]:

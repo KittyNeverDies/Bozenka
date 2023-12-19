@@ -45,7 +45,8 @@ class UserHasPermissions(Filter):
         :return:
         """
         if permission.count(False) > 0 or permission.count(None) > 0:
-            await msg.answer(ru_cmds["no_perms"])
+            await msg.answer("Ошибка ❌\n"
+                             "У вас нет прав на использование этой комманды 🚫")
             return False
         return True
 
