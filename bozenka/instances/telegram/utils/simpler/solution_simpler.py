@@ -205,6 +205,7 @@ class SolutionSimpler:
             msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
             level=logging.INFO)
         user = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
+        user
         if not user:
             new_user = Users(
                 user_id=msg.from_user.id,
@@ -311,8 +312,9 @@ class SolutionSimpler:
         :param msg: Message telegram object
         :param session: Object of telegram command
         """
-
+        print("123")
         chat_data = await get_settings(msg.chat.id, session)
+        print(chat_data)
         if not chat_data:
             new_chat_data = ChatSettings(chat_id=msg.chat.id)
             async with session() as session:

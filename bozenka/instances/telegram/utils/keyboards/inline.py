@@ -2,18 +2,37 @@ import gpt4all
 
 from typing import Any
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from gpt4all import GPT4All
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from bozenka.database.tables.telegram import get_setting
 from bozenka.instances.telegram.utils.callbacks_factory import *
-from bozenka.instances.telegram.utils.simpler import gpt_categories, generate_gpt4free_models, generate_gpt4free_providers, \
-    generate_list_of_features
+from bozenka.instances.telegram.utils.simpler import generate_list_of_features
+from bozenka.generative.gpt4free import generate_gpt4free_models, generate_gpt4free_providers
+from bozenka.generative import text_generative_categories, image_generative_categories, image_generative_size
 
 """
 File, contains inline keyboard & menus and their work.
 Right now only on Russian language, multi-language planning soon.
 """
+
+
+def start_keyboard() -> InlineKeyboardMarkup:
+    """
+    Generate keyboard for /start command
+    """
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Добавить в чат 🔌", callback_data="addtochat")],
+            [InlineKeyboardButton(text="Функционал 🔨", callback_data="functional")],
+            [InlineKeyboardButton(text="О разработчиках ℹ️", callback_data="aboutdevs")],
+            [InlineKeyboardButton(text="Начать диалог с ИИ 🤖", callback_data="dialogai")],
+            [InlineKeyboardButton(text="Генерация Изображений 🖼", callback_data="dialogimage")],
+        ]
+    )
+    return kb
 
 
 # Help related keyboards
@@ -28,7 +47,9 @@ def help_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="Пользователи 👤",
                               callback_data=HelpCategory(category_name="Members").pack())],
         [InlineKeyboardButton(text="В разработке 👨‍💻",
-                              callback_data=HelpCategory(category_name="Devs").pack())]])
+                              callback_data=HelpCategory(category_name="Devs").pack())],
+        [InlineKeyboardButton(text="Вернуться 🔙", callback_data="back")]
+    ])
     return kb
 
 
@@ -72,6 +93,8 @@ def setup_keyboard() -> InlineKeyboardMarkup:
     Generate keyboard for /setup command
     :return:
     """
+    kb = InlineKeyboardBuilder()
+
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Администраторы 👮‍♂",
                              callback_data=SetupCategory(category_name="Admins").pack())],
@@ -99,8 +122,37 @@ def setup_category_keyboard(category: str) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-def setup_feature_keyboard() -> InlineKeyboardMarkup:
-    pass
+async def setup_feature_keyboard(category: str, index: int, session: async_sessionmaker,
+                                 msg: Message) -> InlineKeyboardMarkup:
+    """
+    Generate keyboard for enabling or disabling
+    on of features
+    :param category:
+    :param index:
+    :param session:
+    :param msg:
+    :return:
+    """
+
+    list_of_features = generate_list_of_features(category)
+    is_enabled = await get_setting(
+        chat_id=msg.chat.id,
+        session=session,
+        setting=list_of_features[index].settings_name)
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Выключить ❌", callback_data=SetupAction(action="disable",
+                                                                           feature_category=category,
+                                                                           feature_index=index).pack())
+        if is_enabled else
+        InlineKeyboardButton(text="Включить ✅", callback_data=SetupAction(action="enable",
+                                                                          feature_category=category,
+                                                                          feature_index=index).pack())
+    ], [
+            InlineKeyboardButton(text="Вернуться 🔙", callback_data=SetupAction(action="back",
+                                                                               feature_category=category,
+                                                                               feature_index=index).pack())]])
+    return kb
 
 
 def delete_keyboard(admin_id: int) -> InlineKeyboardMarkup:
@@ -116,6 +168,37 @@ def delete_keyboard(admin_id: int) -> InlineKeyboardMarkup:
     return kb
 
 
+def image_resolution_keyboard(user_id: int, category: str) -> InlineKeyboardMarkup:
+    """
+    Create keyboard with list of resolution to generate image
+    :param user_id:
+    :param category:
+    :return:
+    """
+    builder = InlineKeyboardBuilder()
+    for size in image_generative_size:
+        builder.row(InlineKeyboardButton(text=size,
+                                         callback_data=ImageGeneration(
+                                             user_id=user_id,
+                                             category=category,
+                                             size=size
+                                         ).pack()))
+    return builder.as_markup()
+
+
+def image_generation_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Create keyboard with list of image generation librarioes avaible in the bot
+    :param user_id:
+    :return:
+    """
+    builder = InlineKeyboardBuilder()
+    for category in image_generative_categories:
+        builder.row(InlineKeyboardButton(text=category,
+                                         callback_data=ImageGenerationCategory(user_id=user_id, category=category).pack()))
+    return builder.as_markup()
+
+
 # LLM / GPT related keyboards
 # GPT CATEGORIES
 def gpt_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
@@ -125,8 +208,9 @@ def gpt_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
     :return: InlineKeyboardMarkup
     """
     builder = InlineKeyboardBuilder()
-    for category in gpt_categories:
-        builder.row(InlineKeyboardButton(text=category, callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
+    for category in text_generative_categories:
+        builder.row(InlineKeyboardButton(text=category,
+                                         callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
     return builder.as_markup()
 
 
@@ -212,30 +296,35 @@ def gpt4free_models_keyboard(user_id: int, provider, page: int) -> InlineKeyboar
             models[provider].append("")
         names = items_list_generator(page, models[provider], 4)
         for name in names:
-            builder.row(InlineKeyboardButton(text=name.replace('-', ' '), callback_data=Gpt4freeResult(user_id=str(user_id), provider=provider, model=name).pack()))
+            builder.row(InlineKeyboardButton(text=name.replace('-', ' '),
+                                             callback_data=Gpt4freeResult(user_id=str(user_id), provider=provider,
+                                                                          model=name).pack()))
         pages = [len(models[provider]) // 4 - 1 if page - 1 == -1 else page - 1,
                  0 if page + 1 >= len(models[provider]) // 4 else page + 1]
         if len(models[provider]) > 4:
             builder.row(
-                        # First page button
-                        InlineKeyboardButton(text=str(len(models[provider]) // 4 if page == 0 else "1"),
-                                             callback_data=Gpt4FreeModelPage(
-                                                 page=str(len(models[provider]) // 4 - 1 if page == 0 else "1"),
-                                                 user_id=user_id,).pack(),
-                                             ),
-                        # Page back button
-                        InlineKeyboardButton(text="⬅️",
-                                             callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[0], provider=provider).pack()),
-                        # Count of page button
-                        InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
-                        # Next page button
-                        InlineKeyboardButton(text="➡️", callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[1], provider=provider).pack()),
-                        # Last page button
-                        InlineKeyboardButton(text=str(len(models[provider]) // 4 if page != 0 else "1"),
-                                             callback_data=Gpt4FreeModelPage(
-                                                 page=str(len(models[provider]) // 4 - 1) if page != 0 else "1",
-                                                 user_id=user_id,
-                                                 provider=provider).pack(),))
+                # First page button
+                InlineKeyboardButton(text=str(len(models[provider]) // 4 if page == 0 else "1"),
+                                     callback_data=Gpt4FreeModelPage(
+                                         page=str(len(models[provider]) // 4 - 1 if page == 0 else "1"),
+                                         user_id=user_id,
+                                         provider=provider).pack(),
+                                     ),
+                # Page back button
+                InlineKeyboardButton(text="⬅️",
+                                     callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[0],
+                                                                     provider=provider).pack()),
+                # Count of page button
+                InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
+                # Next page button
+                InlineKeyboardButton(text="➡️", callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[1],
+                                                                                provider=provider).pack()),
+                # Last page button
+                InlineKeyboardButton(text=str(len(models[provider]) // 4 if page != 0 else "1"),
+                                     callback_data=Gpt4FreeModelPage(
+                                         page=str(len(models[provider]) // 4 - 1) if page != 0 else "1",
+                                         user_id=user_id,
+                                         provider=provider).pack(), ))
     else:
         if providers[provider].supports_gpt_4:
             builder.row(InlineKeyboardButton(text="gpt 4",
@@ -246,7 +335,8 @@ def gpt4free_models_keyboard(user_id: int, provider, page: int) -> InlineKeyboar
             builder.row(InlineKeyboardButton(text="gpt 3.5 turbo",
                                              callback_data=Gpt4freeResult
                                              (user_id=str(user_id), provider=provider, model="gpt-3.5-turbo").pack()))
-    builder.row(InlineKeyboardButton(text="🔙 Вернуться к провайдерам", callback_data=GptBackMenu(user_id=user_id, back_to="providers").pack()))
+    builder.row(InlineKeyboardButton(text="🔙 Вернуться к провайдерам",
+                                     callback_data=GptBackMenu(user_id=user_id, back_to="providers").pack()))
     builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌", callback_data=GptStop(user_id=str(user_id)).pack()))
     return builder.as_markup()
 
@@ -348,7 +438,8 @@ def mute_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
        :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅",
+                              callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
         [InlineKeyboardButton(text="Размутить 🛠️",
                               callback_data=UnmuteData(user_id_unmute=ban_id, user_id_clicked=admin_id).pack())]])
     return kb
@@ -362,8 +453,10 @@ def unmute_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
         :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
-        [InlineKeyboardButton(text="Замутить 🛠️", callback_data=MuteData(user_id_mute=ban_id, user_id_clicked=admin_id).pack())]])
+        [InlineKeyboardButton(text="Спасибо ✅",
+                              callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
+        [InlineKeyboardButton(text="Замутить 🛠️",
+                              callback_data=MuteData(user_id_mute=ban_id, user_id_clicked=admin_id).pack())]])
     return kb
 
 
@@ -379,7 +472,8 @@ def invite_keyboard(link: str, admin_id: int, chat_name: str) -> InlineKeyboardM
     link = link.replace("https://", "")
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text=chat_name, url=link)],
-        [InlineKeyboardButton(text="Отозвать 🛠️", callback_data=RevokeCallbackData(admin_id=admin_id, link=link).pack())],
+        [InlineKeyboardButton(text="Отозвать 🛠️",
+                              callback_data=RevokeCallbackData(admin_id=admin_id, link=link).pack())],
         [InlineKeyboardButton(text="Спасибо ✅",
                               callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())]])
     return kb
@@ -421,7 +515,8 @@ def pin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Открепить сообщение 📌", callback_data=UnpinMsg(user_id=user_id, msg_id=msg_id).pack())],
+        [InlineKeyboardButton(text="Открепить сообщение 📌",
+                              callback_data=UnpinMsg(user_id=user_id, msg_id=msg_id).pack())],
         [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
@@ -435,7 +530,8 @@ def unpin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Открепить сообщение 📌", callback_data=PinMsg(user_id=user_id, msg_id=msg_id).pack())],
+        [InlineKeyboardButton(text="Открепить сообщение 📌",
+                              callback_data=PinMsg(user_id=user_id, msg_id=msg_id).pack())],
         [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())]
     ])
     return kb

@@ -1,4 +1,5 @@
 import g4f
+import g4f.Provider
 from g4f.Provider import RetryProvider
 from varname import nameof
 
@@ -8,15 +9,9 @@ def generate_gpt4free_providers():
     Generates list of g4f providers
     :return:
     """
-    provider = {}
-    for prov in g4f.Provider.__all__:
-        if prov != "BaseProvider" and prov != "AsyncProvider" and prov != "RetryProvider":
-            exec(f"provider['{prov}']=g4f.Provider.{prov}")
-    result = {}
-    for check in provider:
-        if provider[check].working:
-            result[check] = provider[check]
-    return result
+    return {prov: g4f.Provider.ProviderUtils.convert[prov] for prov in g4f.Provider.__all__
+            if prov != "BaseProvider" and prov != "AsyncProvider" and prov != "RetryProvider" and
+            g4f.Provider.ProviderUtils.convert[prov].working}
 
 
 def generate_gpt4free_models():
@@ -25,16 +20,17 @@ def generate_gpt4free_models():
     :return:
     """
     models = {}
-    for model, model_name in g4f.models.ModelUtils.convert.items(), g4f.models.ModelUtils.convert.keys():
+    for model_name, model in g4f.models.ModelUtils.convert.items():
         if type(model.best_provider) is RetryProvider:
             for pr in model.best_provider.providers:
-                if pr in models:
-                    models[nameof(pr)].append(model_name)
+                if pr.__name__ in models:
+                    models[pr.__name__].append(model_name)
                 else:
-                    models[nameof(pr)] = [model_name]
+                    models[pr.__name__] = [model_name]
         else:
-            if nameof(model.best_provider) in models:
-                models[nameof(model.best_provider)].append(model_name)
+            if model.best_provider.__name__ in models:
+                models[model.best_provider.__name__].append(model_name)
             else:
-                models[nameof(model.best_provider)] = [model_name]
+                models[model.best_provider.__name__] = [model_name]
+    print(models)
     return models

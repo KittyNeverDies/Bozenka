@@ -13,6 +13,8 @@ def launch_instances() -> None:
     :return:
     """
     logging.log(msg="Setting up g4f logging!", level=logging.INFO)
+    logging.basicConfig(level=logging.INFO)
+    logging.log(msg="Setting up logging!", level=logging.INFO)
     g4f.logging = True
 
     db_url = generate_url()

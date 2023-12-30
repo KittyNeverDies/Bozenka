@@ -8,16 +8,17 @@ from aiogram.types import Message as Message
 
 from bozenka.generative.gpt4all import check
 from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, response_keyboard
-from bozenka.instances.telegram.utils.simpler import generate_gpt4free_providers, ru_cmds, AnsweringGpt4All, \
+from bozenka.instances.telegram.utils.simpler import AnsweringGpt4All, \
     AnsweringGPT4Free
+from bozenka.generative.gpt4free import generate_gpt4free_providers
 
 
 async def already_answering(msg: Message, state: FSMContext):
     """
     Giving response, if answering user now,
     but he still asks something
-    :param msg:
-    :param state:
+    :param msg: Message telegram object
+    :param state: FSM state of bot
     :return:
     """
     await msg.answer("Подождите пожалуйста, мы уже генерируем ответ для вас, подождите, когда мы ответим на ваш передыдущий вопрос",
@@ -27,8 +28,8 @@ async def already_answering(msg: Message, state: FSMContext):
 async def start_dialog_cmd(msg: Message, state: FSMContext):
     """
     /conversation command handler, start
-    :param msg:
-    :param state:
+    :param msg: Message telegram object
+    :param state: FSM state of bot
     :return:
     """
     if await state.get_state():
@@ -42,8 +43,8 @@ async def cancel_answering(msg: Message, state: FSMContext):
     """
     Canceling dialog with generative model
     Works on command /cancel
-    :param msg:
-    :param state:
+    :param msg: Message telegram object
+    :param state: FSM state of bot
     :return:
     """
     current = await state.get_state()
@@ -57,8 +58,8 @@ async def cancel_answering(msg: Message, state: FSMContext):
 async def g4a_generate_answer(msg: Message, state: FSMContext):
     """
     Generating answer if Gpt4All has been selected
-    :param msg:
-    :param state:
+    :param msg: Message telegram object
+    :param state: FSM state of bot
     :return:
     """
     await state.set_state(AnsweringGpt4All.answering)
@@ -100,8 +101,8 @@ async def g4a_generate_answer(msg: Message, state: FSMContext):
 async def g4f_generate_answer(msg: Message, state: FSMContext):
     """
     Generating answer if GPT4Free model and provider has been selected
-    :param msg:
-    :param state:
+    :param msg: Message telegram object
+    :param state: FSM state of bot
     :return:
     """
     await state.set_state(AnsweringGPT4Free.answering)
@@ -126,7 +127,8 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
             provider=providers[info["set_provider"]],
             stream=False
         )
-    except NameError:
+
+    except NameError or SyntaxError:
         try:
             response = g4f.ChatCompletion.create(
                 model=info["set_model"],
@@ -152,6 +154,6 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
 async def generate_image(msg: Message):
     """
     Image generation, planned in future
-    :param msg:
+    :param msg: Message telegram object
     """
     pass

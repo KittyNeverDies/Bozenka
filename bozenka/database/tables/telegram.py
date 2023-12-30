@@ -1,6 +1,7 @@
+import asyncio
 from typing import Tuple, Any
 
-from sqlalchemy import Column, Integer, VARCHAR, Boolean, Text, select, BigInteger, Row
+from sqlalchemy import Column, Integer, VARCHAR, Boolean, Text, select, BigInteger, Row, inspect
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 from bozenka.database.main import MainModel
@@ -65,7 +66,30 @@ async def get_settings(chat_id: int, session: async_sessionmaker):
     """
     async with session() as session:
         async with session.begin():
+            (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id)))
             return (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one_or_none()
+
+
+async def get_setting(chat_id: int, session: async_sessionmaker, setting: str) -> bool:
+    """
+    Return setting by sessionmaker and chat_id
+    :param chat_id: id of telegram chat
+    :param session: sessionmaker from dispatcher
+    :param setting: string setting what we need to get
+    :return:
+    """
+    async with session() as session:
+        async with session.begin():
+            rows = (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one().__dict__
+
+            for r in rows:
+                print(r.__dict__)
+
+            print("!@#1221312321312312313")
+            print(rows)
+            for i in rows:
+                print("+")
+                print(i)
 
 
 async def get_user(user_id: int, chat_id: int, session: async_sessionmaker) -> Row[tuple[Any, ...] | Any] | None:

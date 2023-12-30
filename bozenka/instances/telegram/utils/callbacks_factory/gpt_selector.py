@@ -1,7 +1,24 @@
 from aiogram.filters.callback_data import CallbackData
 
 
-class Gpt4FreeProvider(CallbackData, prefix="provider"):
+class ImageGenerationCategory(CallbackData, prefix="igc"):
+    """
+    Callback with information related to image
+    """
+    user_id: int
+    category: str
+
+
+class ImageGeneration(CallbackData, prefix="igc"):
+    """
+    Callback with information related to image
+    """
+    user_id: int
+    category: str
+    size: str
+
+
+class Gpt4FreeProvider(CallbackData, prefix="g4fp"):
     """
         Callback with information related to selected provider
     """
@@ -48,7 +65,7 @@ class Gpt4AllModel(CallbackData, prefix="g4a"):
         Callback with information to show GPT4All content
     """
     user_id: int
-    model_index: int
+    index: int
 
 
 class GptBackMenu(CallbackData, prefix="gbm"):
@@ -64,7 +81,7 @@ class Gpt4AllSelect(CallbackData, prefix="g4s"):
         Callback with information about selecting model
     """
     user_id: int
-    model_index: int
+    index: int
 
 
 class GptStop(CallbackData, prefix="gs"):

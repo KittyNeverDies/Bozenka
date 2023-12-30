@@ -12,11 +12,10 @@ from bozenka.instances.telegram.utils.simpler import list_of_commands
 async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
     """
     Launches telegram bot with token from enviroment
+    :param session_maker:
     :return:
     """
-    logging.basicConfig(level=logging.INFO)
-    logging.log(msg="Setting up logging!", level=logging.INFO)
-    g4f.logging = True
+    logging.log(msg="-" * 50 + "TELEGRAM INSTANCE LAUNCH" + "-" * 50, level=logging.INFO)
 
     bot = Bot(token=os.getenv("tg_bot_token"), parse_mode="HTML")
 

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List
 
 import g4f
@@ -6,18 +7,36 @@ from g4f.Provider import RetryProvider
 from varname import nameof
 
 
+@dataclass
 class BaseFeature:
     """
     Basic class of Feature.
     Have inside desription, name, callback name,
     """
-    def __init__(self, name: str, description: str, callback_name: str):
-        self.name = name
-        self.description = description
-        self.callback_name = callback_name
+    name: str
+    description: str
+    callback_name: str
+    settings_name: str
 
 
-# List of features, avaible in bozenka
+@dataclass
+class BaseCategory:
+    """
+    Basic class of Feature category
+    Have inside category name, callbackname
+    """
+    name: str
+    callback_name: str
+
+
+# List of categories, avaible in bot
+list_of_categories = [
+    BaseCategory(name="Администраторы 👮‍♂", callback_name="Admins"),
+    BaseCategory(name="Пользователи 👤", callback_name="Members"),
+    BaseCategory(name="В разработке 👨‍💻", callback_name="Devs")
+]
+
+# List of features, avaible in bot
 list_of_features = {
     "Admins": [
         BaseFeature(
@@ -28,7 +47,8 @@ list_of_features = {
                         "/unpin - открепляет сообщение"
                         "/unpin_all - открепляет все сообщения, которые видит бот"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
-            callback_name="pins"
+            callback_name="pins",
+            settings_name="pins"
         ),
         BaseFeature(
             name="Модерация чата 🕵️",
@@ -46,7 +66,8 @@ list_of_features = {
                         "чтобы выполнить одну из комманд по отношению к пользователю, "
                         "ответьте на сообщение пользователя и используйте команду\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
-            callback_name="moderation"
+            callback_name="moderation",
+            settings_name="moderation"
         ),
         BaseFeature(
             name="Работа с Форумом 💬",
@@ -59,14 +80,16 @@ list_of_features = {
                         "/show_general - показывает основную тему форума</pre>\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота. Также должен быть"
                         "включен форум</b>",
-            callback_name="topics"
+            callback_name="topics",
+            settings_name="topics"
         ),
         BaseFeature(
             name="Приглашения в Чат ✉",
             description="<b>Генератор приглашения в Чат ✉</b>\n"
                         "Разрешает использование комманды /invite в чате, для созданния приглашений.\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
-            callback_name="invites"
+            callback_name="invites",
+            settings_name="invite_generator"
         )
     ],
     "Members": [
@@ -74,13 +97,15 @@ list_of_features = {
             name="Приветсвенные сообщения 👋",
             description="<b>Приветсвенные сообщения 👋</b>"
                         "\nПриветсвенные сообщения новым и ушедшим пользователям.",
-            callback_name="welcome"
+            callback_name="welcome",
+            settings_name="welcome_messages"
         ),
         BaseFeature(
             name="Оповещение о муте 📬",
             description="<b>Оповещение о муте 📬</b>"
                         "\nОповещает пользователя в личных сообщениях, что тот был: замучен, размучен, забанен, разбанен",
             callback_name="notify",
+            settings_name="restrict_notification"
         )
     ],
     "Devs": [
@@ -89,7 +114,8 @@ list_of_features = {
             description="<b>Функция `Привет` </b>👋"
                         "\nБот будет отвечать на комманды "
                         "/hi, /hello, /privet и т.п., отвечая приветсвием на сообщение пользователя.",
-            callback_name="hi"
+            callback_name="hi",
+            settings_name="hi_command"
         ),
         BaseFeature(
             name="ИИ ЧатБот 🤖",
@@ -100,23 +126,19 @@ list_of_features = {
                         "Для использования:\n"
                         "<pre>/conversations</pre>"
                         "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘",
-            callback_name="gtm"
+            callback_name="gtm",
+            settings_name="gpt_conversations"
         ),
         BaseFeature(
             name="Генерация изображений 📸",
             description="<b>Генерация изображений </b>🤖"
                         "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘",
-            callback_name="gpm"
+            callback_name="gpm",
+            settings_name="123"
         )
     ]
 
 }
-
-# List of gpt categories, avaible in bozenka now
-gpt_categories = [
-    "Gpt4Free",
-    "Gpt4All",
-]
 
 
 
@@ -129,45 +151,6 @@ def generate_list_of_features(category: str) -> list[BaseFeature]:
     """
     return list_of_features[category]
 
-
-def generate_gpt4free_providers():
-    """
-    Generates list of g4f providers
-    :return:
-    """
-    provider = {}
-    for prov in g4f.Provider.__all__:
-        if prov != "BaseProvider" and prov != "AsyncProvider" and prov != "RetryProvider":
-            exec(f"provider['{prov}']=g4f.Provider.{prov}")
-    result = {}
-    for check in provider:
-        if provider[check].working:
-            result[check] = provider[check]
-    return result
-
-
-def generate_gpt4free_models():
-    """
-    Generates list of g4f models
-    :return:
-    """
-    models = {}
-    for model, model_name in g4f.models.ModelUtils.convert.items(), g4f.models.ModelUtils.convert.keys():
-        if type(model.best_provider) is RetryProvider:
-            for pr in model.best_provider.providers:
-                if pr in models:
-                    models[nameof(pr)].append(model_name)
-                else:
-                    models[nameof(pr)] = [model_name]
-        else:
-            if nameof(model.best_provider) in models:
-                models[nameof(model.best_provider)].append(model_name)
-            else:
-                models[nameof(model.best_provider)] = [model_name]
-    return models
-
-
-en_cmds = {}
 
 ru_cmds = {
     # /info command translation
@@ -278,5 +261,4 @@ list_of_commands = {
 
 translations = {
     "ru": ru_cmds,
-    "en": en_cmds
 }

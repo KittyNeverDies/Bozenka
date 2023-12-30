@@ -9,7 +9,7 @@ from bozenka.instances.telegram.handlers.chat_admin.help import *
 from bozenka.instances.telegram.handlers.chat_admin.mutes import mute, unmute
 from bozenka.instances.telegram.handlers.chat_admin.pins import pin, unpin, unpin_all
 from bozenka.instances.telegram.handlers.chat_admin.topics import *
-from bozenka.instances.telegram.handlers.chat_admin.bans import ban, unban
+from bozenka.instances.telegram.handlers.chat_admin.bans import ban_command, unban_command
 from bozenka.instances.telegram.utils.filters import *
 
 
@@ -29,11 +29,11 @@ def register_admin_cmd(router: Router) -> None:
     router.message.register(help_pin, Command(commands=["pin"]))
     router.message.register(help_unpin, Command(commands=["unpin"]))
     # Ban / Unban commands handler
-    router.message.register(ban, Command(commands="ban"),
+    router.message.register(ban_command, Command(commands="ban"),
                             IsAdminFilter(True))
-    router.message.register(ban, Command(commands="ban"),
+    router.message.register(ban_command, Command(commands="ban"),
                             IsAdminFilter(True), F.reply_to_message.text)
-    router.message.register(unban, Command(commands="unban"),
+    router.message.register(unban_command, Command(commands="unban"),
                             IsAdminFilter(True), F.reply_to_message.text)
     # Mute / Unmute commands handler
     router.message.register(mute, Command(commands=["mute", "re"]), UserHasPermissions(["can_restrict_members"]),

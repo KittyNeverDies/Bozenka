@@ -23,6 +23,15 @@ class SetupBack(CallbackData, prefix="sb"):
     back_to: str
 
 
+class SetupAction(CallbackData, prefix="sa"):
+    """
+    Callback with information to do with a feature
+    """
+    action: str
+    feature_category: str
+    feature_index: int
+
+
 class SetupEditFeature(CallbackData, prefix="sef"):
     """
     Callback data with information to edit status of bozenka enabled feature

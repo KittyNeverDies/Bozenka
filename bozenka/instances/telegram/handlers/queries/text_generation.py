@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from gpt4all import GPT4All
 
-from bozenka.instances.telegram.utils.simpler.states import *
+from bozenka.instances.telegram.utils.simpler.fsm_states import *
 
 # Callbacks for GPT
 from bozenka.instances.telegram.utils.callbacks_factory import (
@@ -170,10 +170,10 @@ async def inline_g4a_model(call: types.CallbackQuery, callback_data: Gpt4AllMode
     if callback_data.user_id != call.from_user.id:
         return
     models = GPT4All.list_models()
-    name = models[callback_data.model_index]['name']
+    name = models[callback_data.index]['name']
     await call.message.edit_text(f"{name}\n"
-                                 f"Обученно на основе {models[callback_data.model_index]['parameters']} строк 👨‍💻",
-                                 reply_markup=gpt4all_model_menu(user_id=call.from_user.id, index=callback_data.model_index))
+                                 f"Обученно на основе {models[callback_data.index]['parameters']} строк 👨‍💻",
+                                 reply_markup=gpt4all_model_menu(user_id=call.from_user.id, index=callback_data.index))
 
 
 async def inline_g4a_select_model(call: types.CallbackQuery, callback_data: Gpt4AllSelect, state: FSMContext) -> None:
@@ -186,13 +186,13 @@ async def inline_g4a_select_model(call: types.CallbackQuery, callback_data: Gpt4
     """
     if callback_data.user_id != call.from_user.id:
         return
-    await state.update_data(set_model=callback_data.model_index)
+    await state.update_data(set_model=callback_data.index)
     await state.set_state(AnsweringGpt4All.ready_to_answer)
     models = GPT4All.list_models()
 
     await call.message.edit_text("Удача ✅\n"
                                  "Вы теперь можете спокойно вести диалог 🤖\n"
-                                 f"Вы выбрали модель <b>{models[callback_data.model_index]['name']}</b>👾 от Gpt4All\n"
+                                 f"Вы выбрали модель <b>{models[callback_data.index]['name']}</b>👾 от Gpt4All\n"
                                  "Чтобы прекратить общение, используйте /cancel ",
                                  reply_markup=delete_keyboard(admin_id=callback_data.user_id))
 

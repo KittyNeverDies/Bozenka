@@ -1,16 +1,13 @@
-__all__ = ["ban", "delete", "gpt"]
-
 from aiogram import Router, F
 
-from bozenka.instances.telegram.handlers.queries.start import inline_help_features, inline_help_feature, \
-    inline_back_help_categories, inline_back_help_features
+from bozenka.instances.telegram.handlers.queries.start import *
 from bozenka.instances.telegram.utils.callbacks_factory import *
 from bozenka.instances.telegram.handlers.queries.ban import *
 from bozenka.instances.telegram.handlers.queries.pins import *
 from bozenka.instances.telegram.handlers.queries.threads import *
 from bozenka.instances.telegram.handlers.queries.delete import *
 from bozenka.instances.telegram.handlers.queries.revoke import *
-from bozenka.instances.telegram.handlers.queries.gpt import *
+from bozenka.instances.telegram.handlers.queries.text_generation import *
 from bozenka.instances.telegram.handlers.queries.setup import *
 
 
@@ -77,16 +74,34 @@ def register_queries(router: Router) -> None:
 
     # /setup command related queries
     # List of features based on category
-    router.callback_query.register(inline_setup_features, SetupCategory.filter())
+    router.callback_query.register(inline_setup_category, SetupCategory.filter())
 
     # Menu of feature to enable or disable
-    router.callback_query.register(inline_feature, SetupFeature.filter())
+    router.callback_query.register(inline_edit_feature, SetupFeature.filter())
+    router.callback_query.register(inline_feature_edited, SetupAction.filter(F.action == "enable"))
+    router.callback_query.register(inline_feature_edited, SetupAction.filter(F.action == "disable"))
+
+    # Back from feature to category
+    router.callback_query.register(inline_setup_category_back, SetupAction.filter(F.action == "back"))
 
     # /start command related queries
     # Help of features based on category
     router.callback_query.register(inline_help_features, HelpCategory.filter())
     router.callback_query.register(inline_back_help_categories, HelpBack.filter(F.back_to == "category"))
     router.callback_query.register(inline_back_help_features, HelpBackCategory.filter())
+
     # Menu to back
     router.callback_query.register(inline_help_feature, HelpFeature.filter())
+
+    # Back to /start
+    router.callback_query.register(inline_start, F.data == "back")
+
+    # Categories of menu
+    router.callback_query.register(inline_about_developers, F.data == "aboutdevs")
+    router.callback_query.register(inline_add_to_chat, F.data == "addtochat")
+    router.callback_query.register(inline_start_chatbot, F.data == "dialogai")
+    router.callback_query.register(inline_help, F.data == "functional")
+
+
+
 
