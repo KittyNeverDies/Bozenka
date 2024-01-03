@@ -16,7 +16,7 @@ from bozenka.instances.telegram.utils.callbacks_factory import (
 )
 # Keyboards for messages
 from bozenka.instances.telegram.utils.keyboards import (
-    gpt4free_models_keyboard,
+    gpt4free_models_by_provider_keyboard,
     gpt4free_providers_keyboard,
     delete_keyboard, gpt_categories_keyboard, generate_gpt4all_page, gpt4all_model_menu
 )
@@ -93,7 +93,7 @@ async def inline_g4f_models(call: types.CallbackQuery, callback_data: Gpt4FreePr
     await state.update_data(set_provider=callback_data.provider)
     await state.set_state(AnsweringGPT4Free.set_model)
 
-    await call.message.edit_text("Выберите пожалуйста модель ИИ 👾", reply_markup=gpt4free_models_keyboard(
+    await call.message.edit_text("Выберите пожалуйста модель ИИ 👾", reply_markup=gpt4free_models_by_provider_keyboard(
         user_id=callback_data.user_id,
         provider=callback_data.provider,
         page=0
@@ -230,7 +230,7 @@ async def inline_next_g4f_models(call: types.CallbackQuery, callback_data: Gpt4F
     logging.log(msg=f"Changed page to {str(callback_data.page + 1)} user_id={call.from_user.id}",
                 level=logging.INFO)
     await call.message.edit_text(call.message.text,
-                                 reply_markup=gpt4free_models_keyboard(
+                                 reply_markup=gpt4free_models_by_provider_keyboard(
                                      user_id=callback_data.user_id,
                                      provider=callback_data.provider,
                                      page=callback_data.page
@@ -263,7 +263,9 @@ async def inline_stop_dialog(call: types.CallbackQuery, callback_data: GptStop, 
     # Clearing state
     await state.clear()
     # Answering something
-    await call.answer()
-    if state.get_state() == AnsweringGPT4Free.ready_to_answer or state.get_state() == AnsweringGpt4All.answering:
+    await call.answer("Хорошо ✅")
+    if await state.get_state() == AnsweringGPT4Free.ready_to_answer or await state.get_state() == AnsweringGpt4All.answering:
         await call.message.edit_text(text=call.message.text + "\n\nДиалог остановлен ✅\n",
                                      reply_markup=delete_keyboard(admin_id=call.from_user.id))
+    else:
+        await call.message.delete()

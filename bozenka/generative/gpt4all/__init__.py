@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 
 def check(model_filename: str) -> bool:
@@ -9,6 +10,7 @@ def check(model_filename: str) -> bool:
     :param model_filename: File name of gpt4all model
     :return:
     """
+    print(os.path.exists("models\\" + model_filename))
     return os.path.exists("models\\" + model_filename)
 
 
@@ -18,4 +20,5 @@ def get_model_path(model_filename: str) -> str:
     :param model_filename: File name of gpt4all model
     :return:
     """
-    return os.curdir + "models\\" + model_filename
+    print(str(pathlib.Path().absolute()) + "\\models\\" + model_filename)
+    return str(pathlib.Path().absolute()) + "\\models\\" + model_filename

@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message as Message
 
 from bozenka.generative.gpt4all import check
-from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, response_keyboard
+from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, text_response_keyboard
 from bozenka.instances.telegram.utils.simpler import AnsweringGpt4All, \
     AnsweringGPT4Free
 from bozenka.generative.gpt4free import generate_gpt4free_providers
@@ -70,7 +70,7 @@ async def g4a_generate_answer(msg: Message, state: FSMContext):
 
     main_msg = await msg.answer("Пожалуйста подождите, мы генерируем вам ответ ⏰\n"
                                 "Если что-то пойдет не так, мы вам сообщим 👌",
-                                reply_markup=response_keyboard(user_id=msg.from_user.id))
+                                reply_markup=text_response_keyboard(user_id=msg.from_user.id))
 
     if not check(models[info["set_model"]]["filename"]):
         main_msg = await main_msg.edit_text(main_msg.text + "\nПодождите пожалуста, мы скачиваем модель...",
@@ -91,9 +91,9 @@ async def g4a_generate_answer(msg: Message, state: FSMContext):
     except Exception as S:
         answer = "Простите, произошла ошибка 😔\nЕсли это продолжается, пожалуйста используйте /cancel"
         logging.log(msg=f"Get an exception for generating answer={S}",
-                    level=logging.INFO)
+                    level=logging.ERROR)
     finally:
-        await main_msg.edit_text(answer, reply_markup=response_keyboard(user_id=msg.from_user.id))
+        await main_msg.edit_text(answer, reply_markup=text_response_keyboard(user_id=msg.from_user.id))
 
     await state.set_state(AnsweringGpt4All.ready_to_answer)
 
@@ -139,21 +139,14 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
         except Exception as S:
             response = "Простите, произошла ошибка 😔\nЕсли это продолжается, пожалуйста используйте /cancel"
             logging.log(msg=f"Get an exception for generating answer={S}",
-                        level=logging.INFO)
+                        level=logging.ERROR)
     except Exception as S:
         response = "Простите, произошла ошибка 😔\nЕсли это продолжается, пожалуйста используйте /cancel"
         logging.log(msg=f"Get an exception for generating answer={S}",
-                    level=logging.INFO)
+                    level=logging.ERROR)
     finally:
-        await reply.edit_text(text=response, reply_markup=response_keyboard(user_id=msg.from_user.id))
+        await reply.edit_text(text=response, reply_markup=text_response_keyboard(user_id=msg.from_user.id))
         current_messages.append({"role": "assistant", "content": response})
         await state.update_data(ready_to_answer=current_messages)
     await state.set_state(AnsweringGPT4Free.ready_to_answer)
 
-
-async def generate_image(msg: Message):
-    """
-    Image generation, planned in future
-    :param msg: Message telegram object
-    """
-    pass

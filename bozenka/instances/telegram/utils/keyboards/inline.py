@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database.tables.telegram import get_setting
 from bozenka.instances.telegram.utils.callbacks_factory import *
-from bozenka.instances.telegram.utils.simpler import generate_list_of_features
+from bozenka.instances.telegram.utils.simpler.lists_of_content import generate_list_of_features
 from bozenka.generative.gpt4free import generate_gpt4free_models, generate_gpt4free_providers
 from bozenka.generative import text_generative_categories, image_generative_categories, image_generative_size
 
@@ -149,9 +149,9 @@ async def setup_feature_keyboard(category: str, index: int, session: async_sessi
                                                                           feature_category=category,
                                                                           feature_index=index).pack())
     ], [
-            InlineKeyboardButton(text="Вернуться 🔙", callback_data=SetupAction(action="back",
-                                                                               feature_category=category,
-                                                                               feature_index=index).pack())]])
+        InlineKeyboardButton(text="Вернуться 🔙", callback_data=SetupAction(action="back",
+                                                                           feature_category=category,
+                                                                           feature_index=index).pack())]])
     return kb
 
 
@@ -195,7 +195,8 @@ def image_generation_keyboard(user_id: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for category in image_generative_categories:
         builder.row(InlineKeyboardButton(text=category,
-                                         callback_data=ImageGenerationCategory(user_id=user_id, category=category).pack()))
+                                         callback_data=ImageGenerationCategory(user_id=user_id,
+                                                                               category=category).pack()))
     return builder.as_markup()
 
 
@@ -280,7 +281,11 @@ def gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup
     return generated_page
 
 
-def gpt4free_models_keyboard(user_id: int, provider, page: int) -> InlineKeyboardMarkup:
+def gpt4free_models_by_provider(user_id: int, page: int) -> InlineKeyboardMarkup:
+    pass
+
+
+def gpt4free_models_by_provider_keyboard(user_id: int, provider: str, page: int) -> InlineKeyboardMarkup:
     """
     Generating list of GPT4Free provider's models, can be used to generate text.
     Will be also reworked.
@@ -355,7 +360,7 @@ def generate_gpt4all_page(user_id: int) -> InlineKeyboardMarkup:
     for model in models:
         builder.row(InlineKeyboardButton(
             text=model["name"],
-            callback_data=Gpt4AllModel(user_id=str(user_id), model_index=str(models.index(model))).pack())
+            callback_data=Gpt4AllModel(user_id=str(user_id), index=str(models.index(model))).pack())
         )
     builder.row(InlineKeyboardButton(text="🔙 Вернуться к списку",
                                      callback_data=GptBackMenu(user_id=user_id, back_to="category").pack()))
@@ -372,7 +377,7 @@ def gpt4all_model_menu(user_id: int, index: int) -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Выбрать ✅",
-                              callback_data=Gpt4AllSelect(user_id=user_id, model_index=str(index)).pack())],
+                              callback_data=Gpt4AllSelect(user_id=user_id, index=str(index)).pack())],
         [InlineKeyboardButton(text="🔙 Вернуться к списку",
                               callback_data=GptBackMenu(user_id=user_id, back_to="g4amodels").pack())],
         [InlineKeyboardButton(text="Спасибо, не надо ❌",
@@ -382,14 +387,28 @@ def gpt4all_model_menu(user_id: int, index: int) -> InlineKeyboardMarkup:
 
 
 # Universal response from GPT / LLM keyboard
-def response_keyboard(user_id: int) -> InlineKeyboardMarkup:
+def text_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     """
     Generating menu for response from GPT
     :param user_id:
+    :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())],
         [InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
+    ])
+    return kb
+
+
+def image_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for image
+    :param user_id:
+    :return:
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Хватит 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
     ])
     return kb
 

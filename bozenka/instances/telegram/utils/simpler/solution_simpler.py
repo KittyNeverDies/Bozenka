@@ -2,88 +2,18 @@ import logging
 import re
 import time
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
-from aiogram import types, Bot
-from aiogram.exceptions import TelegramRetryAfter, TelegramNotFound
-from sqlalchemy import select, insert, Select, Insert, Update
-from aiogram.filters import CommandObject
-from aiogram.types import ChatPermissions
+from aiogram import types
 from aiogram.enums import ChatMemberStatus
-from aiogram.types import ChatPermissions, ChatAdministratorRights
+from aiogram.exceptions import TelegramRetryAfter, TelegramNotFound, TelegramBadRequest
+from aiogram.filters import CommandObject
+from aiogram.types import ChatPermissions, CallbackQuery
+from sqlalchemy import Update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database import get_user, Users
 from bozenka.database.tables.telegram import get_settings, ChatSettings
-
-
-async def basic_ban(msg: types.Message, user: types.User, config: dict[str, None | str | bool], session: async_sessionmaker) -> None:
-    """
-    Bans a user by user_id and writes everything in database.
-    Protects from getting limited as flood
-    :param msg: Message telegram object
-    :param user: User telegram object to ban
-    :param config: Dictionary with information about ban
-    :param session: Session maker object of SqlAlchemy
-    :return: Nothing
-    """
-    try:
-        await msg.chat.ban(user.id, config["ban_time"], config["revert_msg"])
-        logging.log(
-            msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
-            level=logging.INFO)
-        if not await get_user(user_id=user.id, chat_id=msg.chat.id, session=session):
-            new_user = Users(
-                user_id=user.id,
-                chat_id=msg.chat.id,
-                is_banned=True,
-                ban_reason=None if config["reason"] == "" else config["reason"],
-                is_muted=None,
-                mute_reason=None
-            )
-            async with session() as session:
-                async with session.begin():
-                    await session.merge(new_user)
-        else:
-            async with session() as session:
-                async with session.begin():
-                    await session.execute(
-                        Update(Users)
-                        .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
-                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
-
-    except TelegramRetryAfter as ex:
-        time.sleep(ex.retry_after)
-
-        await msg.chat.ban(msg.reply_to_message.from_user.id, config["ban_time"], config["revert_msg"])
-        logging.log(
-            msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
-            level=logging.INFO)
-        user = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
-        if not user:
-            new_user = Users(
-                user_id=msg.from_user.id,
-                chat_id=msg.chat.id,
-                is_banned=True,
-                ban_reason=None if config["reason"] == "" else config["reason"],
-                is_muted=None,
-                mute_reason=None
-            )
-            async with session() as session:
-                async with session.begin():
-                    await session.merge(new_user)
-        else:
-            async with session() as session:
-                async with session.begin():
-                    await session.execute(
-                        Update(Users)
-                        .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
-                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
-
-    except TelegramNotFound:
-        logging.log(
-            msg=f"Can't ban user, something was not avaible or got disabled",
-            level=logging.INFO)
 
 
 def count_time(counted_time: str) -> int:
@@ -114,7 +44,7 @@ class SolutionSimpler:
         :param msg: Message telegram object
         :param cmd: Object of telegram command
         :param session: Session maker object of SqlAlchemy
-        :return:
+        :return: Config
         """
         config = {
             "revert_msg": None,
@@ -132,8 +62,64 @@ class SolutionSimpler:
                     config["ban_time"] = datetime.utcfromtimestamp(count_time(item)).strftime('%Y-%m-%d %H:%M:%S')
                 else:
                     config["reason"] += item + " "
-        if msg.reply_to_message.text:
-            await basic_ban(msg, msg.reply_to_message.from_user, config, session)
+        try:
+            user = msg.reply_to_message.from_user
+            await msg.chat.ban(user.id, config["ban_time"], config["revert_msg"])
+            logging.log(
+                msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
+                level=logging.INFO)
+            if not await get_user(user_id=user.id, chat_id=msg.chat.id, session=session):
+                new_user = Users(
+                    user_id=user.id,
+                    chat_id=msg.chat.id,
+                    is_banned=True,
+                    ban_reason=None if config["reason"] == "" else config["reason"],
+                    is_muted=None,
+                    mute_reason=None
+                )
+                async with session() as session:
+                    async with session.begin():
+                        await session.merge(new_user)
+            else:
+                async with session() as session:
+                    async with session.begin():
+                        await session.execute(
+                            Update(Users)
+                            .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
+                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
+
+        except TelegramRetryAfter as ex:
+            time.sleep(ex.retry_after)
+
+            await msg.chat.ban(msg.reply_to_message.from_user.id, config["ban_time"], config["revert_msg"])
+            logging.log(
+                msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
+                level=logging.INFO)
+            user = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
+            if not user:
+                new_user = Users(
+                    user_id=msg.from_user.id,
+                    chat_id=msg.chat.id,
+                    is_banned=True,
+                    ban_reason=None if config["reason"] == "" else config["reason"],
+                    is_muted=None,
+                    mute_reason=None
+                )
+                async with session() as session:
+                    async with session.begin():
+                        await session.merge(new_user)
+            else:
+                async with session() as session:
+                    async with session.begin():
+                        await session.execute(
+                            Update(Users)
+                            .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
+                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
+
+        except TelegramNotFound:
+            logging.log(
+                msg=f"Can't ban user, something was not avaible or got disabled",
+                level=logging.INFO)
         return config
 
     @staticmethod
@@ -142,7 +128,7 @@ class SolutionSimpler:
         Unbans user by reply, returns nothing
         :param msg: Message telegram object
         :param session: Session maker object of SqlAlchemy
-        :return:
+        :return: Nothing
         """
         await msg.chat.unban(msg.reply_to_message.from_user.id)
         logging.log(
@@ -163,7 +149,7 @@ class SolutionSimpler:
         Get status of user, is it muted or banned.
         :param msg: Message telegram object
         :param session: Session maker object of SqlAlchemy
-        :return:
+        :return: Config
         """
         config = {
             "is_banned": None,
@@ -180,13 +166,13 @@ class SolutionSimpler:
         return config
 
     @staticmethod
-    async def mute_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker):
+    async def mute_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
         """
         Mutes user, returns config, by config you can send special message.
         :param msg: Message telegram object
         :param cmd: Object of telegram command
         :param session: Session maker object of SqlAlchemy
-        :return:
+        :return: Config or Nothing
         """
         config = {
             "mute_time": None,
@@ -199,33 +185,58 @@ class SolutionSimpler:
                     config["mute_time"] = datetime.utcfromtimestamp(count_time(item)).strftime('%Y-%m-%d %H:%M:%S')
                 else:
                     config["reason"] += item + " "
-        perms = ChatPermissions(can_send_messages=False)
-        await msg.chat.restrict(msg.reply_to_message.from_user.id, until_date=config["mute_time"], permissions=perms)
-        logging.log(
-            msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
-            level=logging.INFO)
-        user = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
-        user
-        if not user:
-            new_user = Users(
-                user_id=msg.from_user.id,
-                chat_id=msg.chat.id,
-                is_banned=None,
-                ban_reason=None,
-                is_muted=True,
-                mute_reason=None if config["reason"] == "" else config["reason"]
-            )
-            async with session() as session:
-                async with session.begin():
-                    await session.merge(new_user)
-        else:
-            async with session() as session:
-                async with session.begin():
-                    await session.execute(
-                        Update(Users)
-                        .values(is_muted=True, mute_reason=None if config["reason"] == "" else config["reason"])
-                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
-                    )
+        try:
+            perms = ChatPermissions(can_send_messages=False)
+            await msg.chat.restrict(msg.reply_to_message.from_user.id, until_date=config["mute_time"], permissions=perms)
+            logging.log(
+                msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
+                level=logging.INFO)
+            if not await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+                new_user = Users(
+                    user_id=msg.from_user.id,
+                    chat_id=msg.chat.id,
+                    is_banned=None,
+                    ban_reason=None,
+                    is_muted=True,
+                    mute_reason=None if config["reason"] == "" else config["reason"]
+                )
+                async with session() as session:
+                    async with session.begin():
+                        await session.merge(new_user)
+            else:
+                async with session() as session:
+                    async with session.begin():
+                        await session.execute(
+                            Update(Users)
+                            .values(is_muted=True, mute_reason=None if config["reason"] == "" else config["reason"])
+                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
+        except TelegramRetryAfter as ex:
+            time.sleep(ex.retry_after)
+            perms = ChatPermissions(can_send_messages=False)
+            await msg.chat.restrict(msg.reply_to_message.from_user.id, until_date=config["mute_time"],
+                                    permissions=perms)
+            logging.log(
+                msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
+                level=logging.INFO)
+            if not await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+                new_user = Users(
+                    user_id=msg.from_user.id,
+                    chat_id=msg.chat.id,
+                    is_banned=None,
+                    ban_reason=None,
+                    is_muted=True,
+                    mute_reason=None if config["reason"] == "" else config["reason"]
+                )
+                async with session() as session:
+                    async with session.begin():
+                        await session.merge(new_user)
+            else:
+                async with session() as session:
+                    async with session.begin():
+                        await session.execute(
+                            Update(Users)
+                            .values(is_muted=True, mute_reason=None if config["reason"] == "" else config["reason"])
+                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
         return config
 
     @staticmethod
@@ -234,29 +245,29 @@ class SolutionSimpler:
         Unmutes user, returns nothing
         :param msg: Message telegram object
         :param session: Session maker object of SqlAlchemy
-        :return:
+        :return: Nothing
         """
 
         perms = ChatPermissions(can_send_messages=True)
         await msg.chat.restrict(msg.reply_to_message.from_user.id, permissions=perms)
-        user = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
         logging.log(
             msg=f"Unmuted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
             level=logging.INFO)
-        async with session() as session:
-            async with session.begin():
-                await session.execute(
-                    Update(Users)
-                    .values(is_muted=False, mute_reason=None, )
-                    .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
-                )
+        if await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+            async with session() as session:
+                async with session.begin():
+                    await session.execute(
+                        Update(Users)
+                        .values(is_muted=False, mute_reason=None, )
+                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
+                    )
 
     @staticmethod
     async def pin_msg(msg: types.Message) -> None:
         """
         Pins replied message, returns nothing
         :param msg: Message telegram object
-        :return:
+        :return: Nothing
         """
         await msg.chat.pin_message(message_id=msg.reply_to_message.message_id)
         logging.log(
@@ -268,7 +279,7 @@ class SolutionSimpler:
         """
         Unpins replied message, if it pinned, always returns nothing.
         :param msg: Message telegram object
-        :return:
+        :return: Nothing
         """
         await msg.chat.unpin_message(message_id=msg.reply_to_message.message_id)
         logging.log(
@@ -276,11 +287,11 @@ class SolutionSimpler:
             level=logging.INFO)
 
     @staticmethod
-    async def unpin_all_msg(msg: types.Message) -> None:
+    async def unpin_all_messages(msg: types.Message) -> None:
         """
         Unpins all pinned messages, returns nothing
         :param msg: Message telegram object
-        :return:
+        :return: Nothing
         """
         logging.log(
             msg=f"Unpinned all messages chat_id={msg.chat.id}",
@@ -288,12 +299,12 @@ class SolutionSimpler:
         await msg.chat.unpin_all_messages()
 
     @staticmethod
-    async def create_invite(msg: types.Message, cmd: CommandObject):
+    async def create_invite(msg: types.Message, cmd: CommandObject) -> str:
         """
         Creating invite, returning invite link
         :param msg: Message telegram object
         :param cmd: Object of telegram command
-        :return:
+        :return: Generated invite link
         """
         if cmd.args and re.match(r"^\d[wdysmh]", cmd.args):
             link = await msg.chat.create_invite_link()
@@ -305,14 +316,14 @@ class SolutionSimpler:
         return link.invite_link
 
     @staticmethod
-    async def auto_settings(msg: types.Message, session: async_sessionmaker):
+    async def auto_settings(msg: types.Message, session: async_sessionmaker) -> None:
         """
         Creating settings related to chat automaticly
         after adding
         :param msg: Message telegram object
         :param session: Object of telegram command
+        :return: Nothing
         """
-        print("123")
         chat_data = await get_settings(msg.chat.id, session)
         print(chat_data)
         if not chat_data:
@@ -320,3 +331,124 @@ class SolutionSimpler:
             async with session() as session:
                 async with session.begin():
                     await session.merge(new_chat_data)
+
+    @staticmethod
+    async def close_topic(msg: types.Message, call: Optional[CallbackQuery] = None) -> list[str, bool]:
+        """
+        Closing topic of chat automaticly
+        :param msg: Message telegram object
+        :param call: CallbackQuery telegram object
+        :return: Nothing
+        """
+        try:
+            if not call:
+                if msg.message_thread_id:
+                    await msg.bot.close_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
+                    return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} закрыл данное обсуждение.",
+                            True]
+                else:
+                    await msg.bot.close_general_forum_topic(chat_id=msg.chat.id)
+                    return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} закрыл основное обсуждение.",
+                            True]
+            else:
+                if msg.message_thread_id:
+                    await msg.bot.close_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
+                    return [f"Удача ✅\nПользователь {call.from_user.mention_html()} закрыл данное обсуждение.",
+                            True]
+                else:
+                    await msg.bot.close_general_forum_topic(chat_id=msg.chat.id)
+                    return [f"Удача ✅\nПользователь {call.from_user.mention_html()} закрыл основное обсуждение.",
+                            True]
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                return [f"Ошибка ❌\nДанное обсуждение уже закрыто.",
+                        False]
+
+    @staticmethod
+    async def open_topic(msg: types.Message, call: Optional[CallbackQuery] = None) -> list[str, bool]:
+        """
+        Opening topic of chat automaticly
+        :param msg: Message telegram object
+        :param call: CallbackQuery telegram object
+        :return: Nothing
+        """
+        try:
+
+            if not call:
+                if msg.message_thread_id:
+                    await msg.bot.reopen_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
+                    return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} открыл данное обсуждение.",
+                            True]
+                else:
+                    await msg.bot.reopen_general_forum_topic(chat_id=msg.chat.id)
+                    return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} открыл основное обсуждение",
+                            True]
+            else:
+                if msg.message_thread_id:
+                    await msg.bot.reopen_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
+                    return [f"Удача ✅\nПользователь {call.from_user.mention_html()} открыл данное обсуждение.",
+                            True]
+                else:
+                    await msg.bot.reopen_general_forum_topic(chat_id=msg.chat.id)
+                    return [f"Удача ✅\nПользователь {call.from_user.mention_html()} открыл основное обсуждение",
+                            True]
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                return [f"Ошибка ❌\nДанное обсуждение уже открыто.",
+                        False]
+
+    @staticmethod
+    async def open_general_topic(msg: types.Message) -> list[str, bool]:
+        """
+        Opening general topic of chat automaticly
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        try:
+            await msg.bot.reopen_general_forum_topic(chat_id=msg.chat.id)
+            return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} открыл основное обсуждение", True]
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                return [f"Ошибка ❌\nДанное обсуждение уже открыто.", False]
+
+    @staticmethod
+    async def close_general_topic(msg: types.Message) -> list[str, bool]:
+        """
+        Closing general topic of chat automaticly
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        try:
+            await msg.bot.close_general_forum_topic(chat_id=msg.chat.id)
+            return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} закрыл основное обсуждение", True]
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                return [f"Ошибка ❌\nДанное обсуждение уже закрыто.", False]
+
+    @staticmethod
+    async def show_general_topic(msg: types.Message) -> list[str, bool]:
+        """
+        Showing general topic of chat automaticly
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        try:
+            await msg.bot.unhide_general_forum_topic(chat_id=msg.chat.id)
+            return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} раскрыл основное обсуждение", True]
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                return [f"Ошибка ❌\nДанное обсуждение уже публично.", False]
+
+    @staticmethod
+    async def hide_general_topic(msg: types.Message) -> list[str, bool]:
+        """
+        Hiding topic of chat automaticly
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        try:
+            await msg.bot.hide_general_forum_topic(chat_id=msg.chat.id)
+            return [f"Удача ✅\nПользователь {msg.from_user.mention_html()} скрыл основное обсуждение", True]
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                return [f"Ошибка ❌\nДанное обсуждение уже публично.", False]

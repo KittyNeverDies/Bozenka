@@ -80,16 +80,8 @@ async def get_setting(chat_id: int, session: async_sessionmaker, setting: str) -
     """
     async with session() as session:
         async with session.begin():
-            rows = (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one().__dict__
-
-            for r in rows:
-                print(r.__dict__)
-
-            print("!@#1221312321312312313")
-            print(rows)
-            for i in rows:
-                print("+")
-                print(i)
+            rows = (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one()
+            print(rows.pin)
 
 
 async def get_user(user_id: int, chat_id: int, session: async_sessionmaker) -> Row[tuple[Any, ...] | Any] | None:

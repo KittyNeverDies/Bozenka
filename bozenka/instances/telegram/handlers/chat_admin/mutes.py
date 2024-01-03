@@ -6,14 +6,14 @@ from bozenka.instances.telegram.utils.keyboards import mute_keyboard, unmute_key
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
 
-async def mute(msg: Message, command: CommandObject, session_maker: async_sessionmaker):
+async def mute(msg: Message, command: CommandObject, session_maker: async_sessionmaker) -> None:
     """
     Handler of command /mute
     Restricts member from using chat
     :param msg: Message telegram object
     :param command: Object of telegram command
     :param session_maker: Session maker object of SqlAlchemy
-    :return:
+    :return: Nothing
     """
     restricting = await msg.chat.get_member(msg.reply_to_message.from_user.id)
     if restricting.status == ChatMemberStatus.LEFT or restricting.status == ChatMemberStatus.KICKED:
@@ -44,14 +44,13 @@ async def mute(msg: Message, command: CommandObject, session_maker: async_sessio
                          reply_markup=mute_keyboard(msg.from_user.id, restricting.user.id))
 
 
-async def unmute(msg: Message, session_maker: async_sessionmaker):
+async def unmute(msg: Message, session_maker: async_sessionmaker) -> None:
     """
     Handler of command /unmute
     Gives access member to send messages into chat
     :param msg: Message telegram object
-    :param command: Object of telegram command
     :param session_maker: Session maker object of SqlAlchemy
-    :return:
+    :return: Nothing
     """
     await SolutionSimpler.unmute_user(msg, session_maker)
     await msg.answer("Удача ✅"

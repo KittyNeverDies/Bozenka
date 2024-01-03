@@ -1,5 +1,6 @@
 from aiogram import Router, F
 
+from bozenka.instances.telegram.handlers.queries.image_generation import inline_image_size, inline_image_ready
 from bozenka.instances.telegram.handlers.queries.start import *
 from bozenka.instances.telegram.utils.callbacks_factory import *
 from bozenka.instances.telegram.handlers.queries.ban import *
@@ -57,6 +58,13 @@ def register_queries(router: Router) -> None:
     # Help information (for page button under menu)
     router.callback_query.register(inline_return_pages, F.data == "gotpages")
     router.callback_query.register(inline_g4f_ready, Gpt4freeResult.filter())
+
+    # Image generation menu
+    # Size setting
+    router.callback_query.register(inline_image_size, ImageGenerationCategory.filter())
+
+    # Ready status
+    router.callback_query.register(inline_image_ready, ImageGeneration.filter())
 
     # Gpt4All menus
     # Gpt4All model menu

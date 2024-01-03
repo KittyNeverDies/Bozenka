@@ -1,4 +1,3 @@
-__all__ = ["about", "invite", "welcome", ""]
 
 import logging
 

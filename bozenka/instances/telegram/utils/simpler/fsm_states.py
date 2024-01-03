@@ -22,3 +22,11 @@ class AnsweringGpt4All(StatesGroup):
     answering = State()
 
 
+class GeneratingImages(StatesGroup):
+    """
+    States for generating images
+    """
+    set_category = State()
+    set_size = State()
+    ready_to_generate = State()
+    generating = State()

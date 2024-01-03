@@ -14,7 +14,7 @@ async def ban_command(msg: Message, command: CommandObject, session_maker: async
     :param msg: Message telegram object
     :param command: Object of telegram command
     :param session_maker: Session maker object of SqlAlchemy
-    :return:
+    :return: Nothing
     """
     banned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
 

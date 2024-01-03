@@ -3,10 +3,11 @@ from aiogram.types import Message
 from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 
 
-async def help_ban(msg: Message):
+async def help_ban(msg: Message) -> None:
     """
     Shows help message for /ban
-    :param msg:
+    :param msg: Message telegram object
+    :return: Nothing
     """
     await msg.answer("Использование:\n"
                      "<pre>/ban [время блокировки] [причина блокировки]</pre>\n"
@@ -14,10 +15,11 @@ async def help_ban(msg: Message):
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
-async def help_unban(msg: Message):
+async def help_unban(msg: Message) -> None:
     """
     Shows help message for /unban
-    :param msg:
+    :param msg: Message telegram object
+    :return: Nothing
     """
     await msg.answer("Использование:\n"
                      "<pre>/unban</pre>\n"
@@ -25,10 +27,11 @@ async def help_unban(msg: Message):
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
-async def help_mute(msg: Message):
+async def help_mute(msg: Message) -> None:
     """
     Shows help message for /mute
-    :param msg:
+    :param msg: Message telegram object
+    :return: Nothing
     """
     await msg.answer("Использование:\n"
                      "<pre>/mute [время мута] [причина мута]</pre>\n"
@@ -36,10 +39,11 @@ async def help_mute(msg: Message):
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
-async def help_unmute(msg: Message):
+async def help_unmute(msg: Message) -> None:
     """
     Shows help message for /unmute
-    :param msg:
+    :param msg: Message telegram object
+    :return: Nothing
     """
     await msg.answer("Использование:\n"
                      "<pre>/unmute</pre>\n"
@@ -47,10 +51,11 @@ async def help_unmute(msg: Message):
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
-async def help_pin(msg: Message):
+async def help_pin(msg: Message) -> None:
     """
     Shows help message for /mute
-    :param msg:
+    :param msg: Message telegram object
+    :return: Nothing
     """
     await msg.answer("Использование:\n"
                      "<pre>/pin</pre>\n"
@@ -58,10 +63,11 @@ async def help_pin(msg: Message):
                      reply_markup=delete_keyboard(msg.from_user.id))
 
 
-async def help_unpin(msg: Message):
+async def help_unpin(msg: Message) -> None:
     """
     Shows help message for /mute
-    :param msg:
+    :param msg: Message telegram object
+    :return: Nothing
     """
     await msg.answer("Использование:\n"
                      "<pre>/unpin</pre>\n"

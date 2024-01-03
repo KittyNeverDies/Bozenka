@@ -1,12 +1,12 @@
-__all__ = ["ai", "hello"]
-
 import logging
 
 from aiogram.filters import Command
 
 from bozenka.instances.telegram.handlers.dev.hello import hi, testing
-from bozenka.instances.telegram.handlers.dev.ai import *
-from bozenka.instances.telegram.utils.simpler import AnsweringGPT4Free, AnsweringGpt4All
+from bozenka.instances.telegram.handlers.dev.text_generation import *
+from bozenka.instances.telegram.handlers.dev.image_generation import *
+
+from bozenka.instances.telegram.utils.simpler import AnsweringGPT4Free, AnsweringGpt4All, GeneratingImages
 from aiogram import Router
 
 
@@ -25,5 +25,7 @@ def register_dev_cmd(router: Router) -> None:
     router.message.register(already_answering, AnsweringGpt4All.answering, ~Command(commands=["cancel"]))
     router.message.register(already_answering, AnsweringGPT4Free.answering, ~Command(commands=["cancel"]))
     router.message.register(g4a_generate_answer, AnsweringGpt4All.ready_to_answer, ~Command(commands=["cancel"]))
+    router.message.register(kadinsky_generating_images, GeneratingImages.ready_to_generate, ~Command(commands=["cancel"]))
+    router.message.register(start_imagine_cmd, Command(commands=["imagine"]))
     router.message.register(cancel_answering, Command(commands=["cancel"]))
     router.message.register(testing, Command(commands=["testingtest"]))

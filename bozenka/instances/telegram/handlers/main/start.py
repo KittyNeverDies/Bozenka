@@ -2,7 +2,7 @@ from aiogram.enums import ChatType
 from aiogram.types import Message as Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bozenka.instances.telegram.utils.keyboards import start_keyboard_builder, help_keyboard, start_keyboard
+from bozenka.instances.telegram.utils.keyboards import help_keyboard, start_keyboard
 
 
 async def start_cmd(msg: Message):
