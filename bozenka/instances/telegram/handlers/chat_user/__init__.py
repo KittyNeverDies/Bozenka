@@ -19,8 +19,11 @@ def register_user_cmd(router: Router) -> None:
     :return:
     """
     logging.log(msg="Registering user commands", level=logging.INFO)
+
     router.message.register(invite, Command(commands=["invite"]))
     router.message.register(about, Command(commands=["about"]))
+
     router.message.register(leave, F.content_type == ContentType.LEFT_CHAT_MEMBER)
     router.message.register(join, F.content_type == ContentType.NEW_CHAT_MEMBERS)
+
     router.message.register(chat_info, Command(commands=["info"]))

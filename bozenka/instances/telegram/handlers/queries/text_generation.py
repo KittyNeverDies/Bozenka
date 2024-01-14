@@ -12,13 +12,15 @@ from bozenka.instances.telegram.utils.callbacks_factory import (
     Gpt4FreeProvider,
     Gpt4freeResult,
     Gpt4FreeProviderPage,
-    Gpt4FreeModelPage, GptStop, GptBackMenu, Gpt4AllModel, Gpt4AllSelect
+    Gpt4FreeProvsModelPage, GptStop, GptBackMenu, Gpt4AllModel, Gpt4AllSelect, Gpt4FreeCategory, Gpt4FreeModelPage,
+    Gpt4FreeModel
 )
 # Keyboards for messages
 from bozenka.instances.telegram.utils.keyboards import (
     gpt4free_models_by_provider_keyboard,
     gpt4free_providers_keyboard,
-    delete_keyboard, gpt_categories_keyboard, generate_gpt4all_page, gpt4all_model_menu
+    delete_keyboard, gpt_categories_keyboard, generate_gpt4all_page, gpt4all_model_menu, gpt4free_categories_keyboard,
+    gpt4free_models_keyboard
 )
 # Simpler utlilities
 from bozenka.instances.telegram.utils.simpler import (
@@ -28,13 +30,99 @@ from bozenka.instances.telegram.utils.simpler import (
 
 
 async def inline_start_gpt(call: types.CallbackQuery, callback_data: GptBackMenu, state: FSMContext) -> None:
+    """
+    Query, what shows when clicking on button in /start menu
+    :param call:
+    :param state:
+    :param callback_data:
+    :return:
+    """
     if call.from_user.id != callback_data.user_id:
         return
     await call.message.edit_text("Пожалуста, выберите сервис для ИИ.",
                                  reply_markup=gpt_categories_keyboard(user_id=call.from_user.id))
 
 
-async def inline_g4f_providers(call: types.CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
+async def inline_g4f_providers(call: types.CallbackQuery, callback_data: Gpt4FreeCategory, state: FSMContext) -> None:
+    """
+    Query, what creating providers selecting menu.
+    :param state:
+    :param call:
+    :param callback_data:
+    :return:
+    """
+    if call.from_user.id != callback_data.user_id:
+        return
+
+    logging.log(msg=f"Selected gpt4free category by user_id={call.from_user.id}",
+                level=logging.INFO)
+
+    await call.answer("Вы выбрали провайдеры 🤖")
+
+    await state.set_state(AnsweringGPT4Free.set_provider)
+    await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
+                                 reply_markup=gpt4free_providers_keyboard(user_id=call.from_user.id, page=0))
+
+
+async def inline_g4f_models(call: types.CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
+    """
+    Query, what creating models selecting menu
+    :param state:
+    :param call:
+    :param callback_data:
+    :return:
+    """
+    if call.from_user.id != callback_data.user_id:
+        return
+
+    await state.set_state(AnsweringGPT4Free.set_model)
+
+    await call.answer("Вы выбрали модели 🤖")
+
+    await call.message.edit_text("Выберите модель, с которой будете общаться 🤖",
+                                 reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id, page=0))
+
+
+async def inline_g4f_model_select(call: types.CallbackQuery, callback_data: Gpt4FreeModel, state: FSMContext):
+    """
+    Query, what ending model selecting
+    :param call:
+    :param callback_data:
+    :param state:
+    :return:
+    """
+    if call.from_user.id != callback_data.user_id:
+        return
+
+    await state.update_data(set_model=callback_data.model)
+    await state.set_state(AnsweringGPT4Free.ready_to_answer)
+
+    await call.answer("Вы можете начать общаться 🤖")
+
+    await call.message.edit_text("Удача ✅\n"
+                                 "Вы теперь можете спокойно вести диалог 🤖\n"
+                                 f"Вы выбрали модель <b>{callback_data.model}</b>👾\n"
+                                 "Чтобы прекратить общение, используйте /cancel ", reply_markup=delete_keyboard(admin_id=call.from_user.id))
+
+
+async def inline_g4f_next_models(call: types.CallbackQuery, callback_data: Gpt4FreeModelPage, state: FSMContext) -> None:
+    """
+    Query, what creating models selecting menu
+    :param state:
+    :param call:
+    :param callback_data:
+    :return:
+    """
+    if call.from_user.id != callback_data.user_id:
+        return
+
+    await call.answer(f"Вы перелистнули на страницу {callback_data.page + 1}📄")
+
+    await call.message.edit_text("Выберите модель, с которой будете общаться 🤖",
+                                 reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id, page=callback_data.page))
+
+
+async def inline_g4f_categories(call: types.CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
     """
     Query, what creating providers selecting menu.
     :param state:
@@ -49,11 +137,10 @@ async def inline_g4f_providers(call: types.CallbackQuery, callback_data: GptCate
                 level=logging.INFO)
 
     await state.update_data(set_category=callback_data.category)
-    await state.set_state(AnsweringGPT4Free.set_provider)
-
-    await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
-                                 reply_markup=gpt4free_providers_keyboard(page=0, user_id=callback_data.user_id))
-    await call.answer("Выберите пожалуйста одного из провайдеров 👨‍💻")
+    await call.answer("Вы выбрали Gpt4Free 🤖")
+    await call.message.edit_text("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖",
+                                 reply_markup=gpt4free_categories_keyboard(user_id=call.from_user.id))
+    await call.answer("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖")
 
 
 async def inline_g4f_providers_back(call: types.CallbackQuery, callback_data: GptBackMenu, state: FSMContext) -> None:
@@ -76,7 +163,7 @@ async def inline_g4f_providers_back(call: types.CallbackQuery, callback_data: Gp
     await call.answer("Выберите пожалуйста одного из провайдеров 👨‍💻")
 
 
-async def inline_g4f_models(call: types.CallbackQuery, callback_data: Gpt4FreeProvider, state: FSMContext) -> None:
+async def inline_g4f_provider_models(call: types.CallbackQuery, callback_data: Gpt4FreeProvider, state: FSMContext) -> None:
     """
     Query, what creating models selecting menu.
     :param state:
@@ -216,7 +303,7 @@ async def inline_next_g4f_providers(call: types.CallbackQuery, callback_data: Gp
     await call.answer(f"Вы перелистнули на страницу {callback_data.page + 1}📄")
 
 
-async def inline_next_g4f_models(call: types.CallbackQuery, callback_data: Gpt4FreeModelPage,
+async def inline_next_g4f_models(call: types.CallbackQuery, callback_data: Gpt4FreeProvsModelPage,
                                  state: FSMContext) -> None:
     """
     Query, what generates a next page of models for user.

@@ -1,6 +1,29 @@
 from aiogram.filters.callback_data import CallbackData
 
 
+class Gpt4FreeModel(CallbackData, prefix="g4fm"):
+    """
+    Callback with information to show page of models list
+    """
+    user_id: int
+    model: str
+
+
+class Gpt4FreeModelPage(CallbackData, prefix="g4fmnp"):
+    """
+    Callback with information to show page of models list
+    """
+    user_id: int
+    page: int
+
+
+class Gpt4FreeCategory(CallbackData, prefix="g4fcat"):
+    """
+    Callback with information to select one of categories
+    """
+    user_id: int
+    category: str
+
 class Gpt4FreeProvider(CallbackData, prefix="g4fp"):
     """
         Callback with information related to selected provider
@@ -17,7 +40,7 @@ class GptCategory(CallbackData, prefix="gpt"):
     category: str
 
 
-class Gpt4FreeModelPage(CallbackData, prefix="g4mp"):
+class Gpt4FreeProvsModelPage(CallbackData, prefix="g4fmp"):
     """
         Callback with information to show new page
     """

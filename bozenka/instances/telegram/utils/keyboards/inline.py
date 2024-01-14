@@ -1,3 +1,4 @@
+import g4f
 import gpt4all
 
 from typing import Any
@@ -275,14 +276,70 @@ def gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup
          ],
         # Under list buttons
         [InlineKeyboardButton(text="🔙 Вернуться к категориям",
-                              callback_data=GptBackMenu(user_id=user_id, back_to="category").pack())],
+                              callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack())],
         [InlineKeyboardButton(text="Спасибо, не надо ❌",
                               callback_data=GptStop(user_id=str(user_id)).pack())]])
     return generated_page
 
 
-def gpt4free_models_by_provider(user_id: int, page: int) -> InlineKeyboardMarkup:
-    pass
+def gpt4free_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Menu of categories in Gpt4Free (Providers / Models)
+    :param user_id:
+    :return:
+    """
+    print("!231234")
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="По моделям 🤖",
+                             callback_data=Gpt4FreeCategory(category="models", user_id=user_id).pack())
+    ], [
+        InlineKeyboardButton(text="По провайдерам 🤖",
+                             callback_data=Gpt4FreeCategory(category="providers", user_id=user_id).pack())
+    ]])
+    return kb
+
+
+def gpt4free_models_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
+    """
+    Generating list of GPT4FREE models, can be used to generate text.
+    :param user_id:
+    :param page:
+    :return:
+    """
+    builder = InlineKeyboardBuilder()
+    full_list = g4f.ModelUtils.convert.keys()
+    models = items_list_generator(page=page, list_of_items=full_list, count_of_items=4)
+    pages = [len(full_list) // 4 - 1 if page - 1 == -1 else page - 1,
+             0 if page + 1 >= len(full_list) // 4 else page + 1]
+
+    for model in models:
+        builder.row(InlineKeyboardButton(text=model,
+                                         callback_data=Gpt4FreeModel(user_id=user_id, model=model).pack()))
+    builder.row(
+        # First page button
+        InlineKeyboardButton(text=str(len(full_list) // 4 if page == 0 else "1"),
+                             callback_data=Gpt4FreeModelPage(
+                                 page=str(len(full_list) // 4 - 1 if page == 0 else "1"),
+                                 user_id=user_id).pack(),
+                             ),
+        # Page back button
+        InlineKeyboardButton(text="⬅️",
+                             callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[0], ).pack()),
+        # Count of page button
+        InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
+        # Next page button
+        InlineKeyboardButton(text="➡️",
+                             callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[1]).pack()),
+        # Last page button
+        InlineKeyboardButton(text=str(len(full_list) // 4 if page != 0 else "1"),
+                             callback_data=Gpt4FreeModelPage(
+                                 page=str(len(full_list) // 4 - 1) if page != 0 else "1",
+                                 user_id=user_id).pack(), ))
+    builder.row(InlineKeyboardButton(text="🔙 Вернуться",
+                                     callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack()))
+    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌",
+                                     callback_data=GptStop(user_id=str(user_id)).pack()))
+    return builder.as_markup()
 
 
 def gpt4free_models_by_provider_keyboard(user_id: int, provider: str, page: int) -> InlineKeyboardMarkup:
@@ -292,6 +349,7 @@ def gpt4free_models_by_provider_keyboard(user_id: int, provider: str, page: int)
     :param user_id:
     :param provider:
     :param page:
+    :return:
     """
     builder = InlineKeyboardBuilder()
     models = generate_gpt4free_models()
@@ -310,23 +368,24 @@ def gpt4free_models_by_provider_keyboard(user_id: int, provider: str, page: int)
             builder.row(
                 # First page button
                 InlineKeyboardButton(text=str(len(models[provider]) // 4 if page == 0 else "1"),
-                                     callback_data=Gpt4FreeModelPage(
+                                     callback_data=Gpt4FreeProvsModelPage(
                                          page=str(len(models[provider]) // 4 - 1 if page == 0 else "1"),
                                          user_id=user_id,
                                          provider=provider).pack(),
                                      ),
                 # Page back button
                 InlineKeyboardButton(text="⬅️",
-                                     callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[0],
-                                                                     provider=provider).pack()),
+                                     callback_data=Gpt4FreeProvsModelPage(user_id=str(user_id), page=pages[0],
+                                                                          provider=provider).pack()),
                 # Count of page button
                 InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
                 # Next page button
-                InlineKeyboardButton(text="➡️", callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[1],
-                                                                                provider=provider).pack()),
+                InlineKeyboardButton(text="➡️",
+                                     callback_data=Gpt4FreeProvsModelPage(user_id=str(user_id), page=pages[1],
+                                                                          provider=provider).pack()),
                 # Last page button
                 InlineKeyboardButton(text=str(len(models[provider]) // 4 if page != 0 else "1"),
-                                     callback_data=Gpt4FreeModelPage(
+                                     callback_data=Gpt4FreeProvsModelPage(
                                          page=str(len(models[provider]) // 4 - 1) if page != 0 else "1",
                                          user_id=user_id,
                                          provider=provider).pack(), ))

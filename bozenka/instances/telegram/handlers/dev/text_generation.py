@@ -117,6 +117,10 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
     if info.get("ready_to_answer"):
         for message in info["ready_to_answer"]:
             current_messages.append(message)
+
+    if not info.get("set_provider"):
+        info["set_provider"] = None
+
     current_messages.append({"role": "user", "content": msg.text})
 
     response = ""
@@ -124,7 +128,7 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
         response = await g4f.ChatCompletion.create_async(
             model=info["set_model"],
             messages=current_messages,
-            provider=providers[info["set_provider"]],
+            provider=None if info["set_provider"] is None else providers[info["set_provider"]],
             stream=False
         )
 
@@ -133,7 +137,7 @@ async def g4f_generate_answer(msg: Message, state: FSMContext):
             response = g4f.ChatCompletion.create(
                 model=info["set_model"],
                 messages=current_messages,
-                provider=providers[info["set_provider"]],
+                provider=None if info["set_provider"] is None else providers[info["set_provider"]],
                 stream=False
             )
         except Exception as S:

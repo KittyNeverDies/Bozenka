@@ -7,7 +7,8 @@ text_generative_categories = [
 
 # List of image generative categories, what we support
 image_generative_categories = [
-    "Kadinsky"
+    "Kadinsky",
+    "StableDiffusion XL"
 ]
 
 image_generative_size = [

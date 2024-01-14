@@ -44,14 +44,22 @@ def register_queries(router: Router) -> None:
     router.callback_query.register(inline_start_gpt, GptBackMenu.filter(F.back_to == "category"))
 
     # Gpt4Free menus (Providers/Models)
-    router.callback_query.register(inline_g4f_providers, GptCategory.filter(F.category == "Gpt4Free"))
-    router.callback_query.register(inline_g4f_models, Gpt4FreeProvider.filter())
+    router.callback_query.register(inline_g4f_categories, GptCategory.filter(F.category == "Gpt4Free"))
+    router.callback_query.register(inline_g4f_categories, GptBackMenu.filter(F.back_to == "g4fcategory"))
+
+    router.callback_query.register(inline_g4f_provider_models, Gpt4FreeProvider.filter())
+
+    router.callback_query.register(inline_g4f_models, Gpt4FreeCategory.filter(F.category == "models"))
+    router.callback_query.register(inline_g4f_providers, Gpt4FreeCategory.filter(F.category == "providers"))
+
+    router.callback_query.register(inline_g4f_model_select, Gpt4FreeModel.filter())
+    router.callback_query.register(inline_g4f_next_models, Gpt4FreeModelPage.filter())
 
     # Get back to menu state
     router.callback_query.register(inline_g4f_providers_back, GptBackMenu.filter(F.back_to == "providers"))
 
     # Generates next pages (Providers/Models)
-    router.callback_query.register(inline_next_g4f_models, Gpt4FreeModelPage.filter(), flags={"rate_limit": {"rate": 5}})
+    router.callback_query.register(inline_next_g4f_models, Gpt4FreeProvsModelPage.filter(), flags={"rate_limit": {"rate": 5}})
     router.callback_query.register(inline_next_g4f_providers, Gpt4FreeProviderPage.filter(),
                                    flags={"rate_limit": {"rate": 5}})
 

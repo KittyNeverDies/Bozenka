@@ -239,24 +239,32 @@ ru_cmds = {
 }
 
 list_of_commands = {
+    # Main commands
     ("start", "Command to start work with bozenka the bot"),
-    ('setup', 'Command to setup bozenka work in chat'),
+    ('setup', 'Command to setup bozenka features in chat'),
+    # Moderation commands
     ("ban", "Command to ban user in chat"),
     ('unban', 'Command to unban user in chat'),
     ('mute', 'Command to mute user in chat'),
     ('unmute', 'Command to unmute user in chat'),
+    # Work with pins
     ('pin', 'Pin fast any message in chat'),
     ('unpin', 'Unpin fast any message in chat'),
+    # Close / open topics
     ('close', 'Close fast topic (not general) in chat'),
     ('open', 'Open fast topic (not general) in chat'),
     ('hide_general', 'Hide general topic in chat'),
     ('show_general', 'Show general topic in chat'),
     ("close_general", 'Closes general topic in chat'),
     ("open_general", 'Opens general topic in chat'),
-    ('conversation', 'Starts conversation with gpt'),
-    ('invite', 'Generates invite into this chat'),
+    # AI related
+    ('conversation', 'Starts conversation with text generative ai'),
+    ('imagine', 'Starts conversation with image generative ai'),\
+    # Basic features
+    ('invite', 'Generates invite into current chat'),
     ('about', 'Sends information about bozenka'),
-    ('hi', 'Sends welcome message')
+    ('hi', 'Sends test welcome message'),
+    ('info', 'Get information about chat')
 }
 
 translations = {
