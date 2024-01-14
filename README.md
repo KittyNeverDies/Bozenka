@@ -22,23 +22,24 @@
     - [x] Hide general topic
     - [x] Rename topics
     - [x] Work with inline keyboard
-  - [ ] Users
+  - [x] Users
     - [x] Show information about chat (/info)
     - [x] Welcome messages
     - [x] Generating invites
-    - [ ] Start command menu (/start)
+    - [x] Start command menu (/start)
 - [ ] Fun
   - [ ] GPT based text generation
     - [x] Gpt4All
     - [x] Gpt4Free
     - [ ] RWKV
     - [ ] H20
-    - [ ] Work with inline keyboard
+    - [x] Work with inline keyboard
     - [ ] Using tutorial.
     - [x] Threads and Topic of dialog support (Already by new aiogram)
   - [ ] Image generation
     - [ ] Using tutorial 
     - [ ] Inline generation
+    - [x] Imagine command + inline keyboard support
 - [x] Code
   - [x] Logging support
   - [x] Features descriptions
