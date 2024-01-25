@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b5f4690f-9c7d-4552-b353-4d3f2e04dd73" name="Changes" comment="Updated README.md with our changes">
+      <change afterPath="$PROJECT_DIR$/bozenka/database/migrate/versions/03fc3d7fd323_settings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bozenka/database/migrate/versions/126f2b7d596f_.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bozenka/database/migrate/versions/b8e872782072_.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/mute.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/database/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/database/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/database/tables/telegram.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/database/tables/telegram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/chat_admin/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/chat_admin/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/chat_admin/bans.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/chat_admin/bans.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/chat_admin/mutes.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/chat_admin/mutes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/dev/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/fun/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/dev/hello.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/fun/hello.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/dev/image_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/fun/image_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/dev/text_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/fun/text_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/ban.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/ban.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/handlers/queries/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/utils/filters/chat_setting.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/utils/filters/chat_setting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/utils/filters/permissions.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/utils/filters/permissions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/utils/keyboards/inline.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/utils/keyboards/inline.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/utils/simpler/lists_of_content.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/utils/simpler/lists_of_content.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bozenka/instances/telegram/utils/simpler/solution_simpler.py" beforeDir="false" afterPath="$PROJECT_DIR$/bozenka/instances/telegram/utils/simpler/solution_simpler.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Y8FoijbXlQL5ZAVGNg0R9yVpb7" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;telegram&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Me/Desktop/New folder (3)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Files\Documents\GitHub\Bozenka\bozenka\instances\telegram\handlers" />
+      <recent name="D:\Files\Documents\GitHub\Bozenka\bozenka\instances\telegram\utils\callbacks_factory" />
+      <recent name="D:\Files\Documents\GitHub\Bozenka\bozenka\instances\telegram\cmds\admin" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.run">
+    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Bozenka" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bozenka/generative/pytorch" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bozenka/generative/pytorch/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Bozenka" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="db_host" value="localhost" />
+        <env name="db_name" value="postgres" />
+        <env name="db_password" value="1234" />
+        <env name="db_port" value="5432" />
+        <env name="db_username" value="postgres" />
+        <env name="ds_bot_token" value="MTE2MjY3MTI1NTc3OTAzNzE5NA.GYa37J.ReFlk8di-24NgUgmxM5axIOzQPcCBtvzlGdcT4" />
+        <env name="kadinsky_api" value="0707980654288A1B6A3AC07F872F6DE6" />
+        <env name="kadinsky_secret" value="C7EED671E33AE23FC44A9CC7F8028159" />
+        <env name="tg_bot_token" value="6200798957:AAGgLAFCAxR1-YVdr3GutpjrS7bfIhTPwXk" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bozenka/generative/kadinsky" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.run" />
+        <item itemvalue="Python.__init__" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b5f4690f-9c7d-4552-b353-4d3f2e04dd73" name="Changes" comment="" />
+      <created>1699899491933</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1699899491933</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Added pins, threads menu.&#10;Added G4A support&#10;Added for AI menu `back` button&#10;Added for AI menu `stop` menu&#10;Added custom menu for response&#10;Added some code for /setup command">
+      <option name="closed" value="true" />
+      <created>1700770003336</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1700770003336</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added some parts of new /setup codes">
+      <option name="closed" value="true" />
+      <created>1700930970914</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1700930970914</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Updated README for current progress">
+      <option name="closed" value="true" />
+      <created>1700931415851</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1700931415851</updated>
+    </task>
+    <task id="LOCAL-00004" summary="requirements.txt updated!">
+      <option name="closed" value="true" />
+      <created>1700931570002</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1700931570002</updated>
+    </task>
+    <task id="LOCAL-00005" summary="README!!!">
+      <option name="closed" value="true" />
+      <created>1700931703910</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1700931703910</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Fixed readme )">
+      <option name="closed" value="true" />
+      <created>1700931736843</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1700931736843</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fixed readme )">
+      <option name="closed" value="true" />
+      <created>1700931775166</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1700931775166</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Big refactor updates, fixes &amp; fixes&#10;- Big code refactor&#10;- Gpt4All fixes&#10;- Some changes&#10;- Added /start basic functions">
+      <option name="closed" value="true" />
+      <created>1702910622536</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1702910622536</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Reverting and saving&#10;- Turned antispam.py into retry.py, need redis storage for better work.&#10;- Reverted /ban recode&#10;- Removed registration.py middleware&#10;- Removed using in perms ru_cmds (outdated)">
+      <option name="closed" value="true" />
+      <created>1703018173398</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1703018173398</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Changelog:&#10;- /start finished&#10;- started codding /setup database&#10;- too much refactors&#10;- started codding image generation&#10;- reverted changes for /ban recode">
+      <option name="closed" value="true" />
+      <created>1703937156500</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1703937156500</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Changelog:&#10;- `/imagine` created, added image generation by kadinsky!&#10;- `/ban`, `/mute` refactors, added internet issue support&#10;- reply.py removed&#10;- More advanced work with threads (threads.py and solution_simpler.py)&#10;- `/start` finished">
+      <option name="closed" value="true" />
+      <created>1704276926842</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1704276926842</updated>
+    </task>
+    <task id="LOCAL-00012" summary="### A small changes:&#10;- Added support for g4f selecting generating provider by model&#10;- Recoded `/info` &#10;- Updated commands list + requirements.txt">
+      <option name="closed" value="true" />
+      <created>1705230302075</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1705230302075</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Updated README.md with our changes">
+      <option name="closed" value="true" />
+      <created>1705230413690</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1705230413690</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added pins, threads menu.&#10;Added G4A support&#10;Added for AI menu `back` button&#10;Added for AI menu `stop` menu&#10;Added custom menu for response&#10;Added some code for /setup command" />
+    <MESSAGE value="Added some parts of new /setup codes" />
+    <MESSAGE value="Updated README for current progress" />
+    <MESSAGE value="requirements.txt updated!" />
+    <MESSAGE value="README!!!" />
+    <MESSAGE value="Fixed readme )" />
+    <MESSAGE value="Big refactor updates, fixes &amp; fixes&#10;- Big code refactor&#10;- Gpt4All fixes&#10;- Some changes&#10;- Added /start basic functions" />
+    <MESSAGE value="Reverting and saving&#10;- Turned antispam.py into retry.py, need redis storage for better work.&#10;- Reverted /ban recode&#10;- Removed registration.py middleware&#10;- Removed using in perms ru_cmds (outdated)" />
+    <MESSAGE value="Changelog:&#10;- /start finished&#10;- started codding /setup database&#10;- too much refactors&#10;- started codding image generation&#10;- reverted changes for /ban recode" />
+    <MESSAGE value="Changelog:&#10;- `/imagine` created, added image generation by kadinsky!&#10;- `/ban`, `/mute` refactors, added internet issue support&#10;- reply.py removed&#10;- More advanced work with threads (threads.py and solution_simpler.py)&#10;- `/start` finished" />
+    <MESSAGE value="### A small changes:&#10;- Added support for g4f selecting generating provider by model&#10;- Recoded `/info` &#10;- Updated commands list + requirements.txt" />
+    <MESSAGE value="Updated README.md with our changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated README.md with our changes" />
+  </component>
+</project>
