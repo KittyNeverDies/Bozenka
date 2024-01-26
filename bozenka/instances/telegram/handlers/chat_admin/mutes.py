@@ -21,25 +21,25 @@ async def mute(msg: Message, command: CommandObject, session_maker: async_sessio
     config = await SolutionSimpler.mute_user(msg, command, session_maker)
     if config["mute_time"] and config["reason"] != "":
         await msg.answer("Удача ✅\n"
-                         f"Пользователь {msg.from_user.mention_html()} запретил писать "
-                         f"сообщения пользователю {msg.reply_to_message.from_user.mention_html()}.\n"
+                         f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
+                         f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n"
                          f"По причине {config['reason']}, до даты {config['mute_time']}",
                          reply_markup=mute_keyboard(msg.from_user.id, restricting.user.id))
-    elif config["mute_reason"] != "":
+    elif config["reason"] != "":
         await msg.answer("Удача ✅\n"
-                         f"Пользователь {msg.from_user.mention_html()} запретил писать "
-                         f"сообщения пользователю {msg.reply_to_message.from_user.mention_html()}.\n"
+                         f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
+                         f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n"
                          f"По причине {config['reason']}",
                          reply_markup=mute_keyboard(msg.from_user.id, restricting.user.id))
     elif config["mute_time"]:
         await msg.answer("Удача ✅\n"
-                         f"Пользователь {msg.from_user.mention_html()} запретил писать "
-                         f"сообщения пользователю {msg.reply_to_message.from_user.mention_html()}.\n"
+                         f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
+                         f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n"
                          f"До даты {config['mute_time']}",
                          reply_markup=mute_keyboard(msg.from_user.id, restricting.user.id))
     else:
         await msg.answer("Удача ✅\n"
-                         f"Пользователь {msg.from_user.mention_html()} запретил писать "
+                         f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
                          f"сообщения пользователю {msg.reply_to_message.from_user.mention_html()}.\n",
                          reply_markup=mute_keyboard(msg.from_user.id, restricting.user.id))
 
@@ -54,6 +54,6 @@ async def unmute(msg: Message, session_maker: async_sessionmaker) -> None:
     """
     await SolutionSimpler.unmute_user(msg, session_maker)
     await msg.answer("Удача ✅"
-                     f"Пользователь {msg.from_user.mention_html()} разрешил писать "
-                     f"сообщения пользователю {msg.reply_to_message.from_user.mention_html()}",
+                     f"{msg.from_user.mention_html('Этот пользователь')} разрешил писать\n"
+                     f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}",
                      reply_markup=unmute_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))

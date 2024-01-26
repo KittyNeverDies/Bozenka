@@ -19,8 +19,8 @@ class Users(MainModel):
     - Mute reason
     """
     __tablename__ = 'users'
-    user_id = Column(BigInteger, unique=True, nullable=False, primary_key=True)
-    chat_id = Column(BigInteger, unique=True, nullable=False, primary_key=True)
+    user_id = Column(BigInteger, unique=False, nullable=False, primary_key=True)
+    chat_id = Column(BigInteger, unique=False, nullable=False, primary_key=True)
     is_banned = Column(Boolean, nullable=True, unique=False)
     ban_reason = Column(Text, nullable=True, unique=False)
     is_muted = Column(Boolean, nullable=True, unique=False)

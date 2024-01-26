@@ -22,14 +22,6 @@ def register_admin_cmd(router: Router) -> None:
     """
     logging.log(msg="Registering administrator commands", level=logging.INFO)
 
-    # Helpig handlers
-    router.message.register(help_ban, Command(commands=["ban"]))
-    router.message.register(help_unban, Command(commands=["unban"]))
-    router.message.register(help_mute, Command(commands=["mute"]))
-    router.message.register(help_unmute, Command(commands=["mute"]))
-    router.message.register(help_pin, Command(commands=["pin"]))
-    router.message.register(help_unpin, Command(commands=["unpin"]))
-
     # Ban / Unban commands handler
     router.message.register(ban_command, Command(commands="ban"),
                             IsAdminFilter(True))
@@ -71,4 +63,12 @@ def register_admin_cmd(router: Router) -> None:
     router.message.register(unhide_general_topic, Command(commands=["unhide_general", "show_general"]),
                             UserHasPermissions(["can_manage_topics"]),
                             BotHasPermissions(["can_manage_topics"]), F.chat.is_forum)
+
+    # Helpig handlers
+    router.message.register(help_ban, Command(commands=["ban"]))
+    router.message.register(help_unban, Command(commands=["unban"]))
+    router.message.register(help_mute, Command(commands=["mute"]))
+    router.message.register(help_unmute, Command(commands=["mute"]))
+    router.message.register(help_pin, Command(commands=["pin"]))
+    router.message.register(help_unpin, Command(commands=["unpin"]))
 

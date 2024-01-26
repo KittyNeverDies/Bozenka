@@ -501,33 +501,33 @@ def unban_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
 
 
 # Mute / Unmute keyboards
-def mute_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
+def mute_keyboard(admin_id: int, mute_id: int) -> InlineKeyboardMarkup:
     """
        Generating menu for /mute command.
        :param admin_id:
-       :param ban_id:
+       :param mute_id:
        :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Спасибо ✅",
                               callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
         [InlineKeyboardButton(text="Размутить 🛠️",
-                              callback_data=UnmuteData(user_id_unmute=ban_id, user_id_clicked=admin_id).pack())]])
+                              callback_data=UnmuteData(user_id_unmute=mute_id, user_id_clicked=admin_id).pack())]])
     return kb
 
 
-def unmute_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
+def unmute_keyboard(admin_id: int, unmute_id: int) -> InlineKeyboardMarkup:
     """
         Generating menu for /unmute command.
         :param admin_id:
-        :param ban_id:
+        :param unmute_id:
         :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Спасибо ✅",
                               callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
         [InlineKeyboardButton(text="Замутить 🛠️",
-                              callback_data=MuteData(user_id_mute=ban_id, user_id_clicked=admin_id).pack())]])
+                              callback_data=MuteData(user_id_mute=unmute_id, user_id_clicked=admin_id).pack())]])
     return kb
 
 

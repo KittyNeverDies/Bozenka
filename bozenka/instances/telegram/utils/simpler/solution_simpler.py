@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database import get_user_info, Users
 from bozenka.database.tables.telegram import get_chat_configuration, ChatSettings
+from bozenka.instances.telegram.utils.callbacks_factory import BanData, UnbanData, MuteData, UnmuteData
 
 
 def count_time(counted_time: str) -> int:
@@ -37,9 +38,50 @@ class SolutionSimpler:
     """
 
     @staticmethod
-    async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
+    async def inline_ban_user(call: types.CallbackQuery, data: BanData, session: async_sessionmaker) -> None:
         """
         Bans user or user, returns config, by config you can send special message.
+        Support multibans & antiflood telegram protection
+        :param call: CallbackQuery telegram object
+        :param data: BanData
+        :param session: Session maker object of SqlAlchemy
+        :return: Nothing
+        """
+        try:
+            await call.message.chat.ban(data.user_id_ban)
+        except TelegramRetryAfter as ex:
+            time.sleep(ex.retry_after)
+            await call.message.chat.ban(data.user_id_ban)
+        except TelegramNotFound:
+            logging.log(
+                msg=f"Can't ban user, something was not avaible or got disabled",
+                level=logging.INFO)
+            return
+        finally:
+            if not await get_user_info(user_id=data.user_id_ban, chat_id=call.message.chat.id, session=session):
+                new_user = Users(
+                    user_id=data.user_id_ban,
+                    chat_id=call.message.chat.id,
+                    is_banned=True,
+                    ban_reason=None,
+                    is_muted=None,
+                    mute_reason=None
+                )
+                async with session() as session:
+                    async with session.begin():
+                        await session.merge(new_user)
+            else:
+                async with session() as session:
+                    async with session.begin():
+                        await session.execute(
+                            Update(Users)
+                            .values(is_banned=True, ban_reason=None)
+                            .where(Users.user_id == data.user_id_ban and Users.chat_id == call.message.chat.id))
+
+    @staticmethod
+    async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
+        """
+        Bans user, returns config, by config you can send special message.
         Support multibans & antiflood telegram protection
         :param msg: Message telegram object
         :param cmd: Object of telegram command
@@ -68,25 +110,6 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            if not await get_user_info(user_id=user.id, chat_id=msg.chat.id, session=session):
-                new_user = Users(
-                    user_id=user.id,
-                    chat_id=msg.chat.id,
-                    is_banned=True,
-                    ban_reason=None if config["reason"] == "" else config["reason"],
-                    is_muted=None,
-                    mute_reason=None
-                )
-                async with session() as session:
-                    async with session.begin():
-                        await session.merge(new_user)
-            else:
-                async with session() as session:
-                    async with session.begin():
-                        await session.execute(
-                            Update(Users)
-                            .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
-                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
 
         except TelegramRetryAfter as ex:
             time.sleep(ex.retry_after)
@@ -95,10 +118,15 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            user = await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
-            if not user:
+        except TelegramNotFound:
+            logging.log(
+                msg=f"Can't ban user, something was not avaible or got disabled",
+                level=logging.INFO)
+            return config
+        finally:
+            if not await get_user_info(user_id=msg.reply_to_message.from_user.id, chat_id=msg.chat.id, session=session):
                 new_user = Users(
-                    user_id=msg.from_user.id,
+                    user_id=msg.reply_to_message.from_user.id,
                     chat_id=msg.chat.id,
                     is_banned=True,
                     ban_reason=None if config["reason"] == "" else config["reason"],
@@ -114,13 +142,26 @@ class SolutionSimpler:
                         await session.execute(
                             Update(Users)
                             .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
-                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
-
-        except TelegramNotFound:
-            logging.log(
-                msg=f"Can't ban user, something was not avaible or got disabled",
-                level=logging.INFO)
+                            .where(Users.user_id == msg.reply_to_message.from_user.id and Users.chat_id == msg.chat.id))
         return config
+
+    @staticmethod
+    async def inline_unban_user(call: types.CallbackQuery, data: UnbanData, session: async_sessionmaker) -> None:
+        """
+        Unbans user by clicking on button, returns nothing
+        :param call: Message telegram object
+        :param session: Session maker object of SqlAlchemy
+        :return: Nothing
+        """
+        await call.message.chat.unban(data.user_id_unban)
+        if await get_user_info(user_id=data.user_id_unban, chat_id=call.message.chat.id, session=session):
+            async with session() as session:
+                async with session.begin():
+                    await session.execute(
+                        Update(Users)
+                        .values(is_banned=False, ban_reason=None)
+                        .where(Users.user_id == data.user_id_unban and Users.chat_id == call.message.chat.id)
+                    )
 
     @staticmethod
     async def unban_user(msg: types.Message, session: async_sessionmaker) -> None:
@@ -166,6 +207,46 @@ class SolutionSimpler:
         return config
 
     @staticmethod
+    async def inline_mute_user(call: types.CallbackQuery, data: MuteData, session: async_sessionmaker) -> None:
+        """
+        Mutes user, returns config, by config you can send special message.
+        :param call: CallBackQuery telegram object
+        :param data: MuteData object
+        :param session: Session maker object of SqlAlchemy
+        :return: Config or Nothing
+        """
+        info = await get_user_info(user_id=data.user_id_mute, chat_id=call.message.chat.id, session=session)
+        try:
+            perms = ChatPermissions(can_send_messages=False)
+            await call.message.chat.restrict(data.user_id_mute, permissions=perms)
+        except TelegramRetryAfter as ex:
+            time.sleep(ex.retry_after)
+            perms = ChatPermissions(can_send_messages=False)
+            await call.message.chat.restrict(data.user_id_mute, permissions=perms)
+        finally:
+            if info is None:
+                print("TTTTT")
+                print(info)
+                new_user = Users(
+                    user_id=data.user_id_mute,
+                    chat_id=call.message.chat.id,
+                    is_banned=None,
+                    ban_reason=None,
+                    is_muted=True,
+                    mute_reason=None
+                )
+                async with session() as session:
+                    async with session.begin():
+                        await session.merge(new_user)
+            else:
+                async with session() as session:
+                    async with session.begin():
+                        await session.execute(
+                            Update(Users)
+                            .values(is_muted=True, mute_reason=None)
+                            .where(Users.user_id == data.user_id_mute and Users.chat_id == call.message.chat.id))
+
+    @staticmethod
     async def mute_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
         """
         Mutes user, returns config, by config you can send special message.
@@ -191,25 +272,6 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            if not await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
-                new_user = Users(
-                    user_id=msg.from_user.id,
-                    chat_id=msg.chat.id,
-                    is_banned=None,
-                    ban_reason=None,
-                    is_muted=True,
-                    mute_reason=None if config["reason"] == "" else config["reason"]
-                )
-                async with session() as session:
-                    async with session.begin():
-                        await session.merge(new_user)
-            else:
-                async with session() as session:
-                    async with session.begin():
-                        await session.execute(
-                            Update(Users)
-                            .values(is_muted=True, mute_reason=None if config["reason"] == "" else config["reason"])
-                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
         except TelegramRetryAfter as ex:
             time.sleep(ex.retry_after)
             perms = ChatPermissions(can_send_messages=False)
@@ -218,9 +280,10 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            if not await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+        finally:
+            if not await get_user_info(user_id=msg.reply_to_message.from_user.id, chat_id=msg.chat.id, session=session):
                 new_user = Users(
-                    user_id=msg.from_user.id,
+                    user_id=msg.reply_to_message.from_user.id,
                     chat_id=msg.chat.id,
                     is_banned=None,
                     ban_reason=None,
@@ -236,8 +299,29 @@ class SolutionSimpler:
                         await session.execute(
                             Update(Users)
                             .values(is_muted=True, mute_reason=None if config["reason"] == "" else config["reason"])
-                            .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id))
+                            .where(Users.user_id == msg.reply_to_message.from_user.id and Users.chat_id == msg.chat.id))
         return config
+
+    @staticmethod
+    async def inline_unmute_user(call: types.CallbackQuery, data: UnmuteData, session: async_sessionmaker):
+        """
+        Unmutes user, returns nothing
+        :param call: Message telegram object
+        :param data: Unmute data object
+        :param session: Session maker object of SqlAlchemy
+        :return: Nothing
+        """
+
+        perms = ChatPermissions(can_send_messages=True)
+        await call.message.chat.restrict(data.user_id_unmute, permissions=perms)
+        if await get_user_info(user_id=data.user_id_unmute, chat_id=call.message.chat.id, session=session):
+            async with session() as session:
+                async with session.begin():
+                    await session.execute(
+                        Update(Users)
+                        .values(is_muted=False, mute_reason=None, )
+                        .where(Users.user_id == data.user_id_unmute and Users.chat_id == call.message.chat.id)
+                    )
 
     @staticmethod
     async def unmute_user(msg: types.Message, session: async_sessionmaker):

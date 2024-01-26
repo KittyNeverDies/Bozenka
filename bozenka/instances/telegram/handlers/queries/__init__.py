@@ -1,6 +1,7 @@
 from aiogram import Router, F
 
 from bozenka.instances.telegram.handlers.queries.image_generation import inline_image_size, inline_image_ready
+from bozenka.instances.telegram.handlers.queries.mute import *
 from bozenka.instances.telegram.handlers.queries.start import *
 from bozenka.instances.telegram.utils.callbacks_factory import *
 from bozenka.instances.telegram.handlers.queries.ban import *
@@ -24,6 +25,10 @@ def register_queries(router: Router) -> None:
     # Ban / Unban buttons reactions
     router.callback_query.register(inline_ban, BanData.filter())
     router.callback_query.register(inline_unban, UnbanData.filter())
+
+    # Mute / Un,ute buttons reactions
+    router.callback_query.register(inline_mute, MuteData.filter())
+    router.callback_query.register(inline_unmute, UnmuteData.filter())
 
     # Revoke telegram invite link button
     router.callback_query.register(inline_revoke, RevokeCallbackData.filter())
