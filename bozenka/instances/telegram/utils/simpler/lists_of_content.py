@@ -1,10 +1,12 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Any
 
 import g4f
 from g4f import Provider
 from g4f.Provider import RetryProvider
 from varname import nameof
+
+from bozenka.database.tables.telegram import ChatSettings
 
 
 @dataclass
@@ -17,6 +19,7 @@ class BaseFeature:
     description: str
     callback_name: str
     settings_name: str
+    db_name: Any
 
 
 @dataclass
@@ -43,12 +46,13 @@ list_of_features = {
             name="Закреп 📌",
             description="<b>Закреп</b>📌"
                         "\nДанная функция включает команды:"
-                        "/pin - закрепляет сообщение"
-                        "/unpin - открепляет сообщение"
-                        "/unpin_all - открепляет все сообщения, которые видит бот"
+                        "<pre>/pin - закрепляет сообщение\n"
+                        "/unpin - открепляет сообщение\n"
+                        "/unpin_all - открепляет все сообщения, которые видит бот</pre>\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="pins",
-            settings_name="pins"
+            settings_name="pins",
+            db_name=ChatSettings.pins
         ),
         BaseFeature(
             name="Модерация чата 🕵️",
@@ -67,7 +71,8 @@ list_of_features = {
                         "ответьте на сообщение пользователя и используйте команду\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="moderation",
-            settings_name="moderation"
+            settings_name="moderation",
+            db_name=ChatSettings.moderation
         ),
         BaseFeature(
             name="Работа с Форумом 💬",
@@ -81,7 +86,8 @@ list_of_features = {
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота. Также должен быть"
                         "включен форум</b>",
             callback_name="topics",
-            settings_name="topics"
+            settings_name="topics",
+            db_name=ChatSettings.topics
         ),
         BaseFeature(
             name="Приглашения в Чат ✉",
@@ -89,7 +95,8 @@ list_of_features = {
                         "Разрешает использование комманды /invite в чате, для созданния приглашений.\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="invites",
-            settings_name="invite_generator"
+            settings_name="invite_generator",
+            db_name=ChatSettings.invite_generator
         )
     ],
     "Members": [
@@ -98,14 +105,16 @@ list_of_features = {
             description="<b>Приветсвенные сообщения 👋</b>"
                         "\nПриветсвенные сообщения новым и ушедшим пользователям.",
             callback_name="welcome",
-            settings_name="welcome_messages"
+            settings_name="welcome_messages",
+            db_name=ChatSettings.welcome_messages
         ),
         BaseFeature(
             name="Оповещение о муте 📬",
             description="<b>Оповещение о муте 📬</b>"
                         "\nОповещает пользователя в личных сообщениях, что тот был: замучен, размучен, забанен, разбанен",
             callback_name="notify",
-            settings_name="restrict_notification"
+            settings_name="restrict_notification",
+            db_name=ChatSettings.restrict_notification
         )
     ],
     "Devs": [
@@ -115,7 +124,8 @@ list_of_features = {
                         "\nБот будет отвечать на комманды "
                         "/hi, /hello, /privet и т.п., отвечая приветсвием на сообщение пользователя.",
             callback_name="hi",
-            settings_name="hi_command"
+            settings_name="hi_command",
+            db_name=ChatSettings.hi_command
         ),
         BaseFeature(
             name="ИИ ЧатБот 🤖",
@@ -127,14 +137,16 @@ list_of_features = {
                         "<pre>/conversations</pre>"
                         "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘",
             callback_name="gtm",
-            settings_name="gpt_conversations"
+            settings_name="gpt_conversations",
+            db_name=ChatSettings.text_generation
         ),
         BaseFeature(
             name="Генерация изображений 📸",
             description="<b>Генерация изображений </b>🤖"
                         "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘",
             callback_name="gpm",
-            settings_name="123"
+            settings_name="123",
+            db_name=ChatSettings.image_generation
         )
     ]
 

@@ -44,8 +44,8 @@ class ChatSettings(MainModel):
     """
     __tablename__ = 'chats_tg'
     chat_id = Column(BigInteger, unique=True, nullable=False, primary_key=True)
+    # Admin features
     moderation = Column(Boolean, default=True, unique=False)
-    gpt_conversations = Column(Boolean, default=False, unique=False)
     topics = Column(Boolean, default=False, unique=False)
     pins = Column(Boolean, default=False, unique=False)
     welcome_messages = Column(Boolean, default=True, unique=False)
@@ -54,10 +54,13 @@ class ChatSettings(MainModel):
     chat_info = Column(Boolean, default=True, unique=False)
     results_in_dm = Column(Boolean, default=True, unique=False)
     restrict_notification = Column(Boolean, default=True, unique=False)
+
+    text_generation = Column(Boolean, default=False, unique=False)
+    image_generation = Column(Boolean, default=False, unique=False)
     # openai_token = Column(Text)
 
 
-async def get_settings(chat_id: int, session: async_sessionmaker):
+async def get_chat_configuration(chat_id: int, session: async_sessionmaker):
     """
     Return settings with sessionmaker by chat_id
     :param chat_id: id of telegram chat
@@ -70,7 +73,7 @@ async def get_settings(chat_id: int, session: async_sessionmaker):
             return (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one_or_none()
 
 
-async def get_setting(chat_id: int, session: async_sessionmaker, setting: str) -> bool:
+async def get_chat_config_value(chat_id: int, session: async_sessionmaker, setting) -> bool:
     """
     Return setting by sessionmaker and chat_id
     :param chat_id: id of telegram chat
@@ -80,11 +83,11 @@ async def get_setting(chat_id: int, session: async_sessionmaker, setting: str) -
     """
     async with session() as session:
         async with session.begin():
-            rows = (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one()
-            print(rows.pin)
+            rows = (await session.execute(select(setting.db_name).where(ChatSettings.chat_id == chat_id))).one()
+            return rows[0]
 
 
-async def get_user(user_id: int, chat_id: int, session: async_sessionmaker) -> Row[tuple[Any, ...] | Any] | None:
+async def get_user_info(user_id: int, chat_id: int, session: async_sessionmaker) -> Row[tuple[Any, ...] | Any] | None:
     """
     Return user with sessionmaker by user_id and chat_id.
     :param user_id: id of telegram user

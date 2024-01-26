@@ -26,9 +26,9 @@ async def ban_command(msg: Message, command: CommandObject, session_maker: async
     config = await SolutionSimpler.ban_user(msg, command, session_maker)
     if config["reason"] and config["ban_time"]:
         await msg.answer("Удача ✅\n"
-                        f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.from_user.mention_html()}.\n"
-                        f"По причине {config['reason']}, до даты {config['ban_time']}",
-                        reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
+                         f"Пользователь {msg.reply_to_message.from_user.mention_html()} был заблокирован пользователем {msg.from_user.mention_html()}.\n"
+                         f"По причине {config['reason']}, до даты {config['ban_time']}",
+                         reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
     elif config["reason"]:
         await msg.answer(
             "Удача ✅\n"

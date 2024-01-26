@@ -8,7 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from gpt4all import GPT4All
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bozenka.database.tables.telegram import get_setting
+from bozenka.database.tables.telegram import get_chat_config_value
 from bozenka.instances.telegram.utils.callbacks_factory import *
 from bozenka.instances.telegram.utils.simpler.lists_of_content import generate_list_of_features
 from bozenka.generative.gpt4free import generate_gpt4free_models, generate_gpt4free_providers
@@ -123,23 +123,16 @@ def setup_category_keyboard(category: str) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-async def setup_feature_keyboard(category: str, index: int, session: async_sessionmaker,
-                                 msg: Message) -> InlineKeyboardMarkup:
+async def setup_feature_keyboard(category: str, index: int, is_enabled: bool) -> InlineKeyboardMarkup:
     """
     Generate keyboard for enabling or disabling
     on of features
+    :param is_enabled:
     :param category:
     :param index:
-    :param session:
-    :param msg:
+
     :return:
     """
-
-    list_of_features = generate_list_of_features(category)
-    is_enabled = await get_setting(
-        chat_id=msg.chat.id,
-        session=session,
-        setting=list_of_features[index].settings_name)
 
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Выключить ❌", callback_data=SetupAction(action="disable",

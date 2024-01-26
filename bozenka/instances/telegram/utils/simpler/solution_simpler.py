@@ -12,8 +12,8 @@ from aiogram.types import ChatPermissions, CallbackQuery
 from sqlalchemy import Update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bozenka.database import get_user, Users
-from bozenka.database.tables.telegram import get_settings, ChatSettings
+from bozenka.database import get_user_info, Users
+from bozenka.database.tables.telegram import get_chat_configuration, ChatSettings
 
 
 def count_time(counted_time: str) -> int:
@@ -68,7 +68,7 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            if not await get_user(user_id=user.id, chat_id=msg.chat.id, session=session):
+            if not await get_user_info(user_id=user.id, chat_id=msg.chat.id, session=session):
                 new_user = Users(
                     user_id=user.id,
                     chat_id=msg.chat.id,
@@ -95,7 +95,7 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Banned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            user = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
+            user = await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
             if not user:
                 new_user = Users(
                     user_id=msg.from_user.id,
@@ -134,7 +134,7 @@ class SolutionSimpler:
         logging.log(
             msg=f"Unbanned user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
             level=logging.INFO)
-        if await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+        if await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
             async with session() as session:
                 async with session.begin():
                     await session.execute(
@@ -158,7 +158,7 @@ class SolutionSimpler:
             "mute_reason": None,
         }
         user_tg = await msg.chat.get_member(msg.from_user.id)
-        user_db = await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
+        user_db = await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session)
         config["is_banned"] = True if user_tg.status == ChatMemberStatus.KICKED else False
         config["ban_reason"] = user_db.ban_reason if user_db.ban_reason else None
         config["is_muted"] = True if not user_tg.can_send_messages else False
@@ -191,7 +191,7 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            if not await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+            if not await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
                 new_user = Users(
                     user_id=msg.from_user.id,
                     chat_id=msg.chat.id,
@@ -218,7 +218,7 @@ class SolutionSimpler:
             logging.log(
                 msg=f"Muted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
                 level=logging.INFO)
-            if not await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+            if not await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
                 new_user = Users(
                     user_id=msg.from_user.id,
                     chat_id=msg.chat.id,
@@ -253,7 +253,7 @@ class SolutionSimpler:
         logging.log(
             msg=f"Unmuted user @{msg.reply_to_message.from_user.full_name} id={msg.reply_to_message.from_user.id}",
             level=logging.INFO)
-        if await get_user(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
+        if await get_user_info(user_id=msg.from_user.id, chat_id=msg.chat.id, session=session):
             async with session() as session:
                 async with session.begin():
                     await session.execute(
@@ -324,7 +324,7 @@ class SolutionSimpler:
         :param session: Object of telegram command
         :return: Nothing
         """
-        chat_data = await get_settings(msg.chat.id, session)
+        chat_data = await get_chat_configuration(msg.chat.id, session)
         print(chat_data)
         if not chat_data:
             new_chat_data = ChatSettings(chat_id=msg.chat.id)

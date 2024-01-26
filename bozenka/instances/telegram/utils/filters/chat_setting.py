@@ -3,7 +3,7 @@ from aiogram.types import Message
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from varname.helpers import exec_code
 
-from bozenka.database.tables.telegram import get_settings
+from bozenka.database.tables.telegram import get_chat_configuration
 
 
 class ChatSettingFilter(Filter):
@@ -15,7 +15,7 @@ class ChatSettingFilter(Filter):
         self.settings = settings
 
     async def __call__(self, msg: Message, session: async_sessionmaker) -> bool:
-        chat_setting = await get_settings(chat_id=msg.chat.id, session=session)
+        chat_setting = await get_chat_configuration(chat_id=msg.chat.id, session=session)
         exec_code(f'return chat_setting.{self.settings}')
         return True
 
