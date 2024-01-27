@@ -29,6 +29,7 @@ def start_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="Добавить в чат 🔌", callback_data="addtochat")],
             [InlineKeyboardButton(text="Функционал 🔨", callback_data="functional")],
             [InlineKeyboardButton(text="О разработчиках ℹ️", callback_data="aboutdevs")],
+            [InlineKeyboardButton(text="О запущенном экзепляре ℹ️", callback_data="aboutbot")],
             [InlineKeyboardButton(text="Начать диалог с ИИ 🤖", callback_data="dialogai")],
             [InlineKeyboardButton(text="Генерация Изображений 🖼", callback_data="dialogimage")],
         ]
@@ -80,8 +81,6 @@ def help_feature_keyboard(category: str) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔙 Назад к функциям",
-                              callback_data=HelpBackCategory(back_to_category=category).pack())],
         [InlineKeyboardButton(text="🔙 Назад к функциям",
                               callback_data=HelpBackCategory(back_to_category=category).pack())]
     ])

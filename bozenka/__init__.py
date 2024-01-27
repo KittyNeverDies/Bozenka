@@ -1,6 +1,8 @@
 import asyncio
 import logging
+import os
 
+import git
 import g4f
 
 from bozenka.instances.telegram import launch_telegram_instance
@@ -12,6 +14,7 @@ def launch_instances() -> None:
     Launches bozenka instances, working async
     :return:
     """
+
     logging.log(msg="Setting up g4f logging!", level=logging.INFO)
     logging.basicConfig(level=logging.INFO)
     logging.log(msg="Setting up logging!", level=logging.INFO)

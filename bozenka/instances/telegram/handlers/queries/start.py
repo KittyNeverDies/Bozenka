@@ -1,8 +1,11 @@
+import git
+
 from aiogram.types import *
 
 from bozenka.instances.telegram.utils.callbacks_factory import *
 from bozenka.instances.telegram.utils.keyboards import *
 from bozenka.instances.telegram.utils.simpler import list_of_features
+from bozenka.instances.version import is_updated, build
 
 
 async def inline_start(call: CallbackQuery):
@@ -36,9 +39,6 @@ async def inline_help(call: CallbackQuery):
     :param call:
     :return:
     """
-    kb = InlineKeyboardMarkup(inline_keyboard=[[
-
-    ]])
     await call.message.edit_text("Выберите категорию, по которой нужна помощь:",
                                  reply_markup=help_keyboard())
 
@@ -52,13 +52,36 @@ async def inline_about_developers(call: CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="Вернуться 🔙", callback_data="back")
     ]])
-    await call.message.edit_text("Бозенька - это мультифункциональный (в будущем кроссплатформенный бот)."
+    await call.message.edit_text("""
+Бозенька - это мультифункциональный (в будущем кроссплатформенный) бот.\n
+Он умеет работать с групповыми чатами и готовыми нейронными сетями для генерации текста и изображений.
+Бозенька разрабатывается коммандой, которая состоит из одного
+    """)
+    await call.message.edit_text("Бозенька - это мультифункциональный (в будущем кроссплатформенный бот).\n"
                                  "Он умеет работать с группами и готовыми нейронными сетями\n"
                                  "Бозеьнка разработавается коммандой, состаящей из одного человека, сам проект был изначально для развития моих навыков в Python\n"
                                  "Исходный код находится под лицензией <b>GPL-3.0</b>. Исходный код проекта всегда будет открыт и доступен.\n"
                                  "Исходный код проекта всегда можно найти по этой ссылке: https://github.com/kittyneverdies/bozenka/\n"
                                  "Исходный код бота для телеграма можно найти по этой ссылке: https://github.com/kittyneverdies/bozenka/branch/telegram",
                                  reply_markup=kb)
+
+
+async def inline_about_instance(call: CallbackQuery):
+    """
+    Query, what shows information about runned instance
+    :param call:
+    :return:
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Вернуться 🔙", callback_data="back")
+    ]])
+    me = await call.message.bot.get_me()
+    update_status = {False: "требуется обновление",
+                     True: "последняя доступная версия"}
+    await call.message.edit_text(
+        f"Информация об данном запущенном экземпляре, {me.mention_html()}\n"
+        f"Запущенная версия бота <code>{build}</code>, {update_status[is_updated]}\n",
+        reply_markup=kb)
 
 
 async def inline_add_to_chat(call: CallbackQuery):

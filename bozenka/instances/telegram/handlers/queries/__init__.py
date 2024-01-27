@@ -122,7 +122,7 @@ def register_queries(router: Router) -> None:
     router.callback_query.register(inline_add_to_chat, F.data == "addtochat")
     router.callback_query.register(inline_start_chatbot, F.data == "dialogai")
     router.callback_query.register(inline_help, F.data == "functional")
-
+    router.callback_query.register(inline_about_instance, F.data == "aboutbot")
 
 
 
