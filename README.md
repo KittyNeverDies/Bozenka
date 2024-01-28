@@ -5,6 +5,7 @@
 [Telegram Channel](https://t.me/bozodevelopment/)
 
 </div>
+
 <details><summary><h2>Telegram Instance</h2></summary>
 
 ### Features of Telegram instance
