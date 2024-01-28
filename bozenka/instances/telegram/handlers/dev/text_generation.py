@@ -6,7 +6,7 @@ from gpt4all import GPT4All
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message as Message
 
-from bozenka.generative.gpt4all import check
+from bozenka.generative.gpt4all import check, model_path
 from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, text_response_keyboard
 from bozenka.instances.telegram.utils.simpler import AnsweringGpt4All, \
     AnsweringGPT4Free
@@ -79,7 +79,7 @@ async def g4a_generate_answer(msg: Message, state: FSMContext):
     try:
         # Setting Gpt4All model
         model = GPT4All(model_name=models[info['set_model']]['filename'],
-                        model_path="/bozenka/generative\\gpt4all\\models\\",
+                        model_path=model_path,
                         allow_download=True)
         # Setting our chat session if exist
         model.current_chat_session = [] if not info.get("ready_to_answer") else info["ready_to_answer"]

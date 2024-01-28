@@ -3,9 +3,10 @@ from aiogram.types import Message
 from aiogram.enums import ChatMemberStatus
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from bozenka.database.tables.telegram import get_chat_config_value
 from bozenka.instances.telegram.utils.keyboards import ban_keyboard, delete_keyboard
 
-from bozenka.instances.telegram.utils.simpler import SolutionSimpler, ru_cmds
+from bozenka.instances.telegram.utils.simpler import SolutionSimpler, ru_cmds, list_of_features
 
 
 async def ban_command(msg: Message, command: CommandObject, session_maker: async_sessionmaker) -> None:
@@ -17,10 +18,20 @@ async def ban_command(msg: Message, command: CommandObject, session_maker: async
     :return: Nothing
     """
     banned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
+    send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=list_of_features["Admin"][4])
+    send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=list_of_features["Admin"][5])
+
+    where_send = {
+        True: msg.from_user.id,
+        False: msg.chat.id
+    }
 
     if banned_user.status == ChatMemberStatus.KICKED:
-        await msg.answer("Ошибка ❌\n"
-                         "Этот пользователь уже удален из группы", reply_markup=delete_keyboard(msg.from_user.id))
+        await msg.bot.send_message(chat_id=where_send[send_to_dm],
+                                   text="Ошибка ❌\n"
+                                   "Этот пользователь уже удален из группы",
+                                   reply_markup=delete_keyboard(msg.from_user.id))
+        await msg.answer()
         return
 
     config = await SolutionSimpler.ban_user(msg, command, session_maker)

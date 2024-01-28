@@ -97,6 +97,24 @@ list_of_features = {
             callback_name="invites",
             settings_name="invite_generator",
             db_name=ChatSettings.invite_generator
+        ),
+        BaseFeature(
+            name="Результаты в лс ✉",
+            description="<b>Результаты в личных сообщениях ✉</b>\n"
+                        "Отправляет все результаты команд модерации в личные сообщения пользователя\n"
+                        "Никаких особых прав у бота не требует.",
+            callback_name="results_in_dm",
+            settings_name="results_in_dm",
+            db_name=ChatSettings.results_in_dm
+        ),
+        BaseFeature(
+            name="Оповещение об ограничении 🗯",
+            description="<b>Оповещение об ограничении 🗯</b>\n"
+                        "Отправляет оповещение пользователю об его муте, бане\n"
+                        "Никаких особых прав у бота не требует.",
+            callback_name="restrict_notification",
+            settings_name="restrict_notification",
+            db_name=ChatSettings.restrict_notification
         )
     ],
     "Members": [
@@ -151,7 +169,6 @@ list_of_features = {
     ]
 
 }
-
 
 
 def generate_list_of_features(category: str) -> list[BaseFeature]:
@@ -271,7 +288,7 @@ list_of_commands = {
     ("open_general", 'Opens general topic in chat'),
     # AI related
     ('conversation', 'Starts conversation with text generative ai'),
-    ('imagine', 'Starts conversation with image generative ai'),\
+    ('imagine', 'Starts conversation with image generative ai'), \
     # Basic features
     ('invite', 'Generates invite into current chat'),
     ('about', 'Sends information about bozenka'),

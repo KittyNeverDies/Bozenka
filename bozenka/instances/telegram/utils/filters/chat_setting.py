@@ -1,21 +1,27 @@
 from aiogram.filters import Filter
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import async_sessionmaker
-from varname.helpers import exec_code
 
-from bozenka.database.tables.telegram import get_chat_configuration
+from bozenka.database.tables.telegram import get_chat_configuration, get_chat_config_value
+from bozenka.instances.telegram.utils.simpler import list_of_features
 
 
-class ChatSettingFilter(Filter):
+class IsSettingEnabled(Filter):
     """
-    Check, does chat have enabled features
+    Check, does chat have enabled required feature
     """
 
-    def __init__(self, settings: str) -> None:
-        self.settings = settings
+    def __init__(self, setting: str) -> None:
+        self.setting = setting
 
-    async def __call__(self, msg: Message, session: async_sessionmaker) -> bool:
-        chat_setting = await get_chat_configuration(chat_id=msg.chat.id, session=session)
-        exec_code(f'return chat_setting.{self.settings}')
-        return True
+    async def __call__(self, msg: Message, session_maker: async_sessionmaker) -> bool:
+        setting_object = None
+        for key in list_of_features.items():
+            for feature in list_of_features[key]:
+                if feature.setting_name == self.setting:
+                    setting_object = feature
+                else:
+                    continue
+
+        return await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=setting_object)
 

@@ -26,12 +26,12 @@ def start_keyboard() -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Добавить в чат 🔌", callback_data="addtochat")],
-            [InlineKeyboardButton(text="Функционал 🔨", callback_data="functional")],
-            [InlineKeyboardButton(text="О разработчиках ℹ️", callback_data="aboutdevs")],
-            [InlineKeyboardButton(text="О запущенном экзепляре ℹ️", callback_data="aboutbot")],
-            [InlineKeyboardButton(text="Начать диалог с ИИ 🤖", callback_data="dialogai")],
-            [InlineKeyboardButton(text="Генерация Изображений 🖼", callback_data="dialogimage")],
+            [InlineKeyboardButton(text="Добавить в ваш групповой чат 🔌", callback_data="addtochat")],
+            [InlineKeyboardButton(text="Информация об функционале бота 🔨", callback_data="functional")],
+            [InlineKeyboardButton(text="Об данном проекте ℹ️", callback_data="aboutdevs")],
+            [InlineKeyboardButton(text="О данном запущенном экзепляре ℹ️", callback_data="aboutbot")],
+            [InlineKeyboardButton(text="Начать диалог с текстовым ИИ 🤖", callback_data="dialogai")],
+            [InlineKeyboardButton(text="Начать генерацию изображений 🖼", callback_data="dialogimage")],
         ]
     )
     return kb

@@ -10,8 +10,6 @@ class RetryMessageMiddleware(BaseMiddleware):
     """
     Protects from user don't get update by message
     """
-    def __init__(self) -> None:
-        self.counter = 0
 
     async def __call__(
         self,
@@ -27,8 +25,6 @@ class RetryCallbackMiddleware(BaseMiddleware):
     """
     Protects from user don't get update by callbackquery
     """
-    def __init__(self) -> None:
-        self.counter = 0
 
     async def __call__(
         self,
