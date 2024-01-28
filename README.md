@@ -6,6 +6,8 @@
 
 </div>
 
+<details><summary><h2>Telegram Instance</h2></summary>
+
 ### Features of Telegram instance
 
 - [ ] Group
@@ -53,3 +55,4 @@
 -  [Aiogram python library](https://github.com/aiogram/aiogram) and with their community support.
 -  [GPT4Free](https://github.com/xtekky/gpt4free), [Gpt4All](https://github.com/nomic-ai/gpt4all), [SqlAlchemy](https://github.com/sqlalchemy/sqlalchemy/) python libraries
 - With our love & your support <3
+</details>
