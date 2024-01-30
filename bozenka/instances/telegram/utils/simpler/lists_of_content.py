@@ -6,7 +6,7 @@ from g4f import Provider
 from g4f.Provider import RetryProvider
 from varname import nameof
 
-from bozenka.database.tables.telegram import ChatSettings
+from bozenka.database.tables.telegram import TelegramChatSettings
 
 
 @dataclass
@@ -52,7 +52,7 @@ list_of_features = {
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="pins",
             settings_name="pins",
-            db_name=ChatSettings.pins
+            db_name=TelegramChatSettings.pins
         ),
         BaseFeature(
             name="Модерация чата 🕵️",
@@ -72,7 +72,7 @@ list_of_features = {
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="moderation",
             settings_name="moderation",
-            db_name=ChatSettings.moderation
+            db_name=TelegramChatSettings.moderation
         ),
         BaseFeature(
             name="Работа с Форумом 💬",
@@ -87,7 +87,7 @@ list_of_features = {
                         "включен форум</b>",
             callback_name="topics",
             settings_name="topics",
-            db_name=ChatSettings.topics
+            db_name=TelegramChatSettings.topics
         ),
         BaseFeature(
             name="Приглашения в Чат ✉",
@@ -96,7 +96,7 @@ list_of_features = {
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="invites",
             settings_name="invite_generator",
-            db_name=ChatSettings.invite_generator
+            db_name=TelegramChatSettings.invite_generator
         ),
         BaseFeature(
             name="Результаты в лс ✉",
@@ -105,7 +105,7 @@ list_of_features = {
                         "Никаких особых прав у бота не требует.",
             callback_name="results_in_dm",
             settings_name="results_in_dm",
-            db_name=ChatSettings.results_in_dm
+            db_name=TelegramChatSettings.results_in_dm
         ),
         BaseFeature(
             name="Оповещение об ограничении 🗯",
@@ -114,7 +114,7 @@ list_of_features = {
                         "Никаких особых прав у бота не требует.",
             callback_name="restrict_notification",
             settings_name="restrict_notification",
-            db_name=ChatSettings.restrict_notification
+            db_name=TelegramChatSettings.restrict_notification
         )
     ],
     "Members": [
@@ -124,7 +124,7 @@ list_of_features = {
                         "\nПриветсвенные сообщения новым и ушедшим пользователям.",
             callback_name="welcome",
             settings_name="welcome_messages",
-            db_name=ChatSettings.welcome_messages
+            db_name=TelegramChatSettings.welcome_messages
         ),
         BaseFeature(
             name="Оповещение о муте 📬",
@@ -132,7 +132,7 @@ list_of_features = {
                         "\nОповещает пользователя в личных сообщениях, что тот был: замучен, размучен, забанен, разбанен",
             callback_name="notify",
             settings_name="restrict_notification",
-            db_name=ChatSettings.restrict_notification
+            db_name=TelegramChatSettings.restrict_notification
         )
     ],
     "Devs": [
@@ -143,7 +143,7 @@ list_of_features = {
                         "/hi, /hello, /privet и т.п., отвечая приветсвием на сообщение пользователя.",
             callback_name="hi",
             settings_name="hi_command",
-            db_name=ChatSettings.hi_command
+            db_name=TelegramChatSettings.hi_command
         ),
         BaseFeature(
             name="ИИ ЧатБот 🤖",
@@ -156,7 +156,7 @@ list_of_features = {
                         "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘",
             callback_name="gtm",
             settings_name="gpt_conversations",
-            db_name=ChatSettings.text_generation
+            db_name=TelegramChatSettings.text_generation
         ),
         BaseFeature(
             name="Генерация изображений 📸",
@@ -164,7 +164,7 @@ list_of_features = {
                         "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘",
             callback_name="gpm",
             settings_name="123",
-            db_name=ChatSettings.image_generation
+            db_name=TelegramChatSettings.image_generation
         )
     ]
 

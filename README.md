@@ -2,7 +2,10 @@
 
 <img src="images/header.png">
 
+[![CodeFactor](https://www.codefactor.io/repository/github/kittyneverdies/bozenka/badge)](https://www.codefactor.io/repository/github/kittyneverdies/bozenka)
+
 [Telegram Channel](https://t.me/bozodevelopment/)
+
 
 </div>
 

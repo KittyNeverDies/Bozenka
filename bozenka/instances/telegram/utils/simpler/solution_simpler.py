@@ -12,8 +12,8 @@ from aiogram.types import ChatPermissions, CallbackQuery
 from sqlalchemy import Update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bozenka.database import get_user_info, Users
-from bozenka.database.tables.telegram import get_chat_configuration, ChatSettings
+from bozenka.database import get_user_info, TelegramUsers
+from bozenka.database.tables.telegram import get_chat_configuration, TelegramChatSettings
 from bozenka.instances.telegram.utils.callbacks_factory import BanData, UnbanData, MuteData, UnmuteData
 
 
@@ -59,7 +59,7 @@ class SolutionSimpler:
             return
         finally:
             if not await get_user_info(user_id=data.user_id_ban, chat_id=call.message.chat.id, session=session):
-                new_user = Users(
+                new_user = TelegramUsers(
                     user_id=data.user_id_ban,
                     chat_id=call.message.chat.id,
                     is_banned=True,
@@ -74,9 +74,9 @@ class SolutionSimpler:
                 async with session() as session:
                     async with session.begin():
                         await session.execute(
-                            Update(Users)
+                            Update(TelegramUsers)
                             .values(is_banned=True, ban_reason=None)
-                            .where(Users.user_id == data.user_id_ban and Users.chat_id == call.message.chat.id))
+                            .where(TelegramUsers.user_id == data.user_id_ban and TelegramUsers.chat_id == call.message.chat.id))
 
     @staticmethod
     async def ban_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
@@ -125,7 +125,7 @@ class SolutionSimpler:
             return config
         finally:
             if not await get_user_info(user_id=msg.reply_to_message.from_user.id, chat_id=msg.chat.id, session=session):
-                new_user = Users(
+                new_user = TelegramUsers(
                     user_id=msg.reply_to_message.from_user.id,
                     chat_id=msg.chat.id,
                     is_banned=True,
@@ -140,9 +140,9 @@ class SolutionSimpler:
                 async with session() as session:
                     async with session.begin():
                         await session.execute(
-                            Update(Users)
+                            Update(TelegramUsers)
                             .values(is_banned=True, ban_reason=None if config["reason"] == "" else config["reason"])
-                            .where(Users.user_id == msg.reply_to_message.from_user.id and Users.chat_id == msg.chat.id))
+                            .where(TelegramUsers.user_id == msg.reply_to_message.from_user.id and TelegramUsers.chat_id == msg.chat.id))
         return config
 
     @staticmethod
@@ -158,9 +158,9 @@ class SolutionSimpler:
             async with session() as session:
                 async with session.begin():
                     await session.execute(
-                        Update(Users)
+                        Update(TelegramUsers)
                         .values(is_banned=False, ban_reason=None)
-                        .where(Users.user_id == data.user_id_unban and Users.chat_id == call.message.chat.id)
+                        .where(TelegramUsers.user_id == data.user_id_unban and TelegramUsers.chat_id == call.message.chat.id)
                     )
 
     @staticmethod
@@ -179,9 +179,9 @@ class SolutionSimpler:
             async with session() as session:
                 async with session.begin():
                     await session.execute(
-                        Update(Users)
+                        Update(TelegramUsers)
                         .values(is_banned=False, ban_reason=None)
-                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
+                        .where(TelegramUsers.user_id == msg.from_user.id and TelegramUsers.chat_id == msg.chat.id)
                     )
 
     @staticmethod
@@ -227,7 +227,7 @@ class SolutionSimpler:
             if info is None:
                 print("TTTTT")
                 print(info)
-                new_user = Users(
+                new_user = TelegramUsers(
                     user_id=data.user_id_mute,
                     chat_id=call.message.chat.id,
                     is_banned=None,
@@ -242,9 +242,9 @@ class SolutionSimpler:
                 async with session() as session:
                     async with session.begin():
                         await session.execute(
-                            Update(Users)
+                            Update(TelegramUsers)
                             .values(is_muted=True, mute_reason=None)
-                            .where(Users.user_id == data.user_id_mute and Users.chat_id == call.message.chat.id))
+                            .where(TelegramUsers.user_id == data.user_id_mute and TelegramUsers.chat_id == call.message.chat.id))
 
     @staticmethod
     async def mute_user(msg: types.Message, cmd: CommandObject, session: async_sessionmaker) -> dict[str, None | str | bool]:
@@ -282,7 +282,7 @@ class SolutionSimpler:
                 level=logging.INFO)
         finally:
             if not await get_user_info(user_id=msg.reply_to_message.from_user.id, chat_id=msg.chat.id, session=session):
-                new_user = Users(
+                new_user = TelegramUsers(
                     user_id=msg.reply_to_message.from_user.id,
                     chat_id=msg.chat.id,
                     is_banned=None,
@@ -297,9 +297,9 @@ class SolutionSimpler:
                 async with session() as session:
                     async with session.begin():
                         await session.execute(
-                            Update(Users)
+                            Update(TelegramUsers)
                             .values(is_muted=True, mute_reason=None if config["reason"] == "" else config["reason"])
-                            .where(Users.user_id == msg.reply_to_message.from_user.id and Users.chat_id == msg.chat.id))
+                            .where(TelegramUsers.user_id == msg.reply_to_message.from_user.id and TelegramUsers.chat_id == msg.chat.id))
         return config
 
     @staticmethod
@@ -318,9 +318,9 @@ class SolutionSimpler:
             async with session() as session:
                 async with session.begin():
                     await session.execute(
-                        Update(Users)
+                        Update(TelegramUsers)
                         .values(is_muted=False, mute_reason=None, )
-                        .where(Users.user_id == data.user_id_unmute and Users.chat_id == call.message.chat.id)
+                        .where(TelegramUsers.user_id == data.user_id_unmute and TelegramUsers.chat_id == call.message.chat.id)
                     )
 
     @staticmethod
@@ -341,9 +341,9 @@ class SolutionSimpler:
             async with session() as session:
                 async with session.begin():
                     await session.execute(
-                        Update(Users)
+                        Update(TelegramUsers)
                         .values(is_muted=False, mute_reason=None, )
-                        .where(Users.user_id == msg.from_user.id and Users.chat_id == msg.chat.id)
+                        .where(TelegramUsers.user_id == msg.from_user.id and TelegramUsers.chat_id == msg.chat.id)
                     )
 
     @staticmethod
@@ -411,7 +411,7 @@ class SolutionSimpler:
         chat_data = await get_chat_configuration(msg.chat.id, session)
         print(chat_data)
         if not chat_data:
-            new_chat_data = ChatSettings(chat_id=msg.chat.id)
+            new_chat_data = TelegramChatSettings(chat_id=msg.chat.id)
             async with session() as session:
                 async with session.begin():
                     await session.merge(new_chat_data)
