@@ -19,7 +19,11 @@ def register_main_cmd(router: Router) -> None:
     logging.log(msg="Registering main related commands", level=logging.INFO)
 
     # Start command handler
+    """
     router.message.register(start_cmd, Command(commands=["start"]), F.chat.type == ChatType.PRIVATE)
+    """
+
+    router.message.register(start_cmd, *[Command(commands=["start"]), F.chat.type == ChatType.PRIVATE])
 
     # Registering command /setup
     router.message.register(setup_cmd, Command(commands=["setup"]), ~(F.chat.type == ChatType.PRIVATE))

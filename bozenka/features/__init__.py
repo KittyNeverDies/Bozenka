@@ -1,5 +1,6 @@
 from typing import Callable
 
+from aiogram import Dispatcher
 from aiogram.filters import CommandObject
 from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -7,15 +8,16 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from bozenka.database.tables.telegram import TelegramChatSettings
 
 
-class LineralFeature:
+class BasicFeature:
     """
     A classic class of lineral (basic)
     feature of bozenka. IN FUTURE!
     """
-
     cmd_description: str = "Your description of command"
 
-    @NotImplemented
+    '''
+    Here is example of code you can add:
+    
     async def generate_telegram_inline_keyboard(self) -> InlineKeyboardMarkup:
         """
         Generates a special telegram keyboard (menu)
@@ -23,10 +25,10 @@ class LineralFeature:
         """
         pass
 
-    @NotImplemented
     async def telegram_command_handler(self, msg: Message, cmd: CommandObject, session_maker: async_sessionmaker) -> None:
         """
         A special telegram handler for command (if exist)
+        It is just an example
         :param msg: Telegram message object
         :param cmd: Aiogram command object
         :param session_maker: Async session maker object of SQLAlchemy
@@ -34,17 +36,17 @@ class LineralFeature:
         """
         pass
 
-    @NotImplemented
     async def telegram_callback_handler(self, call: CallbackQuery, callback_data, session_maker: async_sessionmaker) -> None:
         """
         A special telegram handler for command (if exist)
+        It is just an example
         :param call: Telegram callbackquery object
         :param callback_data: A custom callback data created by callback factory
         :param session_maker: Async session maker object of SQLAlchemy
         :return: Nothing
         """
         pass
-
+    '''
     def __init__(self):
         """
         All information about feature
@@ -56,3 +58,15 @@ class LineralFeature:
         self.telegram_commands: list[str | None] = ["test"]
         self.telegram_cmd_avaible = True    # Is a feature have a commands
         self.telegram_callback_factory = None
+        self.telegram_message_handlers = {
+            """
+            Format is
+            Handler: [Filters]
+            """
+        }
+        self.telegram_callback_handlers = {
+            """
+            Format is
+            Handler: [Filters]
+            """
+        }

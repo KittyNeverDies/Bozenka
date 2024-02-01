@@ -28,7 +28,7 @@ class HelpBackCategory(CallbackData, prefix="hbc"):
     Callback data to back to list of features in one
     of categories in menu
     """
-    back_to_category: str
+    category_name: str
 
 
 class BackStart(CallbackData, prefix="start"):

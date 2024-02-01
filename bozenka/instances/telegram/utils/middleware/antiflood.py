@@ -5,6 +5,22 @@ from aiogram.types import Update, Message, CallbackQuery
 from cachetools import TTLCache
 
 
+class CounterMiddleware(BaseMiddleware):
+    def __init__(self) -> None:
+        self.counter = 0
+
+    async def __call__(
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any],
+        **kwargs: Any
+    ) -> Any:
+        self.counter += 1
+        print(self.counter)
+        return await handler(event, data)
+
+
 class MessageThrottlingMiddleware(BaseMiddleware):
     """
     This middleware is skidded from public codes
