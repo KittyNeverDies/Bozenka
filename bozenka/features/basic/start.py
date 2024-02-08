@@ -201,10 +201,9 @@ class Start(BasicFeature):
         will be inside this function
         """
         super().__init__()
-        self.cmd_description: str = "Your description of command"
         # Telegram feature settings
         self.telegram_setting = None
-        self.telegram_commands: list[str | None] = ["start"]
+        self.telegram_commands: dict[str: str] = {"start": "Command to start work with bozenka the bot"}
         self.telegram_cmd_avaible = True  # Is a feature have a commands
         self.telegram_callback_factory = None
         self.telegram_message_handlers = {

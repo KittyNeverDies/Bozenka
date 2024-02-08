@@ -28,7 +28,7 @@ class SetupAction(CallbackData, prefix="sa"):
     Callback with information to do with a feature
     """
     action: str
-    feature_category: str
+    category_name: str
     feature_index: int
 
 

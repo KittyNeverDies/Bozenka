@@ -1,11 +1,3 @@
-from typing import Callable
-
-from aiogram import Dispatcher
-from aiogram.filters import CommandObject
-from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery
-from sqlalchemy.ext.asyncio import async_sessionmaker
-
-from bozenka.database.tables.telegram import TelegramChatSettings
 
 
 class BasicFeature:
@@ -13,60 +5,29 @@ class BasicFeature:
     A classic class of lineral (basic)
     feature of bozenka. IN FUTURE!
     """
-    cmd_description: str = "Your description of command"
-
-    '''
-    Here is example of code you can add:
-    
-    async def generate_telegram_inline_keyboard(self) -> InlineKeyboardMarkup:
-        """
-        Generates a special telegram keyboard (menu)
-        :return: Inline Keyboard
-        """
-        pass
-
-    async def telegram_command_handler(self, msg: Message, cmd: CommandObject, session_maker: async_sessionmaker) -> None:
-        """
-        A special telegram handler for command (if exist)
-        It is just an example
-        :param msg: Telegram message object
-        :param cmd: Aiogram command object
-        :param session_maker: Async session maker object of SQLAlchemy
-        :return: Nothing
-        """
-        pass
-
-    async def telegram_callback_handler(self, call: CallbackQuery, callback_data, session_maker: async_sessionmaker) -> None:
-        """
-        A special telegram handler for command (if exist)
-        It is just an example
-        :param call: Telegram callbackquery object
-        :param callback_data: A custom callback data created by callback factory
-        :param session_maker: Async session maker object of SQLAlchemy
-        :return: Nothing
-        """
-        pass
-    '''
     def __init__(self):
         """
         All information about feature
         will be inside this function
         """
-        self.cmd_description: str = "Your description of command"
-        # Telegram feature settings
-        self.telegram_setting = TelegramChatSettings.text_generation
-        self.telegram_commands: list[str | None] = ["test"]
-        self.telegram_cmd_avaible = True    # Is a feature have a commands
-        self.telegram_callback_factory = None
-        self.telegram_message_handlers = {
-            """
-            Format is
-            Handler: [Filters]
-            """
+
+        # Telegram setting info
+        self.telegram_setting_in_list = False   # Does feature shows in /setup list
+        self.telegram_setting_name = None       # Setting title in /setup command
+        self.telegram_setting_description = None    # Setting description in /setup command
+        self.telegram_db_name = None                # Name of TelegramChatSettings column will be affected
+        # Telegram commands list of feature
+        self.telegram_commands: dict[str: str] = {
+            #
+            # Format is  "CommandNameHere": "Command description is here"
+            #
+            "example": "Its an example"
         }
-        self.telegram_callback_handlers = {
-            """
-            Format is
-            Handler: [Filters]
-            """
-        }
+        self.telegram_cmd_avaible = True  # Does this feature have a telegram commands
+        # All handlers
+        self.telegram_message_handlers = (
+            #  Format is [Handler, [Filters]]
+        )
+        self.telegram_callback_handlers = (
+            #  Format is [Handler, [Filters]]
+        )

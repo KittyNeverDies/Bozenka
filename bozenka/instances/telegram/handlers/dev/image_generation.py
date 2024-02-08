@@ -1,18 +1,12 @@
 import logging
-import os
 
-import g4f
-import base64
-from gpt4all import GPT4All
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message as Message, FSInputFile
 
 from bozenka.generative.kadinsky import kadinsky_gen
-from bozenka.instances.telegram.utils.keyboards import gpt_categories_keyboard, delete_keyboard, text_response_keyboard, \
-    image_generation_keyboard, image_response_keyboard
-from bozenka.instances.telegram.utils.simpler import AnsweringGpt4All, \
-    AnsweringGPT4Free, GeneratingImages
-from bozenka.generative.gpt4free import generate_gpt4free_providers
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard, image_generation_keyboard, \
+    image_response_keyboard
+from bozenka.instances.telegram.utils.simpler import GeneratingImages
 
 
 async def already_generating(msg: Message, state: FSMContext):

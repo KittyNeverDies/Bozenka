@@ -27,7 +27,7 @@ async def inline_setup_category_back(call: CallbackQuery, callback_data: SetupAc
     :return:
     """
     await call.message.edit_text("Выберите настройку, которую хотите изменить",
-                                 reply_markup=setup_category_keyboard(category=callback_data.feature_category))
+                                 reply_markup=setup_category_keyboard(category=callback_data.category_name))
 
 
 async def inline_edit_feature(call: CallbackQuery, callback_data: SetupFeature, session_maker: async_sessionmaker):
@@ -63,11 +63,11 @@ async def inline_feature_edited(call: CallbackQuery, callback_data: SetupAction,
     async with session_maker() as session:
         async with session.begin():
             await session.execute(Update(TelegramChatSettings)
-                                  .values({list_of_features[callback_data.feature_category][callback_data.feature_index].settings_name:
+                                  .values({list_of_features[callback_data.category_name][callback_data.feature_index].settings_name:
                                                                                  callback_data.action == "enable"})
                                   .where(TelegramChatSettings.chat_id == call.message.chat.id))
     await call.message.edit_text(
-        list_of_features[callback_data.feature_category][callback_data.feature_index].description,
-        reply_markup=await setup_feature_keyboard(category=callback_data.feature_category,
+        list_of_features[callback_data.category_name][callback_data.feature_index].description,
+        reply_markup=await setup_feature_keyboard(category=callback_data.category_name,
                                                   index=callback_data.feature_index,
                                                   is_enabled=callback_data.action == "enable"))

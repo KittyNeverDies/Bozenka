@@ -24,8 +24,6 @@ def register_admin_cmd(router: Router) -> None:
 
     # Ban / Unban commands handler
     router.message.register(ban_command, Command(commands="ban"),
-                            IsAdminFilter(True))
-    router.message.register(ban_command, Command(commands="ban"),
                             IsAdminFilter(True), F.reply_to_message.text)
     router.message.register(unban_command, Command(commands="unban"),
                             IsAdminFilter(True), F.reply_to_message.text)

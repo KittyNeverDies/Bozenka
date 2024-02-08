@@ -1,21 +1,18 @@
 import logging
 
 from aiogram import F
-from aiogram.enums import ChatType, ChatMemberStatus
-from aiogram.filters import Command, CommandObject
-from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.enums import ChatMemberStatus
+from aiogram.filters import CommandObject, Command
+from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bozenka.database.tables.telegram import get_chat_config_value
+from bozenka.database.tables.telegram import get_chat_config_value, TelegramChatSettings
 from bozenka.features import BasicFeature
-from bozenka.instances.telegram.utils.callbacks_factory import HelpCategory, HelpBackCategory, HelpFeature, HelpBack, \
-    UnbanData, BanData, UnmuteData, MuteData
-from bozenka.instances.telegram.utils.keyboards import help_category_keyboard, help_keyboard, \
-    help_feature_keyboard, gpt_categories_keyboard, ban_keyboard, delete_keyboard, mute_keyboard, unmute_keyboard, \
+from bozenka.instances.telegram.utils.callbacks_factory import UnbanData, BanData, UnmuteData, MuteData
+from bozenka.instances.telegram.utils.filters import IsAdminFilter, BotHasPermissions, UserHasPermissions
+from bozenka.instances.telegram.utils.keyboards import ban_keyboard, delete_keyboard, mute_keyboard, unmute_keyboard, \
     unban_keyboard
 from bozenka.instances.telegram.utils.simpler import list_of_features, SolutionSimpler
-from bozenka.instances.version import build, is_updated
 
 
 class Moderation(BasicFeature):
@@ -23,7 +20,6 @@ class Moderation(BasicFeature):
     A class of moderation related feature
     All staff related to it will be here
     """
-    cmd_description: str = "Basic command to show main menu"
 
     @staticmethod
     async def telegram_ban_callback_handler(call: CallbackQuery, callback_data: BanData,
@@ -455,15 +451,49 @@ class Moderation(BasicFeature):
         will be inside this function
         """
         super().__init__()
-        self.cmd_description: str = "Your description of command"
-        # Telegram feature settings
-        self.telegram_setting = None
-        self.telegram_commands: list[str | None] = ["start"]
+        # Telegram setting info
+        self.telegram_setting_in_list = True
+        self.telegram_setting_name = "Модерация чата 🕵️"
+        self.telegram_setting_description = "<b>Модерация чата</b>🕵️\nДанная настройка включает следущие комманды:" \
+                                            "\n<pre>/ban [время блокировки] [причина блокировки] - блокировка пользователя" \
+                                            "\n/unban - разблокировка пользователя\n" \
+                                            "/mute [время мута] [причина мута] - мут пользователя\n" \
+                                            "/unmute - Размут пользователя</pre>\n" \
+                                            "Время обозначается как:" \
+                                            "<pre>1h - один час, " \
+                                            "1d - один день, " \
+                                            "1m - одна минута, " \
+                                            "1s - одна секунда</pre>\n" \
+                                            "Для того, " \
+                                            "чтобы выполнить одну из комманд по отношению к пользователю, " \
+                                            "ответьте на сообщение пользователя и используйте команду\n" \
+                                            "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
+        self.telegram_db_name = TelegramChatSettings.moderation
+        # Telegram commands
+        self.telegram_commands: dict[str: str] = {
+            "ban": "Command to ban user in chat",
+            'unban': 'Command to unban user in chat',
+            'mute': 'Command to mute user in chat',
+            'unmute': 'Command to unmute user in chat',
+        }
         self.telegram_cmd_avaible = True  # Is a feature have a commands
-        self.telegram_callback_factory = None
-        self.telegram_message_handlers = {
-            # Your message handlers
-        }
-        self.telegram_callback_handlers = {
-            # Start menu
-        }
+        # All handlers
+        self.telegram_message_handlers = (
+            #  Format is [Handler, [Filters]]
+            [self.telegram_ban_cmd_handler, [Command(commands="ban"),
+                                             IsAdminFilter(True), F.reply_to_message.text]],
+            [self.telegram_unban_cmd_handler, [Command(commands="unban"),
+                                               IsAdminFilter(True), F.reply_to_message.text]],
+            [self.telegram_mute_cmd_handler, [Command(commands=["mute", "re"]),
+                                              UserHasPermissions(["can_restrict_members"]),
+                                              BotHasPermissions(["can_restrict_members"])]],
+            [self.telegram_unmute_cmd_handler, [Command(commands=["unmute"]),
+                                                UserHasPermissions(["can_restrict_members"]),
+                                                BotHasPermissions(["can_restrict_members"])]]
+        )
+        self.telegram_callback_handlers = (
+            #  Format is [Handler, [Filters]]
+            [self.telegram_ban_callback_handler, [BanData.filter()]],
+            [self.telegram_unban_callback_handler, [UnbanData.filter()]],
+            [self.telegram_mute_callback_handler, [MuteData.filter()]],
+            [self.telegram_unmute_callback_handler, [UnmuteData.filter()]])

@@ -1,7 +1,11 @@
+from aiogram import F
+from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
+from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features import BasicFeature
 from bozenka.instances.telegram.utils.callbacks_factory import PinMsg, UnpinMsg
+from bozenka.instances.telegram.utils.filters import UserHasPermissions, BotHasPermissions, IsAdminFilter
 from bozenka.instances.telegram.utils.keyboards import unpin_msg_keyboard, delete_keyboard, pin_msg_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
@@ -92,13 +96,31 @@ class Pins(BasicFeature):
         super().__init__()
         self.cmd_description: str = "Your description of command"
         # Telegram feature settings
-        self.telegram_setting = None
-        self.telegram_commands: list[str | None] = ["start"]
+        self.telegram_setting_in_list = True
+        self.telegram_setting_name = "Закреп 📌"
+        self.telegram_setting_description = "<b>Закреп</b>📌" \
+                                            "\nДанная функция включает команды:" \
+                                            "<pre>/pin - закрепляет сообщение\n" \
+                                            "/unpin - открепляет сообщение\n" \
+                                            "/unpin_all - открепляет все сообщения, которые видит бот</pre>\n" \
+                                            "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
+        self.telegram_db_name = TelegramChatSettings.pins
+        # Telegram commands
+        self.telegram_commands: dict[str: str] = {
+            'pin': 'Pin fast any message in chat',
+            'unpin': 'Unpin fast any message in chat',
+        }
         self.telegram_cmd_avaible = True  # Is a feature have a commands
-        self.telegram_callback_factory = None
+        # Telegram Handler
         self.telegram_message_handlers = {
-
+            self.telegram_pin_cmd: [Command(commands="pin"), UserHasPermissions(["can_pin_messages"]),
+                                    BotHasPermissions(["can_pin_messages"]), F.reply_to_message],
+            self.telegram_unpin_cmd: [Command(commands="unpin"), UserHasPermissions(["can_pin_messages"]),
+                                      BotHasPermissions(["can_pin_messages"]), F.reply_to_message],
+            self.telegram_unpinall_cmd: [Command(commands="unpin_all"), IsAdminFilter(True),
+                                         BotHasPermissions(["can_pin_messages"]), F.reply_to_message.text],
         }
         self.telegram_callback_handlers = {
-
+            self.telegram_pin_callback_handler: [PinMsg.filter()],
+            self.telegram_unpin_callback_handler: [UnpinMsg.filter()]
         }

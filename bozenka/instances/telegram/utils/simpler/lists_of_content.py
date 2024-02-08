@@ -92,7 +92,7 @@ list_of_features = {
         BaseFeature(
             name="Приглашения в Чат ✉",
             description="<b>Генератор приглашения в Чат ✉</b>\n"
-                        "Разрешает использование комманды /invite в чате, для созданния приглашений.\n"
+                        "Разрешает использование комманды <code>/invite</code> в чате, для созданния приглашений.\n"
                         "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>",
             callback_name="invites",
             settings_name="invite_generator",
@@ -288,7 +288,7 @@ list_of_commands = {
     ("open_general", 'Opens general topic in chat'),
     # AI related
     ('conversation', 'Starts conversation with text generative ai'),
-    ('imagine', 'Starts conversation with image generative ai'), \
+    ('imagine', 'Starts conversation with image generative ai'),
     # Basic features
     ('invite', 'Generates invite into current chat'),
     ('about', 'Sends information about bozenka'),
