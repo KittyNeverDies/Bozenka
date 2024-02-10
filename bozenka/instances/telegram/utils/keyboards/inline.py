@@ -28,10 +28,10 @@ def start_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [InlineKeyboardButton(text="Добавить в ваш групповой чат 🔌", callback_data="addtochat")],
             [InlineKeyboardButton(text="Информация об функционале бота 🔨", callback_data="functional")],
-            [InlineKeyboardButton(text="Об данном проекте ℹ️", callback_data="aboutdevs")],
+            [InlineKeyboardButton(text="О данном проекте ℹ️", callback_data="aboutdevs")],
             [InlineKeyboardButton(text="О данном запущенном экзепляре ℹ️", callback_data="aboutbot")],
             [InlineKeyboardButton(text="Начать диалог с текстовым ИИ 🤖", callback_data="dialogai")],
-            [InlineKeyboardButton(text="Начать генерацию изображений 🖼", callback_data="dialogimage")],
+            [InlineKeyboardButton(text="Начать генерировать изображения 🖼", callback_data="dialogimage")],
         ]
     )
     return kb
@@ -82,7 +82,7 @@ def help_feature_keyboard(category: str) -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔙 Назад к функциям",
-                              callback_data=HelpBackCategory(back_to_category=category).pack())]
+                              callback_data=HelpBackCategory(category_name=category).pack())]
     ])
     return kb
 
@@ -414,7 +414,7 @@ def generate_gpt4all_page(user_id: int) -> InlineKeyboardMarkup:
             callback_data=Gpt4AllModel(user_id=str(user_id), index=str(models.index(model))).pack())
         )
     builder.row(InlineKeyboardButton(text="🔙 Вернуться к списку",
-                                     callback_data=GptBackMenu(user_id=user_id, back_to="category").pack()))
+                                     callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack()))
     builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌",
                                      callback_data=GptStop(user_id=str(user_id)).pack()))
     return builder.as_markup()

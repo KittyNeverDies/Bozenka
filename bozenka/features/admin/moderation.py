@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F
-from aiogram.enums import ChatMemberStatus
+from aiogram.enums import ChatMemberStatus, ChatType
 from aiogram.filters import CommandObject, Command
 from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -21,7 +21,6 @@ class Moderation(BasicFeature):
     All staff related to it will be here
     """
 
-    @staticmethod
     async def telegram_ban_callback_handler(call: CallbackQuery, callback_data: BanData,
                                             session_maker: async_sessionmaker) -> None:
         """
@@ -35,7 +34,7 @@ class Moderation(BasicFeature):
         banned_user = await call.message.chat.get_member(int(callback_data.user_id_ban))
 
         send_notification = await get_chat_config_value(chat_id=call.message.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=list_of_features["Admins"][5])
 
         if call.from_user.id != callback_data.user_id_clicked \
                 and clicked_user.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR]:
@@ -62,7 +61,6 @@ class Moderation(BasicFeature):
 
         logging.log(msg=f"Banned user @{banned_user.user.full_name} user_id=f{banned_user.user.id}", level=logging.INFO)
 
-    @staticmethod
     async def telegram_unban_callback_handler(call: CallbackQuery, callback_data: UnbanData,
                                               session_maker: async_sessionmaker) -> None:
         """
@@ -92,7 +90,7 @@ class Moderation(BasicFeature):
         )
 
         if await get_chat_config_value(chat_id=call.message.chat.id, session=session_maker,
-                                       setting=list_of_features["Admin"][5]):
+                                       setting=list_of_features["Admins"][5]):
             await call.message.bot.send_message(
                 chat_id=unbanned_user.user.id,
                 text=f"{unbanned_user.user.mention_html('Вы')} были разблокирован {call.from_user.mention_html('этим пользователем')} в чате <code>{call.message.chat.id}</code>.",
@@ -102,7 +100,6 @@ class Moderation(BasicFeature):
         logging.log(msg=f"Unbanned user @{unbanned_user.user.full_name} user_id=f{unbanned_user.user.id}",
                     level=logging.INFO)
 
-    @staticmethod
     async def telegram_ban_cmd_handler(msg: Message, command: CommandObject, session_maker: async_sessionmaker) -> None:
         """
         /ban command function, supports time and reasons.
@@ -113,9 +110,9 @@ class Moderation(BasicFeature):
         """
         banned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admin"][4])
+                                                 setting=list_of_features["Admins"][4])
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=list_of_features["Admins"][5])
 
         where_send = {
             True: msg.from_user.id,
@@ -183,7 +180,6 @@ class Moderation(BasicFeature):
                                                 f"<code>{msg.chat.title}</code>.\n",
                                            reply_markup=delete_keyboard(admin_id=banned_user.user.id))
 
-    @staticmethod
     async def telegram_unban_cmd_handler(msg: Message, command: CommandObject,
                                          session_maker: async_sessionmaker) -> None:
         """
@@ -196,9 +192,9 @@ class Moderation(BasicFeature):
 
         unbanned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admin"][4])
+                                                 setting=list_of_features["Admins"][4])
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=list_of_features["Admins"][5])
 
         where_send = {
             True: msg.from_user.id,
@@ -245,7 +241,6 @@ class Moderation(BasicFeature):
                     reply_markup=delete_keyboard(admin_id=unbanned_user.user.id)
                 )
 
-    @staticmethod
     async def telegram_mute_callback_handler(call: CallbackQuery, callback_data: MuteData,
                                              session_maker: async_sessionmaker) -> None:
         """
@@ -285,7 +280,6 @@ class Moderation(BasicFeature):
 
         logging.log(msg=f"Muted user @{muted_user.user.full_name} user_id=f{muted_user.user.id}", level=logging.INFO)
 
-    @staticmethod
     async def telegram_unmute_callback_handler(call: CallbackQuery, callback_data: UnmuteData,
                                                session_maker: async_sessionmaker) -> None:
         """
@@ -325,7 +319,6 @@ class Moderation(BasicFeature):
         logging.log(msg=f"Unbanned user @{unmuted_user.user.full_name} user_id=f{unmuted_user.user.id}",
                     level=logging.INFO)
 
-    @staticmethod
     async def telegram_mute_cmd_handler(msg: Message, command: CommandObject,
                                         session_maker: async_sessionmaker) -> None:
         """
@@ -336,12 +329,14 @@ class Moderation(BasicFeature):
         :param session_maker: Session maker object of SqlAlchemy
         :return: Nothing
         """
+        print(msg.reply_to_message)
+        print("341414124")
         mute_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
 
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admin"][4])
+                                                 setting=list_of_features["Admins"][4])
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=list_of_features["Admins"][5])
 
         where_send = {
             True: msg.from_user.id,
@@ -411,7 +406,6 @@ class Moderation(BasicFeature):
                          f"сообщения {msg.reply_to_message.from_user.mention_html('вам')} в чате {msg.chat.title}.\n",
                     reply_markup=delete_keyboard(admin_id=mute_user.user.id))
 
-    @staticmethod
     async def telegram_unmute_cmd_handler(msg: Message, session_maker: async_sessionmaker) -> None:
         """
         Handler of command /unmute
@@ -423,9 +417,9 @@ class Moderation(BasicFeature):
         await SolutionSimpler.unmute_user(msg, session_maker)
 
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admin"][4])
+                                                 setting=list_of_features["Admins"][4])
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=list_of_features["Admins"][5])
 
         where_send = {
             True: msg.from_user.id,
@@ -445,55 +439,107 @@ class Moderation(BasicFeature):
                      f"сообщения {msg.reply_to_message.from_user.mention_html('вам')}",
                 reply_markup=delete_keyboard(admin_id=msg.reply_to_message.from_user.id))
 
-    def __init__(self):
+    # Help moderation telegram
+    # Code part
+    async def telegram_help_ban_handler(msg: Message) -> None:
         """
-        All information about feature
-        will be inside this function
+        Shows help message for /ban
+        :param msg: Message telegram object
+        :return: Nothing
         """
-        super().__init__()
-        # Telegram setting info
-        self.telegram_setting_in_list = True
-        self.telegram_setting_name = "Модерация чата 🕵️"
-        self.telegram_setting_description = "<b>Модерация чата</b>🕵️\nДанная настройка включает следущие комманды:" \
-                                            "\n<pre>/ban [время блокировки] [причина блокировки] - блокировка пользователя" \
-                                            "\n/unban - разблокировка пользователя\n" \
-                                            "/mute [время мута] [причина мута] - мут пользователя\n" \
-                                            "/unmute - Размут пользователя</pre>\n" \
-                                            "Время обозначается как:" \
-                                            "<pre>1h - один час, " \
-                                            "1d - один день, " \
-                                            "1m - одна минута, " \
-                                            "1s - одна секунда</pre>\n" \
-                                            "Для того, " \
-                                            "чтобы выполнить одну из комманд по отношению к пользователю, " \
-                                            "ответьте на сообщение пользователя и используйте команду\n" \
-                                            "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
-        self.telegram_db_name = TelegramChatSettings.moderation
-        # Telegram commands
-        self.telegram_commands: dict[str: str] = {
-            "ban": "Command to ban user in chat",
-            'unban': 'Command to unban user in chat',
-            'mute': 'Command to mute user in chat',
-            'unmute': 'Command to unmute user in chat',
-        }
-        self.telegram_cmd_avaible = True  # Is a feature have a commands
-        # All handlers
-        self.telegram_message_handlers = (
-            #  Format is [Handler, [Filters]]
-            [self.telegram_ban_cmd_handler, [Command(commands="ban"),
-                                             IsAdminFilter(True), F.reply_to_message.text]],
-            [self.telegram_unban_cmd_handler, [Command(commands="unban"),
-                                               IsAdminFilter(True), F.reply_to_message.text]],
-            [self.telegram_mute_cmd_handler, [Command(commands=["mute", "re"]),
-                                              UserHasPermissions(["can_restrict_members"]),
-                                              BotHasPermissions(["can_restrict_members"])]],
-            [self.telegram_unmute_cmd_handler, [Command(commands=["unmute"]),
-                                                UserHasPermissions(["can_restrict_members"]),
-                                                BotHasPermissions(["can_restrict_members"])]]
-        )
-        self.telegram_callback_handlers = (
-            #  Format is [Handler, [Filters]]
-            [self.telegram_ban_callback_handler, [BanData.filter()]],
-            [self.telegram_unban_callback_handler, [UnbanData.filter()]],
-            [self.telegram_mute_callback_handler, [MuteData.filter()]],
-            [self.telegram_unmute_callback_handler, [UnmuteData.filter()]])
+        await msg.answer("Использование:\n"
+                         "<pre>/ban [время блокировки] [причина блокировки]</pre>\n"
+                         "Ответьте на сообщение, чтобы заблокировать пользователя",
+                         reply_markup=delete_keyboard(msg.from_user.id))
+
+    async def telegram_help_unban_handler(msg: Message) -> None:
+        """
+        Shows help message for /unban
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        await msg.answer("Использование:\n"
+                         "<pre>/unban</pre>\n"
+                         "Ответьте на сообщение, чтобы разблокировать пользователя",
+                         reply_markup=delete_keyboard(msg.from_user.id))
+
+    async def telegram_help_mute_handler(msg: Message) -> None:
+        """
+        Shows help message for /mute
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        await msg.answer("Использование:\n"
+                         "<pre>/mute [время мута] [причина мута]</pre>\n"
+                         "Ответьте на сообщение, чтобы замутить пользователя",
+                         reply_markup=delete_keyboard(msg.from_user.id))
+
+    async def telegram_help_unmute_handler(msg: Message) -> None:
+        """
+        Shows help message for /unmute
+        :param msg: Message telegram object
+        :return: Nothing
+        """
+        await msg.answer("Использование:\n"
+                         "<pre>/unmute</pre>\n"
+                         "Ответьте на сообщение, чтобы замутить пользователя",
+                         reply_markup=delete_keyboard(msg.from_user.id))
+
+    telegram_setting_in_list = True
+    telegram_setting_name = "Модерация чата 🕵️"
+    telegram_setting_description = "<b>Модерация чата</b>🕵️\nДанная настройка включает следущие комманды:" \
+                                   "\n<pre>/ban [время блокировки] [причина блокировки] - блокировка пользователя" \
+                                   "\n/unban - разблокировка пользователя\n" \
+                                   "/mute [время мута] [причина мута] - мут пользователя\n" \
+                                   "/unmute - Размут пользователя</pre>\n" \
+                                   "Время обозначается как:" \
+                                   "<pre>1h - один час, " \
+                                   "1d - один день, " \
+                                   "1m - одна минута, " \
+                                   "1s - одна секунда</pre>\n" \
+                                   "Для того, " \
+                                   "чтобы выполнить одну из комманд по отношению к пользователю, " \
+                                   "ответьте на сообщение пользователя и используйте команду\n" \
+                                   "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
+
+    telegram_db_name = TelegramChatSettings.moderation
+    # Telegram commands
+    telegram_commands: dict[str: str] = {
+        "ban": "Command to ban user in chat",
+        "unban": "Command to unban user in chat",
+        "mute": "Command to mute user in chat",
+        "unmute": "Command to unmute user in chat",
+    }
+    telegram_cmd_avaible = True  # Is a feature have a commands
+    # All handlers
+    telegram_message_handlers = [
+        #  Format is [Handler, [Filters]]
+        [telegram_ban_cmd_handler, [Command(commands="ban"),
+                                    IsAdminFilter(True, True), F.reply_to_message.text,
+                                    ~(F.chat.type == ChatType.PRIVATE)]],
+        [telegram_unban_cmd_handler, [Command(commands="unban"),
+                                      IsAdminFilter(True, True), F.reply_to_message.text,
+                                      ~(F.chat.type == ChatType.PRIVATE)]],
+        [telegram_mute_cmd_handler, [Command(commands=["mute", "re"]),
+                                     UserHasPermissions(["can_restrict_members"]),
+                                     BotHasPermissions(["can_restrict_members"]), ~(F.chat.type == ChatType.PRIVATE), F.reply_to_message.text]],
+        [telegram_unmute_cmd_handler, [Command(commands=["unmute"]),
+                                       UserHasPermissions(["can_restrict_members"]),
+                                       BotHasPermissions(["can_restrict_members"]),
+                                       ~(F.chat.type == ChatType.PRIVATE), F.reply_to_message.text]],
+        [telegram_help_ban_handler,
+         [Command(commands="ban"), IsAdminFilter(True, True), ~(F.chat.type == ChatType.PRIVATE)]],
+        [telegram_help_unban_handler,
+         [Command(commands="unban"), IsAdminFilter(True, True), ~(F.chat.type == ChatType.PRIVATE)]],
+        [telegram_help_mute_handler, [Command(commands=["mute", "re"]), UserHasPermissions(["can_restrict_members"]),
+                                      BotHasPermissions(["can_restrict_members"]), ~(F.chat.type == ChatType.PRIVATE)]],
+        [telegram_help_unmute_handler,
+         [Command(commands="unmute"), ~(F.chat.type == ChatType.PRIVATE), UserHasPermissions(["can_restrict_members"]),
+          BotHasPermissions(["can_restrict_members"])]]
+    ]
+    telegram_callback_handlers = [
+        #  Format is [Handler, [Filters]]
+        [telegram_ban_callback_handler, [BanData.filter()]],
+        [telegram_unban_callback_handler, [UnbanData.filter()]],
+        [telegram_mute_callback_handler, [MuteData.filter()]],
+        [telegram_unmute_callback_handler, [UnmuteData.filter()]]]

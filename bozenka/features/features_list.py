@@ -1,4 +1,5 @@
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Bot
+from aiogram.types import BotCommand
 
 from bozenka.features import BasicFeature
 from bozenka.features.admin import *
@@ -21,10 +22,4 @@ features_list = [
 ]
 
 
-def register_all_features(features_list: list[BasicFeature], dispatcher: Dispatcher) -> None:
-    """
-    Registers all features / handlers avaible in bozenka
-    :param features_list: List of features
-    :return: None
-    """
-    pass
+

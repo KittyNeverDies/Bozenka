@@ -18,7 +18,6 @@ class Setup(BasicFeature):
     All staff related to it will be here
     """
 
-    @staticmethod
     async def telegram_setup_cmd_handler(msg: Message) -> None:
         """
         /setup telegram handler
@@ -29,7 +28,6 @@ class Setup(BasicFeature):
                          "Чтобы меня настроить, используй меню под данным сообщением",
                          reply_markup=setup_keyboard())
 
-    @staticmethod
     async def telegram_setup_categories_handler(call: CallbackQuery, callback_data: SetupCategory | SetupAction):
         """
         Query, what shows list of  features to enable.
@@ -40,7 +38,6 @@ class Setup(BasicFeature):
         await call.message.edit_text("Выберите настройку, которую хотите изменить",
                                      reply_markup=setup_category_keyboard(category=callback_data.category_name))
 
-    @staticmethod
     async def telegram_setup_edit_feature_handler(call: CallbackQuery, callback_data: SetupFeature, session_maker: async_sessionmaker):
         """
         Query, what shows  menu to enable / disable feature
@@ -61,7 +58,6 @@ class Setup(BasicFeature):
                                                       index=callback_data.feature_index,
                                                       is_enabled=is_enabled))
 
-    @staticmethod
     async def telegram_features_edit_handler(call: CallbackQuery, callback_data: SetupAction, session_maker: async_sessionmaker):
         """
         Query, what shows  menu to enable / disable feature
@@ -83,21 +79,19 @@ class Setup(BasicFeature):
                                                       index=callback_data.afeature_index,
                                                       is_enabled=callback_data.action == "enable"))
 
-    def __init__(self):
-        """
-        All information about feature
-        will be inside this function
-        """
-        super().__init__()
-        # Telegram feature settings
-        self.telegram_setting_in_list = False
-        self.telegram_commands = {"setup": 'Command to setup bozenka features in chat'}
-        self.telegram_cmd_avaible = True
-        self.telegram_message_handlers = {
-            self.telegram_setup_cmd_handler: [Command(commands=["setup"]), ~(F.chat.type == ChatType.PRIVATE)]
-        }
-        self.telegram_callback_handlers = {
-            self.telegram_features_edit_handler: [SetupAction.filter(F.action == "disable" or F.action == "enable")],
-            self.telegram_setup_edit_feature_handler: [SetupFeature.filter()],
-            self.telegram_setup_categories_handler: [SetupAction.filter(F.action == "back")]
-        }
+    """
+    Telegram feature settings
+    """
+    # Telegram feature settings
+    telegram_setting_in_list = False
+    telegram_commands = {"setup": 'Command to setup bozenka features in chat'}
+    telegram_cmd_avaible = True
+    telegram_message_handlers = [
+            [telegram_setup_cmd_handler, [Command(commands=["setup"]), ~(F.chat.type == ChatType.PRIVATE)]]
+        ]
+    telegram_callback_handlers = [
+            [telegram_features_edit_handler, [SetupAction.filter(F.action == "disable")]],
+            [telegram_features_edit_handler, [SetupAction.filter(F.action == "enable")]],
+            [telegram_setup_edit_feature_handler, [SetupFeature.filter()]],
+            [telegram_setup_categories_handler, [SetupAction.filter(F.action == "back")]]
+    ]

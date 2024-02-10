@@ -26,9 +26,7 @@ class TextGeneratrion(BasicFeature):
     A class, what have inside all handlers / functions
     related to text generation of bozenka
     """
-    cmd_description: str = "Your description of command"
 
-    @staticmethod
     async def telegram_already_answering_handler(msg: Message, state: FSMContext) -> None:
         """
         Giving response, if answering user now,
@@ -41,7 +39,6 @@ class TextGeneratrion(BasicFeature):
             "Подождите пожалуйста, мы уже генерируем ответ для вас, подождите, когда мы ответим на ваш передыдущий вопрос",
             reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
-    @staticmethod
     async def telegram_conversation_cmd_handler(msg: Message, state: FSMContext) -> None:
         """
         /conversation command handler, start
@@ -55,7 +52,6 @@ class TextGeneratrion(BasicFeature):
                          reply_markup=gpt_categories_keyboard
                          (user_id=msg.from_user.id))
 
-    @staticmethod
     async def telegram_cancel_cmd_handler(msg: Message, state: FSMContext) -> None:
         """
         Canceling dialog with generative model
@@ -74,7 +70,6 @@ class TextGeneratrion(BasicFeature):
     # G4F telegram category
     # All handlers and other stuff
     # All code and comments
-    @staticmethod
     async def telegram_g4f_generate_handler(msg: Message, state: FSMContext) -> None:
         """
         Generating answer if GPT4Free model and provider has been selected
@@ -131,8 +126,8 @@ class TextGeneratrion(BasicFeature):
             await state.update_data(ready_to_answer=current_messages)
         await state.set_state(AnsweringGPT4Free.ready_to_answer)
 
-    @staticmethod
-    async def telegram_instart_conversation_handler(call: CallbackQuery, callback_data: GptBackMenu, state: FSMContext) -> None:
+    async def telegram_instart_conversation_handler(call: CallbackQuery, callback_data: GptBackMenu,
+                                                    state: FSMContext) -> None:
         """
         Query, what shows when clicking on button in /start menu
         :param call: CallbackQuery class
@@ -145,7 +140,6 @@ class TextGeneratrion(BasicFeature):
         await call.message.edit_text("Пожалуста, выберите сервис для ИИ.",
                                      reply_markup=gpt_categories_keyboard(user_id=call.from_user.id))
 
-    @staticmethod
     async def telegram_g4f_providers_handlers(call: CallbackQuery, callback_data: Gpt4FreeCategory,
                                               state: FSMContext) -> None:
         """
@@ -167,7 +161,6 @@ class TextGeneratrion(BasicFeature):
         await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
                                      reply_markup=gpt4free_providers_keyboard(user_id=call.from_user.id, page=0))
 
-    @staticmethod
     async def telegram_g4f_models_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
         """
         Query, what creating models selecting menu
@@ -186,8 +179,8 @@ class TextGeneratrion(BasicFeature):
         await call.message.edit_text("Выберите модель, с которой будете общаться 🤖",
                                      reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id, page=0))
 
-    @staticmethod
-    async def telegram_end_g4f_model_handler(call: CallbackQuery, callback_data: Gpt4FreeModel, state: FSMContext) -> None:
+    async def telegram_g4f_model_ready_handler(call: CallbackQuery, callback_data: Gpt4FreeModel,
+                                               state: FSMContext) -> None:
         """
         Query, what ending g4f model selecting
         :param call: CallbackQuery class
@@ -209,7 +202,6 @@ class TextGeneratrion(BasicFeature):
                                      "Чтобы прекратить общение, используйте /cancel ",
                                      reply_markup=delete_keyboard(admin_id=call.from_user.id))
 
-    @staticmethod
     async def telegram_g4f_next_model_handler(call: CallbackQuery, callback_data: Gpt4FreeModelPage,
                                               state: FSMContext) -> None:
         """
@@ -228,8 +220,7 @@ class TextGeneratrion(BasicFeature):
                                      reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id,
                                                                            page=callback_data.page))
 
-    @staticmethod
-    async def telegram_g4f_category_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
+    async def telegram_g4f_category_handler(call: CallbackQuery, callback_data: GptCategory | GptBackMenu, state: FSMContext) -> None:
         """
         Query, what creating providers selecting menu.
         :param state: FSMContext aiogram class
@@ -243,13 +234,14 @@ class TextGeneratrion(BasicFeature):
         logging.log(msg=f"Selected gpt4free category by user_id={call.from_user.id}",
                     level=logging.INFO)
 
-        await state.update_data(set_category=callback_data.category)
+        if type(callback_data) == GptCategory:
+            await state.update_data(set_category=callback_data.category)
+
         await call.answer("Вы выбрали Gpt4Free 🤖")
         await call.message.edit_text("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖",
                                      reply_markup=gpt4free_categories_keyboard(user_id=call.from_user.id))
         await call.answer("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖")
 
-    @staticmethod
     async def telegram_g4f_back_provider_handler(call: CallbackQuery, callback_data: GptBackMenu,
                                                  state: FSMContext) -> None:
         """
@@ -270,9 +262,8 @@ class TextGeneratrion(BasicFeature):
                                      reply_markup=gpt4free_providers_keyboard(page=0, user_id=callback_data.user_id))
         await call.answer("Выберите пожалуйста одного из провайдеров 👨‍💻")
 
-    @staticmethod
-    async def inline_g4f_provider_models(call: CallbackQuery, callback_data: Gpt4FreeProvider,
-                                         state: FSMContext) -> None:
+    async def telegram_g4f_by_provider_models(call: CallbackQuery, callback_data: Gpt4FreeProvider,
+                                              state: FSMContext) -> None:
         """
         Query, what creating models selecting menu.
         :param state: FSMContext aiogram class
@@ -297,8 +288,7 @@ class TextGeneratrion(BasicFeature):
                                      ))
         await call.answer("Выберите пожалуйста модель ИИ 👾")
 
-    @staticmethod
-    async def telegram_g4f_ready_handler(call: CallbackQuery, callback_data: Gpt4freeResult, state: FSMContext) -> None:
+    async def telegram_g4f_provider_ready_handler(call: CallbackQuery, callback_data: Gpt4freeResult, state: FSMContext) -> None:
         """
         Query, what says about getting ready to questions for ChatGPT from Gpt4Free.
         :param state: FSMContext aiogram class
@@ -325,7 +315,6 @@ class TextGeneratrion(BasicFeature):
                                      reply_markup=delete_keyboard(admin_id=callback_data.user_id))
         await call.answer("Вы теперь можете спокойно вести диалог 🤖")
 
-    @staticmethod
     async def telegram_g4f_models_by_provider_handler(call: CallbackQuery, callback_data: Gpt4FreeProvsModelPage,
                                                       state: FSMContext) -> None:
         """
@@ -347,7 +336,6 @@ class TextGeneratrion(BasicFeature):
                                      ))
         await call.answer(f"Вы перелистали на страницу {callback_data.page + 1}📄")
 
-    @staticmethod
     async def telegram_next_g4f_providers_handler(call: CallbackQuery, callback_data: Gpt4FreeProviderPage,
                                                   state: FSMContext) -> None:
         """
@@ -370,7 +358,6 @@ class TextGeneratrion(BasicFeature):
     # All code and commentaries here
     # All handlers here
 
-    @staticmethod
     async def telegram_g4a_generate_handler(msg: Message, state: FSMContext) -> None:
         """
         Generating answer if Gpt4All has been selected
@@ -413,7 +400,6 @@ class TextGeneratrion(BasicFeature):
 
         await state.set_state(AnsweringGpt4All.ready_to_answer)
 
-    @staticmethod
     async def telegram_g4a_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
         """
         Query, what shows list for gpt4all models
@@ -428,7 +414,6 @@ class TextGeneratrion(BasicFeature):
         await call.message.edit_text("Выберите пожалуйста модель ИИ 👾",
                                      reply_markup=generate_gpt4all_page(user_id=call.from_user.id))
 
-    @staticmethod
     async def telegram_g4a_back_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
         """
         Query, what shows list for gpt4all models back
@@ -443,8 +428,8 @@ class TextGeneratrion(BasicFeature):
         await call.message.edit_text("Выберите пожалуйста модель ИИ 👾",
                                      reply_markup=generate_gpt4all_page(user_id=call.from_user.id))
 
-    @staticmethod
-    async def telegram_g4a_infomration_handler(call: CallbackQuery, callback_data: Gpt4AllModel, state: FSMContext) -> None:
+    async def telegram_g4a_infomration_handler(call: CallbackQuery, callback_data: Gpt4AllModel,
+                                               state: FSMContext) -> None:
         """
         Query, what show information about clicked gpt4all model from list
         :param state: FSMContext aiogram class
@@ -461,7 +446,6 @@ class TextGeneratrion(BasicFeature):
                                      reply_markup=gpt4all_model_menu(user_id=call.from_user.id,
                                                                      index=callback_data.index))
 
-    @staticmethod
     async def telegram_g4a_end_handler(call: CallbackQuery, callback_data: Gpt4AllSelect,
                                        state: FSMContext) -> None:
         """
@@ -483,7 +467,6 @@ class TextGeneratrion(BasicFeature):
                                      "Чтобы прекратить общение, используйте /cancel ",
                                      reply_markup=delete_keyboard(admin_id=callback_data.user_id))
 
-    @staticmethod
     async def telegram_pages_handler(call: CallbackQuery) -> None:
         """
         Query, made for helping purposes.
@@ -495,7 +478,6 @@ class TextGeneratrion(BasicFeature):
                     level=logging.INFO)
         await call.answer("Здесь расположается текущая странница 📃")
 
-    @staticmethod
     async def telegram_stop_dialog_handler(call: CallbackQuery, callback_data: GptStop, state: FSMContext) -> None:
         """
         Query, what stops dialog
@@ -516,44 +498,49 @@ class TextGeneratrion(BasicFeature):
         else:
             await call.message.delete()
 
-    def __init__(self):
-        """
-        All information about feature
-        will be inside this function
-        """
-        super().__init__()
-        # Telegram feature settings
-        self.telegram_setting = TelegramChatSettings.text_generation
-        self.telegram_setting_in_list = True
-        self.telegram_setting_name = "ИИ ЧатБот 🤖"
-        self.telegram_setting_description = "<b>ИИ ЧатБот </b>🤖" \
-                                            "\nЕсть поддержка:\n" \
-                                            "- Моделей Gpt4All\n" \
-                                            "- Провайдеров Gpt4Free и моделей\n" \
-                                            "Для использования:\n" \
-                                            "<pre>/conversations</pre>" \
-                                            "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘"
-        self.telegram_commands: dict[str: str] = {
-            'conversation': 'Starts conversation with text generative ai'
-        }
-        self.telegram_cmd_avaible = True  # Is a feature have a commands
-        self.telegram_message_handlers = {
-            self.telegram_conversation_cmd_handler: [Command(commands=["conversation"])],
-            self.telegram_g4a_generate_handler: [AnsweringGpt4All.ready_to_answer, ~Command(commands=["cancel"])],
-            self.telegram_g4f_generate_handler: [AnsweringGPT4Free.ready_to_answer, ~Command(commands=["cancel"])],
-            self.telegram_already_answering_handler: [AnsweringGPT4Free.answering, AnsweringGpt4All.answering]
-        }
-        self.telegram_callback_handlers = {
-            # g4a
-            self.telegram_g4a_handler: [GptCategory.filter(F.category == "Gpt4All")],
-            self.telegram_g4a_infomration_handler: [Gpt4AllModel.filter()],
-            self.telegram_g4a_end_handler: [Gpt4AllSelect.filter()],
-            # g4f
-            self.telegram_g4f_category_handler: [GptCategory.filter(F.category == "Gpt4Free")],
-            self.telegram_g4f_models_handler: [Gpt4FreeCategory.filter(F.category == "models")],
-            self.telegram_g4f_providers_handlers: [Gpt4FreeCategory.filter(F.category == "providers")],
-            self.telegram_g4f_models_by_provider_handler: [Gpt4FreeProvider.filter()],
-            self.telegram_next_g4f_providers_handler: [Gpt4FreeProviderPage.filter()],
-            # stop talking
-            self.telegram_stop_dialog_handler: [GptStop.filter()]
-        }
+    # Telegram feature settings
+    telegram_setting = TelegramChatSettings.text_generation
+    telegram_setting_in_list = True
+    telegram_setting_name = "ИИ ЧатБот 🤖"
+    telegram_setting_description = "<b>ИИ ЧатБот </b>🤖" \
+                                   "\nЕсть поддержка:\n" \
+                                   "- Моделей Gpt4All\n" \
+                                   "- Провайдеров Gpt4Free и моделей\n" \
+                                   "Для использования:\n" \
+                                   "<pre>/conversations</pre>" \
+                                   "\nНаходится в разработке, планируется в будущем. Следите за обновлениями 😘"
+    telegram_commands: dict[str: str] = {
+        'conversation': 'Starts conversation with text generative ai'
+    }
+    telegram_cmd_avaible = True  # Is a feature have a commands
+    telegram_message_handlers = (
+        [telegram_conversation_cmd_handler, [Command(commands=["conversation"])]],
+        [telegram_g4a_generate_handler, [AnsweringGpt4All.ready_to_answer, ~Command(commands=["cancel"])]],
+        [telegram_g4f_generate_handler, [AnsweringGPT4Free.ready_to_answer, ~Command(commands=["cancel"])]],
+        [telegram_already_answering_handler, [AnsweringGPT4Free.answering, AnsweringGpt4All.answering]]
+    )
+    telegram_callback_handlers = (
+        # g4a
+        [telegram_g4a_handler, [GptCategory.filter(F.category == "Gpt4All")]],
+        [telegram_g4a_infomration_handler, [Gpt4AllModel.filter()]],
+        [telegram_g4a_end_handler, [Gpt4AllSelect.filter()]],
+        # g4f
+        [telegram_g4f_category_handler, [GptCategory.filter(F.category == "Gpt4Free")]],
+        [telegram_g4f_category_handler, [GptBackMenu.filter(F.back_to == "g4fcategory")]],
+        # categories
+        [telegram_g4f_models_handler, [Gpt4FreeCategory.filter(F.category == "models")]],
+        [telegram_g4f_providers_handlers, [Gpt4FreeCategory.filter(F.category == "providers")]],
+        # providers list
+        [telegram_g4f_providers_handlers, [GptBackMenu.filter(F.back_to == "providers")]],
+        [telegram_next_g4f_providers_handler, [Gpt4FreeProviderPage.filter()]],
+        # models by provider list
+        [telegram_g4f_models_by_provider_handler, [Gpt4FreeProvsModelPage.filter()]],
+        [telegram_g4f_by_provider_models, [Gpt4FreeProvider.filter()]],
+        # models list
+        [telegram_g4f_next_model_handler, [Gpt4FreeModelPage.filter()]],
+        # end features
+        [telegram_g4f_model_ready_handler, [Gpt4FreeModel.filter()]],
+        [telegram_g4f_provider_ready_handler, [Gpt4freeResult.filter()]],
+        # stop talking
+        [telegram_stop_dialog_handler, [GptStop.filter()]]
+    )

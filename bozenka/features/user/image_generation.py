@@ -23,7 +23,6 @@ class ImageGeneratrion(BasicFeature):
     """
     cmd_description: str = "Your description of command"
 
-    @staticmethod
     async def telegram_select_image_size_handler(call: CallbackQuery, callback_data: ImageGenerationCategory,
                                                  state: FSMContext) -> None:
         """
@@ -42,8 +41,8 @@ class ImageGeneratrion(BasicFeature):
                                      reply_markup=image_resolution_keyboard(user_id=call.from_user.id,
                                                                             category=callback_data.category))
 
-    @staticmethod
-    async def telegram_end_generation_handler(call: CallbackQuery, callback_data: ImageGeneration, state: FSMContext) -> None:
+    async def telegram_end_generation_handler(call: CallbackQuery, callback_data: ImageGeneration,
+                                              state: FSMContext) -> None:
         """
         Query, what shows menu for image size to generate in
         :param call:
@@ -60,7 +59,6 @@ class ImageGeneratrion(BasicFeature):
             "Напишите /cancel для отмены",
             reply_markup=delete_keyboard(admin_id=call.from_user.id))
 
-    @staticmethod
     async def telegram_already_generating_handler(msg: Message, state: FSMContext) -> None:
         """
         Giving response, if generating image for user right now,
@@ -73,7 +71,6 @@ class ImageGeneratrion(BasicFeature):
             "Подождите пожалуйста, мы уже генерируем изображение для вас, подождите, когда мы ответим на ваш передыдущий вопрос",
             reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
-    @staticmethod
     async def telegram_imagine_handler(msg: Message, state: FSMContext) -> None:
         """
         /imagine command handler, start menu
@@ -86,7 +83,6 @@ class ImageGeneratrion(BasicFeature):
         await msg.answer("Пожалуста, выберите сервис / модель для генерации изображений",
                          reply_markup=image_generation_keyboard(user_id=msg.from_user.id))
 
-    @staticmethod
     async def telegram_kadinsky_generating_handler(msg: Message, state: FSMContext) -> None:
         """
         Message handler for kandinsky to generate image by text from message
@@ -130,28 +126,25 @@ class ImageGeneratrion(BasicFeature):
                         level=logging.INFO)
         await state.set_state(GeneratingImages.ready_to_generate)
 
-    def __init__(self):
-        """
-        All information about feature
-        will be inside this function
-        """
-        super().__init__()
-        # Telegram feature settings
-        self.telegram_setting = TelegramChatSettings.image_generation
-        self.telegram_commands: dict[str: str] = {'imagine', 'Starts conversation with image generative ai'}
-        self.telegram_setting_in_list = True
-        self.telegram_setting_name = "Генерация изображений 📸"
-        self.telegram_setting_description = "<b>Генерация изображений </b>🤖" \
-                                            "\nНаходится в разработке.\n" \
-                                            "На текущий момент есть поддержка:\n" \
-                                            "- Kadinksy\n" \
-                                            " Следите за обновлениями 😘"
-        self.telegram_cmd_avaible = True  # Is a feature have a commands
-        self.telegram_message_handlers = {
-            self.telegram_kadinsky_generating_handler: [GeneratingImages.ready_to_generate, ~Command(commands=["cancel"])],
-            self.telegram_imagine_handler: [Command(commands=["imagine"])]
-        }
-        self.telegram_callback_handlers = {
-            self.telegram_select_image_size_handler: [ImageGenerationCategory.filter()],
-            self.telegram_end_generation_handler: [ImageGeneration.filter()]
-        }
+    """
+    Telegram feature settings
+    """
+    # Telegram feature settings
+    telegram_setting = TelegramChatSettings.image_generation
+    telegram_commands: dict[str: str] = {'imagine': 'Starts conversation with image generative ai'}
+    telegram_setting_in_list = True
+    telegram_setting_name = "Генерация изображений 📸"
+    telegram_setting_description = "<b>Генерация изображений </b>🤖" \
+                                   "\nНаходится в разработке.\n" \
+                                   "На текущий момент есть поддержка:\n" \
+                                   "- Kadinksy\n" \
+                                   " Следите за обновлениями 😘"
+    telegram_cmd_avaible = True  # Is a feature have a commands
+    telegram_message_handlers = [
+        [telegram_kadinsky_generating_handler, [GeneratingImages.ready_to_generate, ~Command(commands=["cancel"])]],
+        [telegram_imagine_handler, [Command(commands=["imagine"])]]
+    ]
+    telegram_callback_handlers = [
+        [telegram_select_image_size_handler, [ImageGenerationCategory.filter()]],
+        [telegram_end_generation_handler, [ImageGeneration.filter()]]
+    ]

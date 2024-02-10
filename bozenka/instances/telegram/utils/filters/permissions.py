@@ -1,6 +1,7 @@
 from typing import Any
 
 from aiogram.filters import Filter
+from aiogram.methods import GetChatMember
 from aiogram.types import Message, ChatPermissions
 from aiogram.enums import ChatMemberStatus
 from bozenka.instances.telegram.utils.simpler import ru_cmds
@@ -39,7 +40,8 @@ class UserHasPermissions(Filter):
     def __init__(self, perms: list[Any]) -> None:
         self.perms = perms
 
-    async def check_permissions(self, permission, msg: Message) -> bool:
+    @staticmethod
+    async def check_permissions(permission, msg: Message) -> bool:
         """
         Checking permissions, included to user.
         :return:
@@ -52,19 +54,29 @@ class UserHasPermissions(Filter):
 
     def generate_perms_list(self, user) -> list[Any]:
         """
-        Generates list of permissions, included to user
-        :param user:
-        :return:
+        Generates list of permissions for user.
+        :param user: User telegram object
+        :return: List
         """
         permission = []
         for rule in self.perms:
-            if rule in permission:
+            if rule in self.permissions:
                 exec(f"permission.append(user.{rule})")
         return permission
 
     async def __call__(self, msg: Message) -> bool:
+        """
+        Working after catching a call from aiogram
+        :param msg: Message telegram object
+        :param self: A self object of this class
+        :return: None
+        """
         user = await msg.chat.get_member(msg.from_user.id)
-        permission = self.generate_perms_list(user)
+        if user.status != ChatMemberStatus.CREATOR:
+            permission = self.generate_perms_list(user)
+        else:
+            permission = None
+
         return True if user.status == ChatMemberStatus.CREATOR else self.check_permissions(permission, msg)
 
 
@@ -72,20 +84,39 @@ class BotHasPermissions(UserHasPermissions):
     """
     Check, does bot have permissions, what user need to work with bot.
     """
-    async def __call__(self, msg: Message, *args, **kwargs):
+
+    async def __call__(self, msg: Message, *args, **kwargs) -> bool:
+        """
+        Working after catching a call from aiogram
+        :param msg: Message telegram object
+        :param self: A self object of this class
+        :return: None
+        """
         bot = await msg.chat.get_member(msg.chat.bot.id)
         permission = self.generate_perms_list(bot)
-        return self.check_permissions(permission, msg)
+        return await self.check_permissions(permission, msg)
 
 
 class IsOwner(Filter):
     """
-    Checks, is User are owner of chat
+    Checks, is memeber is owner of this chat
     """
+
     def __init__(self, is_admin: bool) -> None:
+        """
+        Basic init class
+        :param is_admin: Is admin status
+        :return: Nothing
+        """
         self.is_admin = is_admin
 
     async def __call__(self, msg: Message) -> bool:
+        """
+        Working after catching a call from aiogram
+        :param msg: Message telegram object
+        :param self: A self object of this class
+        :return: None
+        """
         user = await msg.chat.get_member(msg.from_user.id)
         if ChatMemberStatus.CREATOR != user.status:
             await msg.answer(ru_cmds["no-perms"])
@@ -93,12 +124,36 @@ class IsOwner(Filter):
 
 
 class IsAdminFilter(Filter):
-    def __init__(self, is_admin: bool) -> None:
-        self.is_admin = is_admin
+    """
+    Checks, is member of chat is admin and
+    does bot have administration rights
+    """
+
+    def __init__(self, is_user_admin: bool, is_bot_admin: bool) -> None:
+        """
+        Basic init class
+
+        """
+        self.is_user_admin = is_user_admin
+        self.is_bot_admin = is_bot_admin
 
     async def __call__(self, msg: Message) -> bool:
+        """
+        Working after catching a call from aiogram
+        :param msg: Message telegram object
+        :param self: A self object of this class
+        :return: None
+        """
         user = await msg.chat.get_member(msg.from_user.id)
+        bot = await msg.chat.get_member(msg.bot.id)
+        if ChatMemberStatus.ADMINISTRATOR != user.status and ChatMemberStatus.CREATOR != user.status:
+            if bot.status != ChatMemberStatus.ADMINISTRATOR:
+                await msg.reply("Ошибка ❌\n"
+                                "У вас нет прав на использование этой комманды. У меня нет прав на использование  🚫")
+            else:
+                await msg.reply("Ошибка ❌\n"
+                                "У вас нет прав на использование этой комманды 🚫")
+            return False
         if ChatMemberStatus.CREATOR == user.status:
             return True
-        return ChatMemberStatus.ADMINISTRATOR == user.status
-
+        return ChatMemberStatus.ADMINISTRATOR == user.status or ChatMemberStatus.CREATOR == user.status
