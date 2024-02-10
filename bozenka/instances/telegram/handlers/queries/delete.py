@@ -2,11 +2,11 @@ import logging
 
 from aiogram import types
 
-from bozenka.instances.telegram.utils.callbacks_factory import DeleteCallbackData
+from bozenka.instances.telegram.utils.callbacks_factory import DeleteMenu
 from aiogram.enums import ChatMemberStatus
 
 
-async def inline_delete(call: types.CallbackQuery, callback_data: DeleteCallbackData) -> None:
+async def inline_delete(call: types.CallbackQuery, callback_data: DeleteMenu) -> None:
     """
     Deletes messsage, after special callback
     :param call:

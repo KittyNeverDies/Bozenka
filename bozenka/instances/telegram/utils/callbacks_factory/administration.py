@@ -5,6 +5,7 @@ from aiogram.filters.callback_data import CallbackData
 class BanData(CallbackData, prefix="ban"):
     """
         Callback with information to ban user
+        and handle clicking on button ban
     """
     user_id_ban: int
     user_id_clicked: int
@@ -13,6 +14,7 @@ class BanData(CallbackData, prefix="ban"):
 class UnbanData(CallbackData, prefix="unban"):
     """
        Callback with information to unban user
+       and handle clicking on button unban
     """
     user_id_unban: int
     user_id_clicked: int
@@ -22,6 +24,7 @@ class UnbanData(CallbackData, prefix="unban"):
 class MuteData(CallbackData, prefix="mute"):
     """
        Callback with information to mute user
+       and handle clicking on button unmute
     """
     user_id_mute: int
     user_id_clicked: int

@@ -33,7 +33,7 @@ def register_queries(router: Router) -> None:
     # Revoke telegram invite link button
     router.callback_query.register(inline_revoke, RevokeCallbackData.filter())
     # Delete button message reaction
-    router.callback_query.register(inline_delete, DeleteCallbackData.filter())
+    router.callback_query.register(inline_delete, DeleteMenu.filter())
 
     # Threads (Close/Open)
     router.callback_query.register(inline_close_thread, CloseThread.filter())

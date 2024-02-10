@@ -156,7 +156,7 @@ def delete_keyboard(admin_id: int) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())
+        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())
     ]])
     return kb
 
@@ -445,7 +445,7 @@ def text_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())],
         [InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
     ])
     return kb
@@ -458,7 +458,7 @@ def image_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())],
         [InlineKeyboardButton(text="Хватит 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
     ])
     return kb
@@ -474,7 +474,7 @@ def ban_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
         :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())
+        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())
     ], [
         InlineKeyboardButton(text="Разбанить 🛠️", callback_data=UnbanData(user_id_unban=str(ban_id),
                                                                           user_id_clicked=str(admin_id)).pack())
@@ -491,7 +491,7 @@ def unban_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
     """
     print(ban_id)
     kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())
+        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())
     ], [
         InlineKeyboardButton(text="Забанить 🛠️", callback_data=BanData(user_id_ban=str(ban_id),
                                                                        user_id_clicked=str(admin_id)).pack())
@@ -509,7 +509,7 @@ def mute_keyboard(admin_id: int, mute_id: int) -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Спасибо ✅",
-                              callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
+                              callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())],
         [InlineKeyboardButton(text="Размутить 🛠️",
                               callback_data=UnmuteData(user_id_unmute=mute_id, user_id_clicked=admin_id).pack())]])
     return kb
@@ -524,7 +524,7 @@ def unmute_keyboard(admin_id: int, unmute_id: int) -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Спасибо ✅",
-                              callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())],
+                              callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())],
         [InlineKeyboardButton(text="Замутить 🛠️",
                               callback_data=MuteData(user_id_mute=unmute_id, user_id_clicked=admin_id).pack())]])
     return kb
@@ -545,7 +545,7 @@ def invite_keyboard(link: str, admin_id: int, chat_name: str) -> InlineKeyboardM
         [InlineKeyboardButton(text="Отозвать 🛠️",
                               callback_data=RevokeCallbackData(admin_id=admin_id, link=link).pack())],
         [InlineKeyboardButton(text="Спасибо ✅",
-                              callback_data=DeleteCallbackData(user_id_clicked=str(admin_id)).pack())]])
+                              callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())]])
     return kb
 
 
@@ -558,7 +558,7 @@ def close_thread_keyboard(user_id: int) -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Окрыть обсуждение 🛠️", callback_data=OpenThread(user_id=user_id).pack())],
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
 
@@ -571,7 +571,7 @@ def open_thread_keyboard(user_id: int) -> InlineKeyboardMarkup:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Закрыть обсуждение 🛠️", callback_data=CloseThread(user_id=user_id).pack())],
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
 
@@ -587,7 +587,7 @@ def pin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Открепить сообщение 📌",
                               callback_data=UnpinMsg(user_id=user_id, msg_id=msg_id).pack())],
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
 
@@ -602,7 +602,7 @@ def unpin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Открепить сообщение 📌",
                               callback_data=PinMsg(user_id=user_id, msg_id=msg_id).pack())],
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteCallbackData(user_id_clicked=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
 
