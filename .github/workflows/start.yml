@@ -1,0 +1,24 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "telegram", "main", "discord", "matrix" ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  telegram_notification:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Github Telegram Notifier
+      uses: EverythingSuckz/github-telegram-notify@v1.1.2
+      with:
+        bot_token: '${{ secrets.BOT_TOKEN }}'
+        chat_id: '${{ secrets.CHAT_ID }}'
+
+
+
