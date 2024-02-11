@@ -218,10 +218,10 @@ class Start(BasicFeature):
     Telegram feature settings
     """
     # Telegram feature settings
-    telegram_setting = None
+    telegram_setting_in_list = False
+    telegram_category = None
     telegram_commands: dict[str: str] = {"start": "Command to start work with bozenka the bot"}
     telegram_cmd_avaible = True  # Is a feature have a commands
-    telegram_callback_factory = None
     telegram_message_handlers = [
             [start_cmd_handler, [Command(commands=["start"]), F.chat.type == ChatType.PRIVATE]],
         ]

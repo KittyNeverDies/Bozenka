@@ -1,4 +1,5 @@
-from .invite import Invite
+from .invite_generation import Invite
 from .moderation import Moderation
-from .pins import Pins
+from .msg_pins import Pins
 from .topics import Threads
+from .information import ChatInformation

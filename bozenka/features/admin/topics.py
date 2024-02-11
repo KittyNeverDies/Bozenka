@@ -132,6 +132,7 @@ class Threads(BasicFeature):
                                    "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота. Также должен быть" \
                                    "включен форум</b>"
     telegram_db_name = TelegramChatSettings.topics
+    telegram_category = "admin"
     # Telegram commands
     telegram_commands: dict[str: str] = {
         'close': 'Close fast topic (not general) in chat',

@@ -119,6 +119,7 @@ class Pins(BasicFeature):
                                    "/unpin_all - открепляет все сообщения, которые видит бот</pre>\n" \
                                    "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
     telegram_db_name = TelegramChatSettings.pins
+    telegram_category = "admin"
     # Telegram commands
     telegram_commands: dict[str: str] = {
         'pin': 'Pin fast any message in chat',

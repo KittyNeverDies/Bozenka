@@ -130,7 +130,8 @@ class ImageGeneratrion(BasicFeature):
     Telegram feature settings
     """
     # Telegram feature settings
-    telegram_setting = TelegramChatSettings.image_generation
+    telegram_category = "user"
+    telegram_db_name = TelegramChatSettings.image_generation
     telegram_commands: dict[str: str] = {'imagine': 'Starts conversation with image generative ai'}
     telegram_setting_in_list = True
     telegram_setting_name = "Генерация изображений 📸"

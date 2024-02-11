@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from bozenka.database.tables.telegram import get_chat_config_value, TelegramChatSettings
 from bozenka.features import BasicFeature
 from bozenka.instances.telegram.utils.callbacks_factory import SetupAction, SetupFeature, SetupCategory
+from bozenka.instances.telegram.utils.filters import IsOwner
 from bozenka.instances.telegram.utils.keyboards import setup_keyboard, setup_category_keyboard, setup_feature_keyboard
 from bozenka.instances.telegram.utils.simpler import list_of_features
 
@@ -25,7 +26,8 @@ class Setup(BasicFeature):
         :return: Nothing
         """
         await msg.answer("Привет владелец чата 👋\n"
-                         "Чтобы меня настроить, используй меню под данным сообщением",
+                         "Настрой меня - бота так, как тебе удобно, и я буду помогать тебе в чате с определенными функциями.\n"
+                         "Используй меню настроек ниже, чтобы указать, какие функции, которые я умею, должен выполнять.",
                          reply_markup=setup_keyboard())
 
     async def telegram_setup_categories_handler(call: CallbackQuery, callback_data: SetupCategory | SetupAction):
@@ -86,12 +88,13 @@ class Setup(BasicFeature):
     telegram_setting_in_list = False
     telegram_commands = {"setup": 'Command to setup bozenka features in chat'}
     telegram_cmd_avaible = True
+    telegram_category = None
     telegram_message_handlers = [
-            [telegram_setup_cmd_handler, [Command(commands=["setup"]), ~(F.chat.type == ChatType.PRIVATE)]]
+            [telegram_setup_cmd_handler, [Command(commands=["setup"]), ~(F.chat.type == ChatType.PRIVATE), IsOwner(True)]]
         ]
     telegram_callback_handlers = [
-            [telegram_features_edit_handler, [SetupAction.filter(F.action == "disable")]],
-            [telegram_features_edit_handler, [SetupAction.filter(F.action == "enable")]],
-            [telegram_setup_edit_feature_handler, [SetupFeature.filter()]],
-            [telegram_setup_categories_handler, [SetupAction.filter(F.action == "back")]]
+            [telegram_features_edit_handler, [SetupAction.filter(F.action == "disable"), IsOwner(True)]],
+            [telegram_features_edit_handler, [SetupAction.filter(F.action == "enable"), IsOwner(True)]],
+            [telegram_setup_edit_feature_handler, [SetupFeature.filter(), IsOwner(True)]],
+            [telegram_setup_categories_handler, [SetupAction.filter(F.action == "back"), IsOwner(True)]]
     ]

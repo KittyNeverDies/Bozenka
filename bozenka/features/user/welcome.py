@@ -62,6 +62,7 @@ class Welcome(BasicFeature):
 
     # Telegram feature settings
     telegram_setting = TelegramChatSettings.welcome_messages
+    telegram_category = "user"
     telegram_commands: dict[str: str] = {}
     telegram_setting_in_list = True
     telegram_setting_name = "Приветсвенные сообщения 👋"

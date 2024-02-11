@@ -61,6 +61,7 @@ class Invite(BasicFeature):
                                    "Разрешает использование комманды <code>/invite</code> в чате, для созданния приглашений.\n" \
                                    "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
     telegram_db_name = TelegramChatSettings.invite_generator
+    telegram_category = "admin"
     # Telegram commands
     telegram_commands: dict[str: str] = {"/invite": 'Generates invite into current chat'}
     telegram_cmd_avaible = True  # Is a feature have a commands

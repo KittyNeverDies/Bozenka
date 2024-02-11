@@ -2,7 +2,7 @@ from typing import Any
 
 from aiogram.filters import Filter
 from aiogram.methods import GetChatMember
-from aiogram.types import Message, ChatPermissions
+from aiogram.types import Message, ChatPermissions, CallbackQuery
 from aiogram.enums import ChatMemberStatus
 from bozenka.instances.telegram.utils.simpler import ru_cmds
 
@@ -110,16 +110,19 @@ class IsOwner(Filter):
         """
         self.is_admin = is_admin
 
-    async def __call__(self, msg: Message) -> bool:
+    async def __call__(self, msg: Message | CallbackQuery) -> bool:
         """
         Working after catching a call from aiogram
-        :param msg: Message telegram object
+        :param msg: Message or CallbackQuery telegram object
         :param self: A self object of this class
         :return: None
         """
+        if type(msg) is CallbackQuery:
+            msg = msg.message
         user = await msg.chat.get_member(msg.from_user.id)
         if ChatMemberStatus.CREATOR != user.status:
-            await msg.answer(ru_cmds["no-perms"])
+            await msg.answer("Ошибка ❌\n"
+                             "У вас нет прав на использование этой комманды 🚫")
         return ChatMemberStatus.CREATOR == user.status
 
 

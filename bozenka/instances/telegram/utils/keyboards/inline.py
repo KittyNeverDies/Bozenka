@@ -9,6 +9,7 @@ from gpt4all import GPT4All
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database.tables.telegram import get_chat_config_value
+from bozenka.instances.features_list import customizable_features
 from bozenka.instances.telegram.utils.callbacks_factory import *
 from bozenka.instances.telegram.utils.simpler.lists_of_content import generate_list_of_features
 from bozenka.generative.gpt4free import generate_gpt4free_models, generate_gpt4free_providers
@@ -69,7 +70,7 @@ def help_category_keyboard(category: str) -> InlineKeyboardMarkup:
                                         feature_index=list_of_features.index(setting),
                                         feature_category=category
                                     ).pack()))
-    kb.row(InlineKeyboardButton(text="🔙 Назад к категориям",
+    kb.row(InlineKeyboardButton(text="🔙 Назад к списку категорий",
                                 callback_data=HelpBack(back_to="category").pack()))
     return kb.as_markup()
 
@@ -81,7 +82,7 @@ def help_feature_keyboard(category: str) -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔙 Назад к функциям",
+        [InlineKeyboardButton(text="🔙 Назад к списку функций",
                               callback_data=HelpBackCategory(category_name=category).pack())]
     ])
     return kb
@@ -94,15 +95,16 @@ def setup_keyboard() -> InlineKeyboardMarkup:
     :return:
     """
     kb = InlineKeyboardBuilder()
+    translations = {
+        "admin": "Администраторы 👮‍♂",
+        "user": "Пользователи 👤"
+    }
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="Администраторы 👮‍♂",
-                             callback_data=SetupCategory(category_name="Admins").pack())],
-        [InlineKeyboardButton(text="Пользователи 👤",
-                              callback_data=SetupCategory(category_name="Members").pack())],
-        [InlineKeyboardButton(text="В разработке 👨‍💻",
-                              callback_data=SetupCategory(category_name="Devs").pack())]])
-    return kb
+    for category in customizable_features:
+        kb.row(InlineKeyboardButton(text=translations[category],
+                                    callback_data=SetupCategory(category_name=category).pack()))
+
+    return kb.as_markup()
 
 
 def setup_category_keyboard(category: str) -> InlineKeyboardMarkup:

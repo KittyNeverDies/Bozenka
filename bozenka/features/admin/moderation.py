@@ -501,8 +501,8 @@ class Moderation(BasicFeature):
                                    "чтобы выполнить одну из комманд по отношению к пользователю, " \
                                    "ответьте на сообщение пользователя и используйте команду\n" \
                                    "Для исполнения <b>требует соответсвующих прав от пользователя и их наличие у бота.</b>"
-
     telegram_db_name = TelegramChatSettings.moderation
+    telegram_category = "admin"
     # Telegram commands
     telegram_commands: dict[str: str] = {
         "ban": "Command to ban user in chat",

@@ -499,7 +499,8 @@ class TextGeneratrion(BasicFeature):
             await call.message.delete()
 
     # Telegram feature settings
-    telegram_setting = TelegramChatSettings.text_generation
+    telegram_category = "user"
+    telegram_db_name = TelegramChatSettings.text_generation
     telegram_setting_in_list = True
     telegram_setting_name = "ИИ ЧатБот 🤖"
     telegram_setting_description = "<b>ИИ ЧатБот </b>🤖" \
