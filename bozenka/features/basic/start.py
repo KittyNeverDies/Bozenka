@@ -4,12 +4,11 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from bozenka.features import BasicFeature
+from bozenka.features.main import BasicFeature
+from bozenka.instances.customizable_features_list import categorized_customizable_features, text_transcription
 from bozenka.instances.telegram.utils.callbacks_factory import HelpCategory, HelpBackCategory, HelpFeature, HelpBack
-from bozenka.instances.telegram.utils.keyboards import help_category_keyboard, help_keyboard, \
-    help_feature_keyboard, gpt_categories_keyboard
-from bozenka.instances.telegram.utils.simpler import list_of_features
-from bozenka.instances.version import build, is_updated
+from bozenka.features.user.text_generation import gpt_categories_keyboard
+from bozenka.instances.current_version import build, is_updated
 
 telegram_main_menu = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -21,6 +20,51 @@ telegram_main_menu = InlineKeyboardMarkup(
             [InlineKeyboardButton(text="Начать генерацию изображений 🖼", callback_data="dialogimage")],
         ]
     )
+
+
+# Help related keyboards
+def main_help_keyboard() -> InlineKeyboardMarkup:
+    """
+    Generate keyboard for /help command
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardBuilder()
+    for category in categorized_customizable_features:
+        kb.row(InlineKeyboardButton(text=text_transcription[category],
+                                    callback_data=HelpCategory(category_name=category).pack()))
+
+    return kb.as_markup()
+
+
+def help_category_keyboard(category: str) -> InlineKeyboardMarkup:
+    """
+    Generate keyboard for one of categories
+    :param category: Category name
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardBuilder()
+    for setting in categorized_customizable_features[category]:
+        kb.row(InlineKeyboardButton(text=setting.telegram_setting_name,
+                                    callback_data=HelpFeature(
+                                        feature_index=categorized_customizable_features[category].index(setting),
+                                        feature_category=category
+                                    ).pack()))
+    kb.row(InlineKeyboardButton(text="🔙 Назад к списку категорий",
+                                callback_data=HelpBack(back_to="category").pack()))
+    return kb.as_markup()
+
+
+def help_feature_keyboard(category: str) -> InlineKeyboardMarkup:
+    """
+    Just button for function of /help
+    :param category: Category name
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🔙 Назад к списку функций",
+                              callback_data=HelpBackCategory(category_name=category).pack())]
+    ])
+    return kb
 
 
 class Start(BasicFeature):
@@ -42,7 +86,7 @@ class Start(BasicFeature):
         :return: None
         """
         await call.message.edit_text("Выберите категорию, по которой нужна помощь:",
-                                     reply_markup=help_keyboard())
+                                     reply_markup=main_help_keyboard())
         await call.answer()
 
     @staticmethod
@@ -66,7 +110,7 @@ class Start(BasicFeature):
         :return: None
         """
         await call.message.edit_text(
-            list_of_features[callback_data.feature_category][callback_data.feature_index].description,
+            categorized_customizable_features[callback_data.feature_category][callback_data.feature_index]. telegram_setting_description,
             reply_markup=help_feature_keyboard(category=callback_data.feature_category))
         await call.answer()
 
@@ -78,7 +122,7 @@ class Start(BasicFeature):
         :return: None
         """
         await call.message.edit_text("Выберите категорию функций, по которой вам нужна помощь 🤖",
-                                     reply_markup=help_keyboard())
+                                     reply_markup=main_help_keyboard())
         await call.answer()
 
     @staticmethod

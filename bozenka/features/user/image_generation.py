@@ -4,16 +4,63 @@ from typing import Callable
 from aiogram import Dispatcher
 from aiogram.filters import CommandObject, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, FSInputFile
+from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, FSInputFile, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features import BasicFeature
+from bozenka.features.main import BasicFeature
+from bozenka.generative import image_generative_size, image_generative_categories
 from bozenka.generative.kadinsky import kadinsky_gen
-from bozenka.instances.telegram.utils.callbacks_factory import ImageGenerationCategory, ImageGeneration
-from bozenka.instances.telegram.utils.keyboards import image_resolution_keyboard, delete_keyboard, \
-    image_generation_keyboard, image_response_keyboard
+from bozenka.instances.telegram.utils.callbacks_factory import ImageGenerationCategory, ImageGeneration, DeleteMenu, \
+    GptStop
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import GeneratingImages
+
+
+def telegram_image_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for image
+    :param user_id: User_id of called user
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Хватит 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
+    ])
+    return kb
+
+
+def telegram_image_resolution_keyboard(user_id: int, category: str) -> InlineKeyboardMarkup:
+    """
+    Create keyboard with list of resolution to generate image
+    :param category: Category name
+    :param user_id: User_id of called user
+    :return: InlineKeyboardMarkup
+    """
+    builder = InlineKeyboardBuilder()
+    for size in image_generative_size:
+        builder.row(InlineKeyboardButton(text=size,
+                                         callback_data=ImageGeneration(
+                                             user_id=user_id,
+                                             category=category,
+                                             size=size
+                                         ).pack()))
+    return builder.as_markup()
+
+
+def telegram_image_generation_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Create keyboard with list of image generation librarioes avaible in the bozenka
+    :param user_id: User_id of called user
+    :return: InlineKeyboardMarkup
+    """
+    builder = InlineKeyboardBuilder()
+    for category in image_generative_categories:
+        builder.row(InlineKeyboardButton(text=category,
+                                         callback_data=ImageGenerationCategory(user_id=user_id,
+                                                                               category=category).pack()))
+    return builder.as_markup()
 
 
 class ImageGeneratrion(BasicFeature):
@@ -38,8 +85,8 @@ class ImageGeneratrion(BasicFeature):
         await state.update_data(set_category=callback_data.category)
         await state.set_state(GeneratingImages.set_size)
         await call.message.edit_text("Пожалуста, выберите размер изображения 🖼",
-                                     reply_markup=image_resolution_keyboard(user_id=call.from_user.id,
-                                                                            category=callback_data.category))
+                                     reply_markup=telegram_image_resolution_keyboard(user_id=call.from_user.id,
+                                                                                     category=callback_data.category))
 
     async def telegram_end_generation_handler(call: CallbackQuery, callback_data: ImageGeneration,
                                               state: FSMContext) -> None:
@@ -81,7 +128,7 @@ class ImageGeneratrion(BasicFeature):
         if await state.get_state():
             return
         await msg.answer("Пожалуста, выберите сервис / модель для генерации изображений",
-                         reply_markup=image_generation_keyboard(user_id=msg.from_user.id))
+                         reply_markup=telegram_image_generation_categories_keyboard(user_id=msg.from_user.id))
 
     async def telegram_kadinsky_generating_handler(msg: Message, state: FSMContext) -> None:
         """
@@ -110,13 +157,13 @@ class ImageGeneratrion(BasicFeature):
                 photo = FSInputFile(path)
                 await msg.answer_photo(photo=photo,
                                        caption=msg.text,
-                                       reply_markup=image_response_keyboard(user_id=msg.from_user.id))
+                                       reply_markup=telegram_image_response_keyboard(user_id=msg.from_user.id))
                 await message.delete()
             else:
                 await message.edit_text("Простите, произошла ошибка 😔\n"
                                         "Убедитесь, что севрера kadinsky работают и ваш промт не является неподобающим и неприемлимым\n"
                                         "Если это продолжается, пожалуйста используйте /cancel",
-                                        reply_markup=image_response_keyboard(user_id=msg.from_user.id))
+                                        reply_markup=telegram_image_response_keyboard(user_id=msg.from_user.id))
 
         except Exception as ex:
             logging.log(msg=f"Get an exception for generating answer={ex}",

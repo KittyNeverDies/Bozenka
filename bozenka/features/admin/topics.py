@@ -1,14 +1,41 @@
 from aiogram import F
 from aiogram.enums import ChatType
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features import BasicFeature
-from bozenka.instances.telegram.utils.callbacks_factory import CloseThread, OpenThread
-from bozenka.instances.telegram.utils.filters import UserHasPermissions, BotHasPermissions
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard, close_thread_keyboard, open_thread_keyboard
+from bozenka.features.main import BasicFeature
+from bozenka.instances.telegram.utils.callbacks_factory import CloseThread, OpenThread, DeleteMenu
+from bozenka.instances.telegram.filters import UserHasPermissions, BotHasPermissions
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
+
+
+# Close / Open thread commands related keyboards
+def telegram_close_thread_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Generate menu for /close command
+    :param user_id: User_if of member, who closed thread
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Окрыть обсуждение 🛠️", callback_data=OpenThread(user_id=user_id).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
+    ])
+    return kb
+
+
+def telegram_open_thread_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Generate menu for /open command
+    :param user_id: User_if of member, who opened thread
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Закрыть обсуждение 🛠️", callback_data=CloseThread(user_id=user_id).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
+    ])
+    return kb
 
 
 class Threads(BasicFeature):
@@ -25,7 +52,7 @@ class Threads(BasicFeature):
         """
         config = await SolutionSimpler.close_topic(msg=msg)
         await msg.answer(config[0],
-                         reply_markup=close_thread_keyboard(user_id=msg.from_user.id)
+                         reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id)
                          if config[1] else delete_keyboard(msg.from_user.id))
 
     async def telegram_reopen_topic_cmd_handler(msg: Message) -> None:
@@ -36,7 +63,7 @@ class Threads(BasicFeature):
         """
         config = await SolutionSimpler.open_topic(msg=msg)
         await msg.answer(config[0],
-                         reply_markup=open_thread_keyboard(user_id=msg.from_user.id)
+                         reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id)
                          if config[1] else delete_keyboard(msg.from_user.id))
 
     async def telegram_close_general_topic_cmd_handler(msg: Message) -> None:
@@ -47,7 +74,7 @@ class Threads(BasicFeature):
         """
         config = await SolutionSimpler.close_general_topic(msg=msg)
         await msg.answer(config[0],
-                         reply_markup=close_thread_keyboard(user_id=msg.from_user.id)
+                         reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id)
                          if config[1] else delete_keyboard(msg.from_user.id))
 
     async def telegram_reopen_general_topic_cmd(msg: Message) -> None:
@@ -58,7 +85,7 @@ class Threads(BasicFeature):
         """
         config = await SolutionSimpler.open_general_topic(msg=msg)
         await msg.answer(config[0],
-                         reply_markup=open_thread_keyboard(user_id=msg.from_user.id)
+                         reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id)
                          if config[1] else delete_keyboard(msg.from_user.id))
 
     async def telegram_hide_general_topic_cmd_handler(msg: Message) -> None:
@@ -94,7 +121,7 @@ class Threads(BasicFeature):
         config = await SolutionSimpler.close_topic(msg=call.message, call=call)
         await call.message.edit_text(
             config[0],
-            reply_markup=close_thread_keyboard(user_id=call.from_user.id) if config[1] else
+            reply_markup=telegram_close_thread_keyboard(user_id=call.from_user.id) if config[1] else
             delete_keyboard(admin_id=call.from_user.id)
         )
 
@@ -111,7 +138,7 @@ class Threads(BasicFeature):
         config = await SolutionSimpler.open_topic(msg=call.message, call=call)
         await call.message.edit_text(
             config[0],
-            reply_markup=open_thread_keyboard(user_id=call.from_user.id) if config[1] else
+            reply_markup=telegram_open_thread_keyboard(user_id=call.from_user.id) if config[1] else
             delete_keyboard(admin_id=call.from_user.id)
         )
 

@@ -3,16 +3,80 @@ import logging
 from aiogram import F
 from aiogram.enums import ChatMemberStatus, ChatType
 from aiogram.filters import CommandObject, Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database.tables.telegram import get_chat_config_value, TelegramChatSettings
-from bozenka.features import BasicFeature
-from bozenka.instances.telegram.utils.callbacks_factory import UnbanData, BanData, UnmuteData, MuteData
-from bozenka.instances.telegram.utils.filters import IsAdminFilter, BotHasPermissions, UserHasPermissions
-from bozenka.instances.telegram.utils.keyboards import ban_keyboard, delete_keyboard, mute_keyboard, unmute_keyboard, \
-    unban_keyboard
-from bozenka.instances.telegram.utils.simpler import list_of_features, SolutionSimpler
+from bozenka.features.main import BasicFeature
+from bozenka.instances.telegram.utils.callbacks_factory import UnbanData, BanData, UnmuteData, MuteData, DeleteMenu
+from bozenka.instances.telegram.filters import IsAdminFilter, BotHasPermissions, UserHasPermissions
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard
+from bozenka.instances.telegram.utils.simpler import SolutionSimpler
+
+
+# Ban / Unban keyboards
+def telegram_ban_user_keyboard(admin_id: int, ban_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for /ban command.
+    :param admin_id: User_id of administrator in group chat
+    :param ban_id: User_id of banned member
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())
+    ], [
+        InlineKeyboardButton(text="Разбанить 🛠️", callback_data=UnbanData(user_id_unban=str(ban_id),
+                                                                          user_id_clicked=str(admin_id)).pack())
+    ]])
+    return kb
+
+
+def telegram_unban_user_keyboard(admin_id: int, unban_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for /unban command.
+    :param admin_id: User_id of administrator in group chat
+    :param unban_id: User_id of unbanned member
+    :return: InlineKeyboardMarkup
+    """
+    print(unban_id)
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())
+    ], [
+        InlineKeyboardButton(text="Забанить 🛠️", callback_data=BanData(user_id_ban=str(unban_id),
+                                                                       user_id_clicked=str(admin_id)).pack())
+    ]])
+    return kb
+
+
+# Mute / Unmute keyboards
+def telegram_mute_user_keyboard(admin_id: int, mute_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for /mute command.
+    :param admin_id: User_id of administrator in group chat
+    :param mute_id: User_id of restricted member
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Спасибо ✅",
+                              callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())],
+        [InlineKeyboardButton(text="Размутить 🛠️",
+                              callback_data=UnmuteData(user_id_unmute=mute_id, user_id_clicked=admin_id).pack())]])
+    return kb
+
+
+def telegram_unmute_user_keyboard(admin_id: int, unmute_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for /unmute command.
+    :param admin_id: User_id of administrator in group chat
+    :param unmute_id: User_id of unrestricted member
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Спасибо ✅",
+                              callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())],
+        [InlineKeyboardButton(text="Замутить 🛠️",
+                              callback_data=MuteData(user_id_mute=unmute_id, user_id_clicked=admin_id).pack())]])
+    return kb
 
 
 class Moderation(BasicFeature):
@@ -34,7 +98,7 @@ class Moderation(BasicFeature):
         banned_user = await call.message.chat.get_member(int(callback_data.user_id_ban))
 
         send_notification = await get_chat_config_value(chat_id=call.message.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admins"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
 
         if call.from_user.id != callback_data.user_id_clicked \
                 and clicked_user.status not in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR]:
@@ -49,7 +113,7 @@ class Moderation(BasicFeature):
         await call.message.edit_text(
             "Удача ✅\n"
             f"{banned_user.user.mention_html('Этот пользователь')} был заблокирован {call.from_user.mention_html('этим пользователем')}.",
-            reply_markup=ban_keyboard(admin_id=call.from_user.id, ban_id=banned_user.user.id)
+            reply_markup=telegram_ban_user_keyboard(admin_id=call.from_user.id, ban_id=banned_user.user.id)
         )
 
         if send_notification:
@@ -86,11 +150,11 @@ class Moderation(BasicFeature):
         await call.message.edit_text(
             "Удача ✅\n"
             f"{unbanned_user.user.mention_html('Этот пользователь')} был разблокирован {call.from_user.mention_html('этим пользователем')}.",
-            reply_markup=unban_keyboard(admin_id=call.from_user.id, ban_id=unbanned_user.user.id)
+            reply_markup=telegram_unban_user_keyboard(admin_id=call.from_user.id, unban_id=unbanned_user.user.id)
         )
 
         if await get_chat_config_value(chat_id=call.message.chat.id, session=session_maker,
-                                       setting=list_of_features["Admins"][5]):
+                                       setting=TelegramChatSettings.restrict_notification):
             await call.message.bot.send_message(
                 chat_id=unbanned_user.user.id,
                 text=f"{unbanned_user.user.mention_html('Вы')} были разблокирован {call.from_user.mention_html('этим пользователем')} в чате <code>{call.message.chat.id}</code>.",
@@ -110,9 +174,9 @@ class Moderation(BasicFeature):
         """
         banned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admins"][4])
+                                                 setting=TelegramChatSettings.results_in_dm)
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admins"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
 
         where_send = {
             True: msg.from_user.id,
@@ -133,7 +197,7 @@ class Moderation(BasicFeature):
                                             f"{msg.reply_to_message.from_user.mention_html('Этот пользователь')} "
                                             f"был заблокирован {msg.from_user.mention_html('этим пользователем')}.\n"
                                             f"По причине <code>{config['reason']}</code>, до даты <code>{config['ban_time']}</code>",
-                                       reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
+                                       reply_markup=telegram_ban_user_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
             if send_notification:
                 await msg.bot.send_message(chat_id=banned_user.user.id,
                                            text="Вы "
@@ -146,8 +210,8 @@ class Moderation(BasicFeature):
                                             f"{msg.reply_to_message.from_user.mention_html('Этот пользователь')} "
                                             f"был заблокирован {msg.reply_to_message.from_user.mention_html('этим пользователем')}.\n"
                                             f"По причине <code>{config['reason']}</code>.",
-                                       reply_markup=ban_keyboard(admin_id=msg.from_user.id,
-                                                                 ban_id=msg.reply_to_message.from_user.id))
+                                       reply_markup=telegram_ban_user_keyboard(admin_id=msg.from_user.id,
+                                                                               ban_id=msg.reply_to_message.from_user.id))
             if send_notification:
                 await msg.bot.send_message(chat_id=banned_user.user.id,
                                            text=f"Вы "
@@ -159,8 +223,8 @@ class Moderation(BasicFeature):
                                        text="Удача ✅\n"
                                             f"{msg.reply_to_message.from_user.mention_html('Этот пользователь')} "
                                             f"был заблокирован {msg.from_user.mention_html('этим пользователем')}, до даты <code>{config['ban_time']}</code>",
-                                       reply_markup=ban_keyboard(admin_id=msg.from_user.id,
-                                                                 ban_id=msg.reply_to_message.from_user.id))
+                                       reply_markup=telegram_ban_user_keyboard(admin_id=msg.from_user.id,
+                                                                               ban_id=msg.reply_to_message.from_user.id))
             if send_notification:
                 await msg.bot.send_message(chat_id=banned_user.user.id,
                                            text=f"Вы "
@@ -172,7 +236,7 @@ class Moderation(BasicFeature):
                                        text="Удача ✅\n"
                                             f"{msg.reply_to_message.from_user.mention_html('Этот пользователь')}"
                                             f" был заблокирован {msg.from_user.mention_html('этим пользователем')}.",
-                                       reply_markup=ban_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
+                                       reply_markup=telegram_ban_user_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
             if send_notification:
                 await msg.bot.send_message(chat_id=banned_user.user.id,
                                            text=f"Вы "
@@ -192,9 +256,9 @@ class Moderation(BasicFeature):
 
         unbanned_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admins"][4])
+                                                 setting=TelegramChatSettings.results_in_dm)
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admins"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
 
         where_send = {
             True: msg.from_user.id,
@@ -215,7 +279,7 @@ class Moderation(BasicFeature):
                 text="Удача ✅\n"
                      f"{msg.reply_to_message.from_user.mention_html('Этот пользователь')} был разблокирован "
                      f"{msg.from_user.mention_html('этим пользователем')}.\n",
-                reply_markup=unban_keyboard(admin_id=msg.from_user.id, ban_id=msg.reply_to_message.from_user.id)
+                reply_markup=telegram_unban_user_keyboard(admin_id=msg.from_user.id, unban_id=msg.reply_to_message.from_user.id)
             )
             if send_notification:
                 await msg.bot.send_message(
@@ -266,11 +330,11 @@ class Moderation(BasicFeature):
         await call.message.edit_text(
             "Удача ✅\n"
             f"{muted_user.user.mention_html('Этот пользователь')} был замучен {call.from_user.mention_html('этим пользователем')}.",
-            reply_markup=mute_keyboard(admin_id=call.from_user.id, mute_id=callback_data.user_id_mute)
+            reply_markup=telegram_mute_user_keyboard(admin_id=call.from_user.id, mute_id=callback_data.user_id_mute)
         )
 
         send_notification = await get_chat_config_value(chat_id=call.message.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
         if send_notification:
             await call.message.bot.send_message(
                 chat_id=muted_user.user.id,
@@ -304,11 +368,11 @@ class Moderation(BasicFeature):
         await call.message.edit_text(
             "Удача ✅\n"
             f"{unmuted_user.user.mention_html('Этот пользователь')} был размучен {call.from_user.mention_html('этим пользователем')}.",
-            reply_markup=unmute_keyboard(admin_id=call.from_user.id, unmute_id=unmuted_user.user.id)
+            reply_markup=telegram_unmute_user_keyboard(admin_id=call.from_user.id, unmute_id=unmuted_user.user.id)
         )
 
         send_notification = await get_chat_config_value(chat_id=call.message.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admin"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
         if send_notification:
             await call.message.bot.send_message(
                 chat_id=unmuted_user.user.id,
@@ -329,14 +393,12 @@ class Moderation(BasicFeature):
         :param session_maker: Session maker object of SqlAlchemy
         :return: Nothing
         """
-        print(msg.reply_to_message)
-        print("341414124")
         mute_user = await msg.chat.get_member(msg.reply_to_message.from_user.id)
 
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admins"][4])
+                                                 setting=TelegramChatSettings.results_in_dm)
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admins"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
 
         where_send = {
             True: msg.from_user.id,
@@ -353,7 +415,7 @@ class Moderation(BasicFeature):
                      f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
                      f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n"
                      f"По причине <code>{config['reason']}</code>, до даты <code>{config['mute_time']}</code>",
-                reply_markup=mute_keyboard(msg.from_user.id, mute_user.user.id))
+                reply_markup=telegram_mute_user_keyboard(msg.from_user.id, mute_user.user.id))
             if send_notification:
                 await msg.bot.send_message(
                     chat_id=mute_user.user.id,
@@ -369,7 +431,7 @@ class Moderation(BasicFeature):
                      f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
                      f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n"
                      f"По причине <code>{config['reason']}</code>.",
-                reply_markup=mute_keyboard(msg.from_user.id, mute_user.user.id))
+                reply_markup=telegram_mute_user_keyboard(msg.from_user.id, mute_user.user.id))
             if send_notification:
                 await msg.bot.send_message(
                     chat_id=mute_user.user.id,
@@ -384,7 +446,7 @@ class Moderation(BasicFeature):
                      f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
                      f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n"
                      f"До даты <code>{config['mute_time']}</code>",
-                reply_markup=mute_keyboard(msg.from_user.id, mute_user.user.id))
+                reply_markup=telegram_mute_user_keyboard(msg.from_user.id, mute_user.user.id))
             if send_notification:
                 await msg.bot.send_message(
                     chat_id=mute_user.user.id,
@@ -398,7 +460,7 @@ class Moderation(BasicFeature):
                 text="Удача ✅\n"
                      f"{msg.from_user.mention_html('Этот пользователь')} запретил писать "
                      f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}.\n",
-                reply_markup=mute_keyboard(msg.from_user.id, mute_user.user.id))
+                reply_markup=telegram_mute_user_keyboard(msg.from_user.id, mute_user.user.id))
             if send_notification:
                 await msg.bot.send_message(
                     chat_id=mute_user.user.id,
@@ -417,9 +479,9 @@ class Moderation(BasicFeature):
         await SolutionSimpler.unmute_user(msg, session_maker)
 
         send_to_dm = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                 setting=list_of_features["Admins"][4])
+                                                 setting=TelegramChatSettings.results_in_dm)
         send_notification = await get_chat_config_value(chat_id=msg.chat.id, session=session_maker,
-                                                        setting=list_of_features["Admins"][5])
+                                                        setting=TelegramChatSettings.restrict_notification)
 
         where_send = {
             True: msg.from_user.id,
@@ -431,7 +493,7 @@ class Moderation(BasicFeature):
             text="Удача ✅"
                  f"{msg.from_user.mention_html('Этот пользователь')} разрешил писать\n"
                  f"сообщения {msg.reply_to_message.from_user.mention_html('этому пользователю')}",
-            reply_markup=unmute_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
+            reply_markup=telegram_unmute_user_keyboard(msg.from_user.id, msg.reply_to_message.from_user.id))
         if send_notification:
             await msg.bot.send_message(
                 user_id=msg.reply_to_message.from_user.id,

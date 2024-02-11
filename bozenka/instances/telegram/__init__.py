@@ -5,13 +5,12 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import BotCommand
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bozenka.features import BasicFeature
-from bozenka.instances.features_list import features_list
-from bozenka.instances.telegram.utils.simpler import list_of_commands
+from bozenka.instances.basic_features_list import basic_features
+from bozenka.instances.customizable_features_list import customizable_features
 from bozenka.instances.telegram.queries import *
 
 
-async def register_all_features(list_of_features: list[BasicFeature], dispatcher: Dispatcher, bot: Bot) -> None:
+async def register_all_features(list_of_features: list, dispatcher: Dispatcher, bot: Bot) -> None:
     """
     Registers all features / handlers avaible in bozenka
     :param list_of_features: List of features
@@ -34,10 +33,6 @@ async def register_all_features(list_of_features: list[BasicFeature], dispatcher
 
     await bot.set_my_commands(cmd_list)
 
-    # Registering other handlers
-    await dispatcher.callback_query.register(delete_callback_handler, DeleteMenu.filter())
-    await dispatcher.callback_query.register(hide_menu_handler, HideMenu.filter())
-
 
 async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
     """
@@ -51,7 +46,15 @@ async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
 
     dp = Dispatcher()
 
+    # Registering other handlers
+    dp.callback_query.register(delete_callback_handler, DeleteMenu.filter())
+    dp.callback_query.register(hide_menu_handler, HideMenu.filter())
+
     await dp.start_polling(bot,
                            session_maker=session_maker,     # Pass your async_sessionmaker here, you can do dependency injection
-                           on_startup=[await register_all_features(list_of_features=features_list, dispatcher=dp, bot=bot)]
+                           on_startup=[
+                               await register_all_features(list_of_features=customizable_features, dispatcher=dp, bot=bot),
+                               await register_all_features(list_of_features=basic_features, dispatcher=dp, bot=bot)
+
+                           ]
    )

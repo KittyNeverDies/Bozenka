@@ -6,9 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features import BasicFeature
-from bozenka.instances.telegram.utils.callbacks_factory import PinMsg, UnpinMsg
-from bozenka.instances.telegram.utils.keyboards import unpin_msg_keyboard, delete_keyboard, pin_msg_keyboard
+from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
 

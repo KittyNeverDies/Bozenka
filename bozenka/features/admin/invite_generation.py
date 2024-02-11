@@ -2,13 +2,31 @@ import logging
 
 from aiogram.enums import ChatMemberStatus
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features import BasicFeature
-from bozenka.instances.telegram.utils.callbacks_factory import RevokeCallbackData
-from bozenka.instances.telegram.utils.keyboards import invite_keyboard
-from bozenka.instances.telegram.utils.simpler import ru_cmds
+from bozenka.features.main import BasicFeature
+from bozenka.instances.telegram.utils.callbacks_factory import RevokeCallbackData, DeleteMenu
+
+
+# Invite keyboard
+def invite_telegram_keyboard(invite_link: str, admin_id: int, chat_name: str) -> InlineKeyboardMarkup:
+    """
+    Generating menu for /invite command. Should be reworked.
+    :param invite_link: Invite link to chat
+    :param admin_id: User_id of telegram administrator
+    :param chat_name: Name  of group chat
+    :return: Nothing
+    """
+    invite_revoke_link = invite_link.replace("https://", "")
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text=chat_name, url=invite_link)],
+        [InlineKeyboardButton(text="Отозвать 🛠️",
+                              callback_data=RevokeCallbackData(admin_id=admin_id, link=invite_revoke_link).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅",
+                              callback_data=DeleteMenu(user_id_clicked=str(admin_id)).pack())]])
+    return kb
+
 
 
 class Invite(BasicFeature):
@@ -29,8 +47,8 @@ class Invite(BasicFeature):
 
         await msg.answer(
             f"<em> Держите ваше приглашение в чат, {msg.from_user.mention_html('пользователь')} 👋</em>",
-            reply_markup=invite_keyboard(link=str(link.invite_link), admin_id=msg.from_user.id,
-                                         chat_name=msg.chat.full_name)
+            reply_markup=invite_telegram_keyboard(invite_link=str(link.invite_link), admin_id=msg.from_user.id,
+                                                  chat_name=msg.chat.full_name)
         )
 
     async def telegram_revoke_callback_handler(call: CallbackQuery, callback_data: RevokeCallbackData) -> None:

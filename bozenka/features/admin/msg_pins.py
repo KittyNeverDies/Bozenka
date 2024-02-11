@@ -1,14 +1,45 @@
 from aiogram import F
 from aiogram.enums import ChatType
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features import BasicFeature
-from bozenka.instances.telegram.utils.callbacks_factory import PinMsg, UnpinMsg
-from bozenka.instances.telegram.utils.filters import UserHasPermissions, BotHasPermissions, IsAdminFilter
-from bozenka.instances.telegram.utils.keyboards import unpin_msg_keyboard, delete_keyboard, pin_msg_keyboard
+from bozenka.features.main import BasicFeature
+from bozenka.instances.telegram.utils.callbacks_factory import PinMsg, UnpinMsg, DeleteMenu
+from bozenka.instances.telegram.filters import UserHasPermissions, BotHasPermissions, IsAdminFilter
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
+
+
+# Pin / Unpin command
+def telegram_pin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup:
+    """
+    Generate menu for /pin command
+    :param user_id: User_id of user pinned the message
+    :param msg_id: Message_id of pinned message
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Открепить сообщение 📌",
+                              callback_data=UnpinMsg(user_id=user_id, msg_id=msg_id).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
+    ])
+    return kb
+
+
+def telegram_unpin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup:
+    """
+    Generate menu for /unpin command
+    :param user_id: User_id of user unpinned the message
+    :param msg_id: Message_id of unpinned message
+    :return: InlineKeyboardMarkup
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Открепить сообщение 📌",
+                              callback_data=PinMsg(user_id=user_id, msg_id=msg_id).pack())],
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
+    ])
+    return kb
 
 
 class Pins(BasicFeature):
@@ -30,8 +61,8 @@ class Pins(BasicFeature):
         await call.message.chat.pin_message(message_id=callback_data.msg_id)
         await call.message.edit_text("Удача ✅\n"
                                      "Сообщение было закреплено 📌",
-                                     reply_markup=pin_msg_keyboard(user_id=call.from_user.id,
-                                                                   msg_id=callback_data.msg_id))
+                                     reply_markup=telegram_pin_msg_keyboard(user_id=call.from_user.id,
+                                                                            msg_id=callback_data.msg_id))
 
     async def telegram_unpin_callback_handler(call: CallbackQuery, callback_data: UnpinMsg) -> None:
         """
@@ -46,8 +77,8 @@ class Pins(BasicFeature):
         await call.message.chat.pin_message(message_id=callback_data.msg_id)
         await call.message.edit_text("Удача ✅\n"
                                      "Сообщение было откреплено 📌",
-                                     reply_markup=unpin_msg_keyboard(user_id=call.from_user.id,
-                                                                     msg_id=callback_data.msg_id))
+                                     reply_markup=telegram_unpin_msg_keyboard(user_id=call.from_user.id,
+                                                                              msg_id=callback_data.msg_id))
 
     async def telegram_pin_cmd(msg: Message) -> None:
         """
@@ -58,8 +89,8 @@ class Pins(BasicFeature):
         await SolutionSimpler.pin_msg(msg)
         await msg.answer("Удача ✅\n"
                          "Сообщение было закреплено 📌",
-                         reply_markup=pin_msg_keyboard(msg_id=msg.reply_to_message.message_id,
-                                                       user_id=msg.from_user.id))
+                         reply_markup=telegram_pin_msg_keyboard(msg_id=msg.reply_to_message.message_id,
+                                                                user_id=msg.from_user.id))
 
     async def telegram_unpin_cmd(msg: Message) -> None:
         """
@@ -70,8 +101,8 @@ class Pins(BasicFeature):
         await SolutionSimpler.unpin_msg(msg)
         await msg.answer("Удача ✅\n"
                          "Сообщение было откреплено 📌",
-                         reply_markup=unpin_msg_keyboard(msg_id=msg.reply_to_message.message_id,
-                                                         user_id=msg.from_user.id))
+                         reply_markup=telegram_unpin_msg_keyboard(msg_id=msg.reply_to_message.message_id,
+                                                                  user_id=msg.from_user.id))
 
     async def telegram_unpinall_cmd(msg: Message) -> None:
         """

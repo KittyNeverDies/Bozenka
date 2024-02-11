@@ -83,7 +83,7 @@ async def get_chat_config_value(chat_id: int, session: async_sessionmaker, setti
     """
     async with session() as session:
         async with session.begin():
-            rows = (await session.execute(select(setting.db_name).where(TelegramChatSettings.chat_id == chat_id))).one()
+            rows = (await session.execute(select(setting).where(TelegramChatSettings.chat_id == chat_id))).one()
             return rows[0]
 
 

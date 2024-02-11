@@ -1,9 +1,6 @@
 import logging
 
-from aiogram import Router, Dispatcher
-
-from bozenka.instances.telegram.utils.middleware.antiflood import MessageThrottlingMiddleware, \
-    CallbackThrottlingMiddleware, CounterMiddleware
+from aiogram import Dispatcher
 
 
 def register_middlewares(dp: Dispatcher) -> None:

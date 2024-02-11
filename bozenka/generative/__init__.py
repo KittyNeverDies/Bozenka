@@ -1,14 +1,6 @@
 import dataclasses
 
 
-@dataclasses
-class QueryPosition:
-    """
-    Class  of Query to generate something
-    with models
-    """
-    data: dict
-    instance: str
 
 # List of text generative categories, what we support
 text_generative_categories = [

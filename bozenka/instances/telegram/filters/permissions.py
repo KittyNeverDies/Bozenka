@@ -3,8 +3,9 @@ from typing import Any
 from aiogram.filters import Filter
 from aiogram.methods import GetChatMember
 from aiogram.types import Message, ChatPermissions, CallbackQuery
-from aiogram.enums import ChatMemberStatus
-from bozenka.instances.telegram.utils.simpler import ru_cmds
+from aiogram.enums import ChatMemberStatus, ChatType
+
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 
 
 class UserHasPermissions(Filter):
@@ -149,14 +150,29 @@ class IsAdminFilter(Filter):
         """
         user = await msg.chat.get_member(msg.from_user.id)
         bot = await msg.chat.get_member(msg.bot.id)
+
+        if msg.chat.type == ChatType.PRIVATE:
+            return False
+
         if ChatMemberStatus.ADMINISTRATOR != user.status and ChatMemberStatus.CREATOR != user.status:
             if bot.status != ChatMemberStatus.ADMINISTRATOR:
                 await msg.reply("Ошибка ❌\n"
-                                "У вас нет прав на использование этой комманды. У меня нет прав на использование  🚫")
+                                "У вас нет прав на использование этой комманды. \n"
+                                "У меня нет прав для осуществления этой комманды 🚫",
+                                reply_markup=delete_keyboard())
+                return False
             else:
                 await msg.reply("Ошибка ❌\n"
-                                "У вас нет прав на использование этой комманды 🚫")
+                                "У вас нет прав на использование этой комманды 🚫",
+                                reply_markup=delete_keyboard())
+                return False
+
+        if bot.status != ChatMemberStatus.ADMINISTRATOR:
+            await msg.reply("Ошибка ❌\n"
+                            "У меня нет прав для осуществления этой комманды 🚫",
+                            reply_markup=delete_keyboard())
             return False
+
         if ChatMemberStatus.CREATOR == user.status:
             return True
         return ChatMemberStatus.ADMINISTRATOR == user.status or ChatMemberStatus.CREATOR == user.status

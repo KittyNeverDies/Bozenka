@@ -1,24 +1,282 @@
 import logging
+from typing import Any
 
 import g4f
 from aiogram import F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from gpt4all import GPT4All
 
 from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features import BasicFeature
+from bozenka.features.main import BasicFeature
+from bozenka.generative import text_generative_categories
 from bozenka.generative.gpt4all import model_path, check
-from bozenka.generative.gpt4free import generate_gpt4free_providers
+from bozenka.generative.gpt4free import generate_gpt4free_providers, generate_gpt4free_models
 from bozenka.instances.telegram.utils.callbacks_factory import Gpt4FreeProvsModelPage, Gpt4FreeProviderPage, \
     Gpt4AllSelect, Gpt4AllModel, GptCategory, Gpt4freeResult, \
     Gpt4FreeProvider, GptBackMenu, Gpt4FreeModel, Gpt4FreeCategory, Gpt4FreeModelPage, GptStop
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard, \
-    text_response_keyboard, gpt_categories_keyboard, \
-    gpt4free_models_by_provider_keyboard, gpt4free_providers_keyboard, gpt4all_model_menu, generate_gpt4all_page, \
-    gpt4free_categories_keyboard, gpt4free_models_keyboard
+from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import AnsweringGPT4Free, AnsweringGpt4All
+
+
+
+def gpt_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Create list keyboard list of gpt libraries, available in the bot
+    :param user_id:
+    :return: InlineKeyboardMarkup
+    """
+    builder = InlineKeyboardBuilder()
+    for category in text_generative_categories:
+        builder.row(InlineKeyboardButton(text=category,
+                                         callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
+    return builder.as_markup()
+
+
+# Helper
+def items_list_generator(page: int, list_of_items, count_of_items: int) -> list[Any]:
+    """
+    Generate page, made for backend
+    :param page:
+    :param list_of_items:
+    :param count_of_items:
+    """
+    items = []
+    required_items = [item + page * count_of_items for item in range(count_of_items)]
+    for item, count in zip(list_of_items, range(0, len(list_of_items))):
+        if count not in required_items:
+            continue
+        items.append(item)
+    return items
+
+
+def text_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for response from GPT
+    :param user_id:
+    :return:
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
+    ])
+    return kb
+
+
+def gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
+    """
+    Generate page of gpt providers, can be used by user.
+    :param user_id:
+    :param page:
+    :return:
+    """
+    providers = generate_gpt4free_providers()
+    names = items_list_generator(page, providers, 4)
+    pages = [len(providers) // 4 - 1 if page - 1 == -1 else page - 1,
+             0 if page + 1 >= len(providers) // 4 else page + 1]
+    generated_page = InlineKeyboardMarkup(inline_keyboard=[
+        # First one provider
+        [InlineKeyboardButton(text=names[0],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[0], page="0").pack())],
+        # Second one provider
+        [InlineKeyboardButton(text=names[1],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[1], page="0").pack())],
+        # Third one provider
+        [InlineKeyboardButton(text=names[2],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[2], page="0").pack())],
+        # Fourh one provider (if exist)
+        [InlineKeyboardButton(text=names[3],
+                              callback_data=Gpt4FreeProvider(user_id=user_id, provider=names[3],
+                                                             page="0").pack())] if len(
+            names) == 4 else [],
+        # Page right
+        [InlineKeyboardButton(text=str(len(providers) // 4 if page == 0 else "1"),
+                              callback_data=Gpt4FreeProviderPage(
+                                  page=str(len(providers) // 4 - 1 if page == 0 else "0"),
+                                  user_id=user_id).pack()),
+
+         InlineKeyboardButton(text="⬅️", callback_data=Gpt4FreeProviderPage(page=pages[0], user_id=user_id).pack()),
+         InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
+         # Page left
+         InlineKeyboardButton(text="➡️", callback_data=Gpt4FreeProviderPage(page=pages[1], user_id=user_id).pack()),
+         InlineKeyboardButton(text=str(len(providers) // 4 if page != len(providers) // 4 - 1 else "1"),
+                              callback_data=Gpt4FreeProviderPage(
+                                  page=str(len(providers) // 4 - 1 if page != len(providers) // 4 - 1 else "0"),
+                                  user_id=user_id).pack())
+         ],
+        # Under list buttons
+        [InlineKeyboardButton(text="🔙 Вернуться к категориям",
+                              callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack())],
+        [InlineKeyboardButton(text="Спасибо, не надо ❌",
+                              callback_data=GptStop(user_id=str(user_id)).pack())]])
+    return generated_page
+
+
+def gpt4free_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Menu of categories in Gpt4Free (Providers / Models)
+    :param user_id:
+    :return:
+    """
+    print("!231234")
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="По моделям 🤖",
+                             callback_data=Gpt4FreeCategory(category="models", user_id=user_id).pack())
+    ], [
+        InlineKeyboardButton(text="По провайдерам 🤖",
+                             callback_data=Gpt4FreeCategory(category="providers", user_id=user_id).pack())
+    ]])
+    return kb
+
+
+def gpt4free_models_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
+    """
+    Generating list of GPT4FREE models, can be used to generate text.
+    :param user_id:
+    :param page:
+    :return:
+    """
+    builder = InlineKeyboardBuilder()
+    full_list = g4f.ModelUtils.convert.keys()
+    models = items_list_generator(page=page, list_of_items=full_list, count_of_items=4)
+    pages = [len(full_list) // 4 - 1 if page - 1 == -1 else page - 1,
+             0 if page + 1 >= len(full_list) // 4 else page + 1]
+
+    for model in models:
+        builder.row(InlineKeyboardButton(text=model,
+                                         callback_data=Gpt4FreeModel(user_id=user_id, model=model).pack()))
+    builder.row(
+        # First page button
+        InlineKeyboardButton(text=str(len(full_list) // 4 if page == 0 else "1"),
+                             callback_data=Gpt4FreeModelPage(
+                                 page=str(len(full_list) // 4 - 1 if page == 0 else "1"),
+                                 user_id=user_id).pack(),
+                             ),
+        # Page back button
+        InlineKeyboardButton(text="⬅️",
+                             callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[0], ).pack()),
+        # Count of page button
+        InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
+        # Next page button
+        InlineKeyboardButton(text="➡️",
+                             callback_data=Gpt4FreeModelPage(user_id=str(user_id), page=pages[1]).pack()),
+        # Last page button
+        InlineKeyboardButton(text=str(len(full_list) // 4 if page != 0 else "1"),
+                             callback_data=Gpt4FreeModelPage(
+                                 page=str(len(full_list) // 4 - 1) if page != 0 else "1",
+                                 user_id=user_id).pack(), ))
+    builder.row(InlineKeyboardButton(text="🔙 Вернуться",
+                                     callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack()))
+    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌",
+                                     callback_data=GptStop(user_id=str(user_id)).pack()))
+    return builder.as_markup()
+
+
+def gpt4free_models_by_provider_keyboard(user_id: int, provider: str, page: int) -> InlineKeyboardMarkup:
+    """
+    Generating list of GPT4Free provider's models, can be used to generate text.
+    Will be also reworked.
+    :param user_id:
+    :param provider:
+    :param page:
+    :return:
+    """
+    builder = InlineKeyboardBuilder()
+    models = generate_gpt4free_models()
+    providers = generate_gpt4free_providers()
+    if provider in models:
+        if providers[provider].supports_gpt_4:
+            models[provider].append("")
+        names = items_list_generator(page, models[provider], 4)
+        for name in names:
+            builder.row(InlineKeyboardButton(text=name.replace('-', ' '),
+                                             callback_data=Gpt4freeResult(user_id=str(user_id), provider=provider,
+                                                                          model=name).pack()))
+        pages = [len(models[provider]) // 4 - 1 if page - 1 == -1 else page - 1,
+                 0 if page + 1 >= len(models[provider]) // 4 else page + 1]
+        if len(models[provider]) > 4:
+            builder.row(
+                # First page button
+                InlineKeyboardButton(text=str(len(models[provider]) // 4 if page == 0 else "1"),
+                                     callback_data=Gpt4FreeProvsModelPage(
+                                         page=str(len(models[provider]) // 4 - 1 if page == 0 else "1"),
+                                         user_id=user_id,
+                                         provider=provider).pack(),
+                                     ),
+                # Page back button
+                InlineKeyboardButton(text="⬅️",
+                                     callback_data=Gpt4FreeProvsModelPage(user_id=str(user_id), page=pages[0],
+                                                                          provider=provider).pack()),
+                # Count of page button
+                InlineKeyboardButton(text=str(page + 1), callback_data="gotpages"),
+                # Next page button
+                InlineKeyboardButton(text="➡️",
+                                     callback_data=Gpt4FreeProvsModelPage(user_id=str(user_id), page=pages[1],
+                                                                          provider=provider).pack()),
+                # Last page button
+                InlineKeyboardButton(text=str(len(models[provider]) // 4 if page != 0 else "1"),
+                                     callback_data=Gpt4FreeProvsModelPage(
+                                         page=str(len(models[provider]) // 4 - 1) if page != 0 else "1",
+                                         user_id=user_id,
+                                         provider=provider).pack(), ))
+    else:
+        if providers[provider].supports_gpt_4:
+            builder.row(InlineKeyboardButton(text="gpt 4",
+                                             callback_data=Gpt4freeResult(user_id=str(user_id),
+                                                                          provider=provider,
+                                                                          model="gpt-4").pack()))
+        if providers[provider].supports_gpt_35_turbo:
+            builder.row(InlineKeyboardButton(text="gpt 3.5 turbo",
+                                             callback_data=Gpt4freeResult
+                                             (user_id=str(user_id), provider=provider, model="gpt-3.5-turbo").pack()))
+    builder.row(InlineKeyboardButton(text="🔙 Вернуться к провайдерам",
+                                     callback_data=GptBackMenu(user_id=user_id, back_to="providers").pack()))
+    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌", callback_data=GptStop(user_id=str(user_id)).pack()))
+    return builder.as_markup()
+
+
+# Gpt4All related keyboards
+def generate_gpt4all_page(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Generating list of GPT4All models.
+    :param user_id:
+    :return:
+    """
+    models = GPT4All.list_models()
+
+    builder = InlineKeyboardBuilder()
+
+    for model in models:
+        builder.row(InlineKeyboardButton(
+            text=model["name"],
+            callback_data=Gpt4AllModel(user_id=str(user_id), index=str(models.index(model))).pack())
+        )
+    builder.row(InlineKeyboardButton(text="🔙 Вернуться к списку",
+                                     callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack()))
+    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌",
+                                     callback_data=GptStop(user_id=str(user_id)).pack()))
+    return builder.as_markup()
+
+
+def gpt4all_model_menu(user_id: int, index: int) -> InlineKeyboardMarkup:
+    """
+    Generating menu for selection on of GPT4ALL models
+    :param user_id:
+    :param index:
+    """
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Выбрать ✅",
+                              callback_data=Gpt4AllSelect(user_id=user_id, index=str(index)).pack())],
+        [InlineKeyboardButton(text="🔙 Вернуться к списку",
+                              callback_data=GptBackMenu(user_id=user_id, back_to="g4amodels").pack())],
+        [InlineKeyboardButton(text="Спасибо, не надо ❌",
+                              callback_data=GptStop(user_id=str(user_id)).pack())]
+    ])
+    return kb
+
+
 
 
 class TextGeneratrion(BasicFeature):

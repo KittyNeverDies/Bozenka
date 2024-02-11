@@ -3,7 +3,7 @@ import logging
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from bozenka.features import BasicFeature
+from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.utils.keyboards import delete_keyboard
 
 
