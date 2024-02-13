@@ -14,7 +14,7 @@ from bozenka.generative import image_generative_size, image_generative_categorie
 from bozenka.generative.kadinsky import kadinsky_gen
 from bozenka.instances.telegram.utils.callbacks_factory import ImageGenerationCategory, ImageGeneration, DeleteMenu, \
     GptStop
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard
+from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import GeneratingImages
 
 

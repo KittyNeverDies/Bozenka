@@ -4,7 +4,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bozenka.features.main import BasicFeature
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard
+from bozenka.instances.telegram.utils.delete import delete_keyboard
 
 
 class ChatInformation(BasicFeature):

@@ -17,7 +17,7 @@ from bozenka.generative.gpt4free import generate_gpt4free_providers, generate_gp
 from bozenka.instances.telegram.utils.callbacks_factory import Gpt4FreeProvsModelPage, Gpt4FreeProviderPage, \
     Gpt4AllSelect, Gpt4AllModel, GptCategory, Gpt4freeResult, \
     Gpt4FreeProvider, GptBackMenu, Gpt4FreeModel, Gpt4FreeCategory, Gpt4FreeModelPage, GptStop
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard
+from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import AnsweringGPT4Free, AnsweringGpt4All
 
 

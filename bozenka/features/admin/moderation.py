@@ -10,7 +10,7 @@ from bozenka.database.tables.telegram import get_chat_config_value, TelegramChat
 from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.utils.callbacks_factory import UnbanData, BanData, UnmuteData, MuteData, DeleteMenu
 from bozenka.instances.telegram.filters import IsAdminFilter, BotHasPermissions, UserHasPermissions
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard
+from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
 

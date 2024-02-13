@@ -5,7 +5,7 @@ from aiogram.methods import GetChatMember
 from aiogram.types import Message, ChatPermissions, CallbackQuery
 from aiogram.enums import ChatMemberStatus, ChatType
 
-from bozenka.instances.telegram.utils.keyboards import delete_keyboard
+from bozenka.instances.telegram.utils.delete import delete_keyboard
 
 
 class UserHasPermissions(Filter):

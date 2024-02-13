@@ -28,7 +28,6 @@ def invite_telegram_keyboard(invite_link: str, admin_id: int, chat_name: str) ->
     return kb
 
 
-
 class Invite(BasicFeature):
     """
     A class with information about invite feature

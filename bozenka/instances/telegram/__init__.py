@@ -31,7 +31,12 @@ async def register_all_features(list_of_features: list, dispatcher: Dispatcher, 
         for callback_query_handler in feature.telegram_callback_handlers:
             dispatcher.callback_query.register(callback_query_handler[0], *callback_query_handler[1])
 
-    await bot.set_my_commands(cmd_list)
+    if not (commands := await bot.get_my_commands()):
+        await bot.set_my_commands(cmd_list)
+    else:
+        for cmd in cmd_list:
+            commands.append(cmd)
+        await bot.set_my_commands(commands)
 
 
 async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
@@ -46,6 +51,8 @@ async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
 
     dp = Dispatcher()
 
+    await bot.delete_my_commands()
+
     # Registering other handlers
     dp.callback_query.register(delete_callback_handler, DeleteMenu.filter())
     dp.callback_query.register(hide_menu_handler, HideMenu.filter())
@@ -56,5 +63,4 @@ async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
                                await register_all_features(list_of_features=customizable_features, dispatcher=dp, bot=bot),
                                await register_all_features(list_of_features=basic_features, dispatcher=dp, bot=bot)
 
-                           ]
-   )
+                           ])
