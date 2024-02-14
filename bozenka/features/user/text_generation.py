@@ -11,9 +11,10 @@ from gpt4all import GPT4All
 
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
-from bozenka.generative import text_generative_categories
+from bozenka.generative import text2text_generatiove_libraries
 from bozenka.generative.gpt4all import model_path, check
 from bozenka.generative.gpt4free import generate_gpt4free_providers, generate_gpt4free_models
+from bozenka.instances.telegram.utils.callbacks_factory import DeleteMenu
 from bozenka.instances.telegram.utils.callbacks_factory import Gpt4FreeProvsModelPage, Gpt4FreeProviderPage, \
     Gpt4AllSelect, Gpt4AllModel, GptCategory, Gpt4freeResult, \
     Gpt4FreeProvider, GptBackMenu, Gpt4FreeModel, Gpt4FreeCategory, Gpt4FreeModelPage, GptStop
@@ -21,15 +22,14 @@ from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import AnsweringGPT4Free, AnsweringGpt4All
 
 
-
-def gpt_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
+def telegram_text_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
     """
     Create list keyboard list of gpt libraries, available in the bot
-    :param user_id:
+    :param user_id: User_id of user
     :return: InlineKeyboardMarkup
     """
     builder = InlineKeyboardBuilder()
-    for category in text_generative_categories:
+    for category in text2text_generatiove_libraries:
         builder.row(InlineKeyboardButton(text=category,
                                          callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
     return builder.as_markup()
@@ -39,7 +39,7 @@ def gpt_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
 def items_list_generator(page: int, list_of_items, count_of_items: int) -> list[Any]:
     """
     Generate page, made for backend
-    :param page:
+    :param page: Number of page
     :param list_of_items:
     :param count_of_items:
     """
@@ -65,7 +65,7 @@ def text_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     return kb
 
 
-def gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
+def telegram_gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
     """
     Generate page of gpt providers, can be used by user.
     :param user_id:
@@ -307,7 +307,7 @@ class TextGeneratrion(BasicFeature):
         if await state.get_state():
             return
         await msg.answer("Пожалуста, выберите сервис для ИИ.",
-                         reply_markup=gpt_categories_keyboard
+                         reply_markup=telegram_text_categories_keyboard
                          (user_id=msg.from_user.id))
 
     async def telegram_cancel_cmd_handler(msg: Message, state: FSMContext) -> None:
@@ -396,7 +396,7 @@ class TextGeneratrion(BasicFeature):
         if call.from_user.id != callback_data.user_id or await state.get_state():
             return
         await call.message.edit_text("Пожалуста, выберите сервис для ИИ.",
-                                     reply_markup=gpt_categories_keyboard(user_id=call.from_user.id))
+                                     reply_markup=telegram_text_categories_keyboard(user_id=call.from_user.id))
 
     async def telegram_g4f_providers_handlers(call: CallbackQuery, callback_data: Gpt4FreeCategory,
                                               state: FSMContext) -> None:
@@ -417,7 +417,7 @@ class TextGeneratrion(BasicFeature):
 
         await state.set_state(AnsweringGPT4Free.set_provider)
         await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
-                                     reply_markup=gpt4free_providers_keyboard(user_id=call.from_user.id, page=0))
+                                     reply_markup=telegram_gpt4free_providers_keyboard(user_id=call.from_user.id, page=0))
 
     async def telegram_g4f_models_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
         """
@@ -517,7 +517,7 @@ class TextGeneratrion(BasicFeature):
         await state.set_state(AnsweringGPT4Free.set_provider)
 
         await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
-                                     reply_markup=gpt4free_providers_keyboard(page=0, user_id=callback_data.user_id))
+                                     reply_markup=telegram_gpt4free_providers_keyboard(page=0, user_id=callback_data.user_id))
         await call.answer("Выберите пожалуйста одного из провайдеров 👨‍💻")
 
     async def telegram_g4f_by_provider_models(call: CallbackQuery, callback_data: Gpt4FreeProvider,
@@ -608,8 +608,8 @@ class TextGeneratrion(BasicFeature):
         logging.log(msg=f"Changed page to {str(callback_data.page + 1)} user_id={call.from_user.id}",
                     level=logging.INFO)
         await call.message.edit_text(call.message.text,
-                                     reply_markup=gpt4free_providers_keyboard(user_id=callback_data.user_id,
-                                                                              page=callback_data.page))
+                                     reply_markup=telegram_gpt4free_providers_keyboard(user_id=callback_data.user_id,
+                                                                                       page=callback_data.page))
         await call.answer(f"Вы перелистнули на страницу {callback_data.page + 1}📄")
 
     # G4A telegram handlers section

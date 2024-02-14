@@ -1,7 +1,7 @@
 import logging
 from typing import Callable
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, F
 from aiogram.filters import CommandObject, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, FSInputFile, InlineKeyboardButton
@@ -68,8 +68,6 @@ class ImageGeneratrion(BasicFeature):
     A classic class of lineral (basic)
     feature of bozenka. IN FUTURE!
     """
-    cmd_description: str = "Your description of command"
-
     async def telegram_select_image_size_handler(call: CallbackQuery, callback_data: ImageGenerationCategory,
                                                  state: FSMContext) -> None:
         """
@@ -118,7 +116,7 @@ class ImageGeneratrion(BasicFeature):
             "Подождите пожалуйста, мы уже генерируем изображение для вас, подождите, когда мы ответим на ваш передыдущий вопрос",
             reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
-    async def telegram_imagine_handler(msg: Message, state: FSMContext) -> None:
+    async def telegram_imagine_handler(msg: Message | CallbackQuery, state: FSMContext) -> None:
         """
         /imagine command handler, start menu
         :param msg: Message telegram object
@@ -127,6 +125,10 @@ class ImageGeneratrion(BasicFeature):
         """
         if await state.get_state():
             return
+
+        if type(msg) == CallbackQuery:
+            msg = msg.message
+
         await msg.answer("Пожалуста, выберите сервис / модель для генерации изображений",
                          reply_markup=telegram_image_generation_categories_keyboard(user_id=msg.from_user.id))
 
@@ -194,5 +196,6 @@ class ImageGeneratrion(BasicFeature):
     ]
     telegram_callback_handlers = [
         [telegram_select_image_size_handler, [ImageGenerationCategory.filter()]],
-        [telegram_end_generation_handler, [ImageGeneration.filter()]]
+        [telegram_end_generation_handler, [ImageGeneration.filter()]],
+        [telegram_imagine_handler, [F.data == "dialogimage"]]
     ]

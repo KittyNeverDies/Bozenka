@@ -7,7 +7,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from bozenka.features.main import BasicFeature
 from bozenka.instances.customizable_features_list import categorized_customizable_features, text_transcription
 from bozenka.instances.telegram.utils.callbacks_factory import HelpCategory, HelpBackCategory, HelpFeature, HelpBack
-from bozenka.features.user.text_generation import gpt_categories_keyboard
+from bozenka.features.user.text_generation import telegram_text_categories_keyboard
 from bozenka.instances.current_version import build, is_updated
 
 telegram_main_menu = InlineKeyboardMarkup(
@@ -197,7 +197,7 @@ class Start(BasicFeature):
         :return: Nothing
         """
         await call.message.edit_text("Пожалуста, выберите сервиc / библиотеку, через которую вы будете общаться",
-                                     reply_markup=gpt_categories_keyboard
+                                     reply_markup=telegram_text_categories_keyboard
                                      (user_id=call.from_user.id))
 
     @staticmethod
@@ -239,7 +239,7 @@ class Start(BasicFeature):
         """
         await msg.answer("""
 Привет 👋
-Я - бозенька, бот с открытым исходным кодом, который поможет тебе в различных задачах. 
+Я - групповой чат-бот с открытым исходным кодом, который поможет тебе в различных задачах. 
 
 Вот что ты можешь сделать с помощью меню:
 • Добавить в чат: добавляет меня в групповой чат, чтобы я мог выполнять свои функции внутри него.
@@ -250,7 +250,6 @@ class Start(BasicFeature):
 • Генерация изображений: позволяет сгенерировать изображения на основе заданных параметров и промта
 
 Вот нужные ссылки обо мне:
-• <a href='https://t.me/bozodevelopment'>Канал с новостями об разработке</a>
 • <a href='https://github.com/kittyneverdies/bozenka/'>Исходный код на Github</a>
 
 Чтобы воспользоваться какой-либо функцией, просто нажми на соответствующую кнопку ниже. 
