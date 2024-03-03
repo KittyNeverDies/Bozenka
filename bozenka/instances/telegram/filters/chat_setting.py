@@ -1,3 +1,4 @@
+from aiogram.enums import ChatType
 from aiogram.filters import Filter
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -20,6 +21,8 @@ class IsSettingEnabled(Filter):
         :param session_maker: AsyncSessionMaker SqlAlchemy object
         :return: Is config enabled
         """
-
-        return await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=self.setting)
+        if msg.chat.type != ChatType.PRIVATE:
+            return await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=self.setting)
+        else:
+            return True
 

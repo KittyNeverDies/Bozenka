@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKe
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.utils.callbacks_factory import CloseThread, OpenThread, DeleteMenu
-from bozenka.instances.telegram.filters import UserHasPermissions, BotHasPermissions
+from bozenka.instances.telegram.filters import UserHasPermissions, BotHasPermissions, IsSettingEnabled
 from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
@@ -175,27 +175,27 @@ class Threads(BasicFeature):
         [telegram_close_topic_cmd_handler, [Command(commands=["close_topic", "close"]),
                                             UserHasPermissions(["can_manage_topics"]),
                                             BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
-                                            ~(F.chat.type == ChatType.PRIVATE)]],
+                                            ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_reopen_topic_cmd_handler, [Command(commands=["reopen_topic", "open_topic", "open"]),
                                              UserHasPermissions(["can_manage_topics"]),
                                              BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
-                                             ~(F.chat.type == ChatType.PRIVATE)]],
+                                             ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_close_general_topic_cmd_handler, [Command(commands=["close_general"]),
                                                     UserHasPermissions(["can_manage_topics"]),
                                                     BotHasPermissions(["can_manage_topics"]),
-                                                    F.chat.is_forum]],
+                                                    F.chat.is_forum], IsSettingEnabled(telegram_db_name)],
         [telegram_reopen_general_topic_cmd, [Command(commands=["reopen_general", "open_general"]),
                                              UserHasPermissions(["can_manage_topics"]),
                                              BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
-                                             ~(F.chat.type == ChatType.PRIVATE)]],
+                                             ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_hide_general_topic_cmd_handler, [Command(commands=["hide_general"]),
                                                    UserHasPermissions(["can_manage_topics"]),
                                                    BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
-                                                   ~(F.chat.type == ChatType.PRIVATE)]],
+                                                   ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_unhide_general_topic_cmd, [Command(commands=["unhide_general", "show_general"]),
                                              UserHasPermissions(["can_manage_topics"]),
                                              BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
-                                             ~(F.chat.type == ChatType.PRIVATE)]]
+                                             ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]]
     ]
     telegram_callback_handlers = [
         [telegram_close_thread_callback_handler, [CloseThread.filter()]],

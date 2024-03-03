@@ -11,7 +11,7 @@ from gpt4all import GPT4All
 
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
-from bozenka.generative import text2text_generatiove_libraries
+from bozenka.generative import text2text_generative_libraries
 from bozenka.generative.gpt4all import model_path, check
 from bozenka.generative.gpt4free import generate_gpt4free_providers, generate_gpt4free_models
 from bozenka.instances.telegram.utils.callbacks_factory import DeleteMenu
@@ -29,7 +29,7 @@ def telegram_text_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
     :return: InlineKeyboardMarkup
     """
     builder = InlineKeyboardBuilder()
-    for category in text2text_generatiove_libraries:
+    for category in text2text_generative_libraries:
         builder.row(InlineKeyboardButton(text=category,
                                          callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
     return builder.as_markup()
@@ -449,7 +449,7 @@ class TextGeneratrion(BasicFeature):
         if call.from_user.id != callback_data.user_id:
             return
 
-        await state.update_data(set_model=callback_data.model)
+        await state.update_data(model=callback_data.model)
         await state.set_state(AnsweringGPT4Free.ready_to_answer)
 
         await call.answer("Вы можете начать общаться 🤖")
@@ -493,7 +493,7 @@ class TextGeneratrion(BasicFeature):
                     level=logging.INFO)
 
         if type(callback_data) == GptCategory:
-            await state.update_data(set_category=callback_data.category)
+            await state.update_data(category=callback_data.category)
 
         await call.answer("Вы выбрали Gpt4Free 🤖")
         await call.message.edit_text("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖",
@@ -535,7 +535,7 @@ class TextGeneratrion(BasicFeature):
         logging.log(msg=f"Selected gpt4free provider {callback_data.provider} by user_id={call.from_user.id}",
                     level=logging.INFO)
 
-        await state.update_data(set_provider=callback_data.provider)
+        await state.update_data(provider=callback_data.provider)
         await state.set_state(AnsweringGPT4Free.set_model)
 
         await call.message.edit_text("Выберите пожалуйста модель ИИ 👾",
@@ -560,7 +560,7 @@ class TextGeneratrion(BasicFeature):
         logging.log(msg=f"Selected gpt4free model {callback_data.model} by user_id={call.from_user.id}",
                     level=logging.INFO)
 
-        await state.update_data(set_model=callback_data.model)
+        await state.update_data(model=callback_data.model)
         await state.set_state(AnsweringGPT4Free.ready_to_answer)
 
         logging.log(msg=f"Loaded GPT answering status for user_id={call.from_user.id}",
@@ -715,7 +715,7 @@ class TextGeneratrion(BasicFeature):
         """
         if callback_data.user_id != call.from_user.id:
             return
-        await state.update_data(set_model=callback_data.index)
+        await state.update_data(model=callback_data.index)
         await state.set_state(AnsweringGpt4All.ready_to_answer)
         models = GPT4All.list_models()
 

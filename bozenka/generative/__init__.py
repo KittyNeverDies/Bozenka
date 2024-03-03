@@ -1,9 +1,18 @@
-import dataclasses
+from dataclasses import dataclass
 
+
+@dataclass
+class QueueMember:
+    """
+    Queue Member for waiting to get generated
+    content by AI
+    """
+    content_type: str   # Example "text2text"
+    data: dict          # Example
 
 
 # List of text generative categories, what we support
-text_generative_categories = [
+text2text_generative_libraries = [
     "Gpt4Free",
     "Gpt4All",
 ]

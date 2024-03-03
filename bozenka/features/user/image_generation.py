@@ -12,6 +12,7 @@ from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
 from bozenka.generative import image_generative_size, image_generative_categories
 from bozenka.generative.kadinsky import kadinsky_gen
+from bozenka.instances.telegram.filters import IsSettingEnabled
 from bozenka.instances.telegram.utils.callbacks_factory import ImageGenerationCategory, ImageGeneration, DeleteMenu, \
     GptStop
 from bozenka.instances.telegram.utils.delete import delete_keyboard
@@ -192,7 +193,7 @@ class ImageGeneratrion(BasicFeature):
     telegram_cmd_avaible = True  # Is a feature have a commands
     telegram_message_handlers = [
         [telegram_kadinsky_generating_handler, [GeneratingImages.ready_to_generate, ~Command(commands=["cancel"])]],
-        [telegram_imagine_handler, [Command(commands=["imagine"])]]
+        [telegram_imagine_handler, [Command(commands=["imagine"]), IsSettingEnabled(telegram_db_name)]]
     ]
     telegram_callback_handlers = [
         [telegram_select_image_size_handler, [ImageGenerationCategory.filter()]],

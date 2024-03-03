@@ -6,6 +6,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
+from bozenka.instances.telegram.filters import IsSettingEnabled
 from bozenka.instances.telegram.utils.callbacks_factory import RevokeCallbackData, DeleteMenu
 
 
@@ -85,7 +86,7 @@ class Invite(BasicFeature):
     # List of aiogram handlers
     telegram_message_handlers = [
         #  Format is [Handler, [Filters]]
-        [telegram_invite_command_handler, [Command(commands=["invite"])]]
+        [telegram_invite_command_handler, [Command(commands=["invite"]), IsSettingEnabled(telegram_db_name)]]
     ]
     telegram_callback_handlers = [
         #  Format is [Handler, [Filters]]

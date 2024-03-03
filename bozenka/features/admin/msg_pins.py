@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKe
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.utils.callbacks_factory import PinMsg, UnpinMsg, DeleteMenu
-from bozenka.instances.telegram.filters import UserHasPermissions, BotHasPermissions, IsAdminFilter
+from bozenka.instances.telegram.filters import UserHasPermissions, BotHasPermissions, IsAdminFilter, IsSettingEnabled
 from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
@@ -162,17 +162,17 @@ class Pins(BasicFeature):
         #  Format is [Handler, [Filters]]
         [telegram_pin_cmd, [Command(commands="pin"), UserHasPermissions(["can_pin_messages"]),
                             BotHasPermissions(["can_pin_messages"]), F.reply_to_message,
-                            ~(F.chat.type == ChatType.PRIVATE)]],
+                            ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_unpin_cmd, [Command(commands="unpin"), UserHasPermissions(["can_pin_messages"]),
                               BotHasPermissions(["can_pin_messages"]), F.reply_to_message,
                               ~(F.chat.type == ChatType.PRIVATE)]],
         [telegram_unpinall_cmd, [Command(commands="unpin_all"), IsAdminFilter(True, False),
                                  BotHasPermissions(["can_pin_messages"]), F.reply_to_message.text,
-                                 ~(F.chat.type == ChatType.PRIVATE)]],
+                                 ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_help_pin_cmd, [Command(commands="pin"), UserHasPermissions(["can_pin_messages"]),
                                  BotHasPermissions(["can_pin_messages"]), ~(F.chat.type == ChatType.PRIVATE)]],
         [telegramm_help_unpin_cmd, [Command(commands="unpin"), UserHasPermissions(["can_pin_messages"]),
-                                    BotHasPermissions(["can_pin_messages"]), ~(F.chat.type == ChatType.PRIVATE)]]
+                                    BotHasPermissions(["can_pin_messages"]), ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]]
 
     ]
     telegram_callback_handlers = [

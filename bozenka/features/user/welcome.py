@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
+from bozenka.instances.telegram.filters import IsSettingEnabled
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
 
@@ -62,13 +63,14 @@ class Welcome(BasicFeature):
     telegram_setting = TelegramChatSettings.welcome_messages
     telegram_category = "user"
     telegram_commands: dict[str: str] = {}
+    telegram_db_name = TelegramChatSettings.welcome_messages
     telegram_setting_in_list = True
     telegram_setting_name = "Приветсвенные сообщения 👋"
     telegram_setting_description = "<b>Приветсвенные сообщения 👋</b>" \
                                    "\nПриветсвенные сообщения новым и ушедшим пользователям.",
     telegram_cmd_avaible = False  # Is a feature have a commands
     telegram_message_handlers = [
-        [telegram_leave_handler, [F.content_type == ContentType.LEFT_CHAT_MEMBER]],
-        [telegram_join_handler, [F.content_type == ContentType.NEW_CHAT_MEMBERS]]
+        [telegram_leave_handler, [F.content_type == ContentType.LEFT_CHAT_MEMBER, IsSettingEnabled(telegram_db_name)]],
+        [telegram_join_handler, [F.content_type == ContentType.NEW_CHAT_MEMBERS, IsSettingEnabled(telegram_db_name)]]
     ]
     telegram_callback_handlers = []

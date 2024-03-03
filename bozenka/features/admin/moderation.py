@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from bozenka.database.tables.telegram import get_chat_config_value, TelegramChatSettings
 from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.utils.callbacks_factory import UnbanData, BanData, UnmuteData, MuteData, DeleteMenu
-from bozenka.instances.telegram.filters import IsAdminFilter, BotHasPermissions, UserHasPermissions
+from bozenka.instances.telegram.filters import IsAdminFilter, BotHasPermissions, UserHasPermissions, IsSettingEnabled
 from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
@@ -578,17 +578,19 @@ class Moderation(BasicFeature):
         #  Format is [Handler, [Filters]]
         [telegram_ban_cmd_handler, [Command(commands="ban"),
                                     IsAdminFilter(True, True), F.reply_to_message.text,
-                                    ~(F.chat.type == ChatType.PRIVATE)]],
+                                    ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_unban_cmd_handler, [Command(commands="unban"),
                                       IsAdminFilter(True, True), F.reply_to_message.text,
-                                      ~(F.chat.type == ChatType.PRIVATE)]],
+                                      ~(F.chat.type == ChatType.PRIVATE),
+                                      IsSettingEnabled(telegram_db_name)]],
         [telegram_mute_cmd_handler, [Command(commands=["mute", "re"]),
                                      UserHasPermissions(["can_restrict_members"]),
-                                     BotHasPermissions(["can_restrict_members"]), ~(F.chat.type == ChatType.PRIVATE), F.reply_to_message.text]],
+                                     BotHasPermissions(["can_restrict_members"]), ~(F.chat.type == ChatType.PRIVATE), F.reply_to_message.text,
+                                     IsSettingEnabled(telegram_db_name)]],
         [telegram_unmute_cmd_handler, [Command(commands=["unmute"]),
                                        UserHasPermissions(["can_restrict_members"]),
                                        BotHasPermissions(["can_restrict_members"]),
-                                       ~(F.chat.type == ChatType.PRIVATE), F.reply_to_message.text]],
+                                       ~(F.chat.type == ChatType.PRIVATE), F.reply_to_message.text, IsSettingEnabled(telegram_db_name)]],
         [telegram_help_ban_handler,
          [Command(commands="ban"), IsAdminFilter(True, True), ~(F.chat.type == ChatType.PRIVATE)]],
         [telegram_help_unban_handler,
