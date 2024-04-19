@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from aiogram.filters import Filter
@@ -52,6 +53,7 @@ class UserHasPermissions(Filter):
                              "У вас нет прав на использование этой комманды 🚫")
             return False
         return True
+        print("True")
 
     def generate_perms_list(self, user) -> list[Any]:
         """
@@ -62,7 +64,11 @@ class UserHasPermissions(Filter):
         permission = []
         for rule in self.perms:
             if rule in self.permissions:
-                exec(f"permission.append(user.{rule})")
+                try:
+                    # Checking, does user have this permission
+                    exec(f"permission.append(user.{rule})")
+                except Exception as e:
+                    logging.error(f"Error: {e}")
         return permission
 
     async def __call__(self, msg: Message) -> bool:
@@ -119,11 +125,13 @@ class IsOwner(Filter):
         :return: None
         """
         if type(msg) is CallbackQuery:
-            msg = msg.message
-        user = await msg.chat.get_member(msg.from_user.id)
+            user = await msg.message.chat.get_member(msg.from_user.id)
+        else:
+            user = await msg.chat.get_member(msg.from_user.id)
         if ChatMemberStatus.CREATOR != user.status:
             await msg.answer("Ошибка ❌\n"
                              "У вас нет прав на использование этой комманды 🚫")
+            print(user.status)
         return ChatMemberStatus.CREATOR == user.status
 
 
@@ -141,38 +149,53 @@ class IsAdminFilter(Filter):
         self.is_user_admin = is_user_admin
         self.is_bot_admin = is_bot_admin
 
-    async def __call__(self, msg: Message) -> bool:
+    async def __call__(self, msg: Message | CallbackQuery) -> bool:
         """
         Working after catching a call from aiogram
         :param msg: Message telegram object
         :param self: A self object of this class
         :return: None
         """
-        user = await msg.chat.get_member(msg.from_user.id)
-        bot = await msg.chat.get_member(msg.bot.id)
+        if type(msg) is CallbackQuery:
+            user = await msg.message.chat.get_member(msg.from_user.id)
+            bot = await msg.message.chat.get_member(msg.message.chat.bot.id)
+            msg: CallbackQuery
+        else:
+            user = await msg.chat.get_member(msg.from_user.id)
+            bot = await msg.chat.get_member(msg.chat.bot.id)
 
         if msg.chat.type == ChatType.PRIVATE:
             return False
 
         if ChatMemberStatus.ADMINISTRATOR != user.status and ChatMemberStatus.CREATOR != user.status:
             if bot.status != ChatMemberStatus.ADMINISTRATOR:
-                await msg.reply("Ошибка ❌\n"
-                                "У вас нет прав на использование этой комманды. \n"
-                                "У меня нет прав для осуществления этой комманды 🚫",
-                                reply_markup=delete_keyboard())
+                if type(msg) is Message:
+                    await msg.reply("Ошибка ❌\n"
+                                    "У вас нет прав на использование этой комманды. \n"
+                                    "У меня нет прав для осуществления этой комманды",
+                                    reply_markup=delete_keyboard())
+                else:
+                    await msg.answer(
+                        "Ошибка ❌\n"
+                        "У вас нет прав на осуществленния действия \n"
+                        "У меня нет прав для осуществления действия",
+                        show_alert=True
+                    )
                 return False
             else:
-                await msg.reply("Ошибка ❌\n"
-                                "У вас нет прав на использование этой комманды 🚫",
-                                reply_markup=delete_keyboard())
+                if type(msg) is Message:
+                    await msg.reply("Ошибка ❌\n"
+                                    "У вас нет прав на использование этой комманды 🚫",
+                                    reply_markup=delete_keyboard())
+                else:
+                    await msg.answer("Ошибка ❌\n"
+                                     "У вас нет прав на это действие.", show_alert=True)
                 return False
 
         if bot.status != ChatMemberStatus.ADMINISTRATOR:
             await msg.reply("Ошибка ❌\n"
                             "У меня нет прав для осуществления этой комманды 🚫",
-                            reply_markup=delete_keyboard())
+                            reply_markup=delete_keyboard(msg.from_user.id))
             return False
 
-        if ChatMemberStatus.CREATOR == user.status:
-            return True
         return ChatMemberStatus.ADMINISTRATOR == user.status or ChatMemberStatus.CREATOR == user.status

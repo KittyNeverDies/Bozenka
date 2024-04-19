@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from bozenka.instances.basic_features_list import basic_features
 from bozenka.instances.customizable_features_list import customizable_features
 from bozenka.instances.telegram.queries import *
+from bozenka.generative.generative_categories import register_all_categories
 
 
 async def register_all_features(list_of_features: list, dispatcher: Dispatcher, bot: Bot) -> None:
@@ -61,6 +62,7 @@ async def launch_telegram_instance(session_maker: async_sessionmaker) -> None:
                            session_maker=session_maker,     # Pass your async_sessionmaker here, you can do dependency injection
                            on_startup=[
                                await register_all_features(list_of_features=customizable_features, dispatcher=dp, bot=bot),
-                               await register_all_features(list_of_features=basic_features, dispatcher=dp, bot=bot)
+                               await register_all_features(list_of_features=basic_features, dispatcher=dp, bot=bot),
+                               await register_all_categories(dp=dp, telegram_bot=bot),
 
                            ])

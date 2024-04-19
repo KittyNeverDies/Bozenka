@@ -5,9 +5,10 @@ from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, InlineKe
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bozenka.features.main import BasicFeature
+from bozenka.generative import text2text_generative_libraries
 from bozenka.instances.customizable_features_list import categorized_customizable_features, text_transcription
-from bozenka.instances.telegram.utils.callbacks_factory import HelpCategory, HelpBackCategory, HelpFeature, HelpBack
-from bozenka.features.user.text_generation import telegram_text_categories_keyboard
+from bozenka.instances.telegram.utils.callbacks_factory import HelpCategory, HelpBackCategory, HelpFeature, HelpBack, \
+    GptCategory
 from bozenka.instances.current_version import build, is_updated
 
 telegram_main_menu = InlineKeyboardMarkup(
@@ -20,6 +21,18 @@ telegram_main_menu = InlineKeyboardMarkup(
             [InlineKeyboardButton(text="Начать генерацию изображений 🖼", callback_data="dialogimage")],
         ]
     )
+
+def telegram_text_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    """
+    Create list keyboard list of gpt libraries, available in the bot
+    :param user_id: User_id of user
+    :return: InlineKeyboardMarkup
+    """
+    builder = InlineKeyboardBuilder()
+    for category in text2text_generative_libraries:
+        builder.row(InlineKeyboardButton(text=category,
+                                         callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
+    return builder.as_markup()
 
 
 # Help related keyboards
@@ -180,25 +193,14 @@ class Start(BasicFeature):
         kb = InlineKeyboardMarkup(inline_keyboard=[[
             InlineKeyboardButton(text="Вернуться 🔙", callback_data="back")
         ]])
-        await call.message.edit_text("""
-Бозенька - это мультифункциональный (в будущем кроссплатформенный) бот.\n
+        me = await call.message.bot.get_me()
+        await call.message.edit_text(f"""
+{me.mention_html()} - это мультифункциональный (в будущем кроссплатформенный) бот.\n
 Он умеет работать с групповыми чатами и готовыми нейронными сетями для генерации текста и изображений.
-Бозенька разрабатывается коммандой, которая состоит на данный момент из одного человека.\n
-Исходный код проекта\n
+Бозенька разрабатывается командой, которая состоит на данный момент из одного человека.\n
+<b>Исходный код проекта</b>\n
 Исходный код находится под лицензией GPL-3.0, исходный код проекта можно посмотреть всегда <a href="https://github.com/kittyneverdies/bozenka/">здесь</a>
-Канал с новостями разработки находится <a href="https://t.me/bozodevelopment">здесь</a>
         """, reply_markup=kb, disable_web_page_preview=True)
-
-    @staticmethod
-    async def start_dialog_handler(call: CallbackQuery) -> None:
-        """
-        Handler of CallbackQuery, what shows list of Categories, avaible to use as chatbot
-        :param call: CallbackQuery object
-        :return: Nothing
-        """
-        await call.message.edit_text("Пожалуста, выберите сервиc / библиотеку, через которую вы будете общаться",
-                                     reply_markup=telegram_text_categories_keyboard
-                                     (user_id=call.from_user.id))
 
     @staticmethod
     async def start_callback_handler(call: CallbackQuery) -> None:
@@ -263,14 +265,13 @@ class Start(BasicFeature):
     # Telegram feature settings
     telegram_setting_in_list = False
     telegram_category = None
-    telegram_commands: dict[str: str] = {"start": "Command to start work with bozenka the bot"}
+    telegram_commands: dict[str: str] = {"start": "Command to start work with the bot"}
     telegram_cmd_avaible = True  # Is a feature have a commands
     telegram_message_handlers = [
             [start_cmd_handler, [Command(commands=["start"]), F.chat.type == ChatType.PRIVATE]],
         ]
     telegram_callback_handlers = [
             # Start menu
-            [start_dialog_handler, [F.data == "dialogai"]],
             [add_to_menu_handler, [F.data == "addtochat"]],
             [about_developers_handler, [F.data == "aboutdevs"]],
             [about_instance_callback_handler, [F.data == "aboutbot"]],

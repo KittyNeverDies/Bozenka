@@ -2,6 +2,14 @@ from aiogram.fsm.state import StatesGroup, State
 
 # GPT answering states, only one btw
 
+class AIGeneration(StatesGroup):
+    """
+    FSM states for AI generation for
+    all categories
+    """
+    selection = State()
+    ready_to_answer = State()
+    answering = State()
 
 class AnsweringGPT4Free(StatesGroup):
     """

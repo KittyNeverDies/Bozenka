@@ -55,8 +55,7 @@ class TelegramChatSettings(MainModel):
     results_in_dm = Column(Boolean, default=True, unique=False)
     restrict_notification = Column(Boolean, default=True, unique=False)
 
-    text_generation = Column(Boolean, default=False, unique=False)
-    image_generation = Column(Boolean, default=False, unique=False)
+    ai_working = Column(Boolean, default=False, unique=False)
     # openai_token = Column(Text)
 
 
@@ -86,6 +85,21 @@ async def get_chat_config_value(chat_id: int, session: async_sessionmaker, setti
             rows = (await session.execute(select(setting).where(TelegramChatSettings.chat_id == chat_id))).one_or_none()
             if rows:
                 return rows[0]
+            return False
+
+
+async def is_chat_exist(chat_id: int, session: async_sessionmaker) -> bool:
+    """
+    Check if chat_id exist in database or not
+    :param chat_id: id of telegram chat
+    :param session: async sessionmaker
+    :return: Bool, does chat_id exist or not
+    """
+    async with session() as session:
+        async with session.begin():
+            rows = (await session.execute(select(TelegramChatSettings).where(TelegramChatSettings.chat_id == chat_id))).one_or_none()
+            if rows:
+                return True
             return False
 
 

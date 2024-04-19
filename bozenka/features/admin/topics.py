@@ -1,5 +1,6 @@
 from aiogram import F
 from aiogram.enums import ChatType
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -50,10 +51,21 @@ class Threads(BasicFeature):
         :param msg: Message telegram object
         :return: Nothing
         """
-        config = await SolutionSimpler.close_topic(msg=msg)
-        await msg.answer(config[0],
-                         reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id)
-                         if config[1] else delete_keyboard(msg.from_user.id))
+        try:
+            if msg.message_thread_id:
+                await msg.bot.close_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
+                await msg.answer(
+                    f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} закрыл данное обсуждение.",
+                    reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
+            else:
+                await msg.bot.close_general_forum_topic(chat_id=msg.chat.id)
+                await msg.answer(
+                    f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} закрыл основное обсуждение.",
+                    reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await msg.answer("Ошибка ❌\nДанное обсуждение уже закрыто.",
+                                 reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
 
     async def telegram_reopen_topic_cmd_handler(msg: Message) -> None:
         """
@@ -61,10 +73,21 @@ class Threads(BasicFeature):
         :param msg: Message telegram object
         :return: Nothing
         """
-        config = await SolutionSimpler.open_topic(msg=msg)
-        await msg.answer(config[0],
-                         reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id)
-                         if config[1] else delete_keyboard(msg.from_user.id))
+        try:
+            if msg.message_thread_id:
+                await msg.bot.reopen_forum_topic(chat_id=msg.chat.id, message_thread_id=msg.message_thread_id)
+                await msg.answer(
+                    f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} открыл данное обсуждение.",
+                    reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
+            else:
+                await msg.bot.reopen_general_forum_topic(chat_id=msg.chat.id)
+                await msg.answer(
+                    f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} открыл основное обсуждение.",
+                    reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await msg.answer("Ошибка ❌\nДанное обсуждение уже открыто.",
+                                 reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
 
     async def telegram_close_general_topic_cmd_handler(msg: Message) -> None:
         """
@@ -72,10 +95,14 @@ class Threads(BasicFeature):
         :param msg: Message telegram object
         :return: Nothing
         """
-        config = await SolutionSimpler.close_general_topic(msg=msg)
-        await msg.answer(config[0],
-                         reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id)
-                         if config[1] else delete_keyboard(msg.from_user.id))
+        try:
+            await msg.bot.close_general_forum_topic(chat_id=msg.chat.id)
+            await msg.answer(f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} закрыл основное обсуждение.",
+                             reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await msg.answer(f"Ошибка ❌\nДанное обсуждение уже закрыто.",
+                                 reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
 
     async def telegram_reopen_general_topic_cmd(msg: Message) -> None:
         """
@@ -83,10 +110,14 @@ class Threads(BasicFeature):
         :param msg: Message telegram object
         :return: Nothing
         """
-        config = await SolutionSimpler.open_general_topic(msg=msg)
-        await msg.answer(config[0],
-                         reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id)
-                         if config[1] else delete_keyboard(msg.from_user.id))
+        try:
+            await msg.bot.reopen_general_forum_topic(chat_id=msg.chat.id)
+            await msg.answer(f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} открыл основное обсуждение",
+                             reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await msg.answer("Ошибка ❌\nДанное обсуждение уже открыто.",
+                                 reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
 
     async def telegram_hide_general_topic_cmd_handler(msg: Message) -> None:
         """
@@ -94,9 +125,14 @@ class Threads(BasicFeature):
         :param msg: Message telegram object
         :return: Nothing
         """
-        config = await SolutionSimpler.hide_general_topic(msg=msg)
-        await msg.answer(config[0],
-                         reply_markup=delete_keyboard(msg.from_user.id))
+        try:
+            await msg.bot.hide_general_forum_topic(chat_id=msg.chat.id)
+            await msg.answer(f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} скрыл основное обсуждение",
+                             reply_markup=delete_keyboard(admin_id=msg.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await msg.answer(f"Ошибка ❌\nОсновное обсуждение уже скрыто.",
+                                 reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
     async def telegram_unhide_general_topic_cmd(msg: Message) -> None:
         """
@@ -104,9 +140,14 @@ class Threads(BasicFeature):
         :param msg: Message telegram object
         :return: Nothing
         """
-        config = await SolutionSimpler.show_general_topic(msg=msg)
-        await msg.answer(config[0],
-                         reply_markup=delete_keyboard(msg.from_user.id))
+        try:
+            await msg.bot.unhide_general_forum_topic(chat_id=msg.chat.id)
+            await msg.answer(f"Удача ✅\n{msg.from_user.mention_html('Этот пользователь')} раскрыл основное обсуждение",
+                             reply_markup=delete_keyboard(admin_id=msg.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await msg.answer(f"Ошибка ❌\nДанное обсуждение уже публично.",
+                                 reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
     async def telegram_close_thread_callback_handler(call: CallbackQuery, callback_data: CloseThread) -> None:
         """
@@ -118,14 +159,24 @@ class Threads(BasicFeature):
 
         if callback_data.user_id != call.from_user.id or not call.message.chat.is_forum:
             return
-        config = await SolutionSimpler.close_topic(msg=call.message, call=call)
-        await call.message.edit_text(
-            config[0],
-            reply_markup=telegram_close_thread_keyboard(user_id=call.from_user.id) if config[1] else
-            delete_keyboard(admin_id=call.from_user.id)
-        )
+        try:
+            if call.message.message_thread_id:
+                await call.bot.close_forum_topic(chat_id=call.message.chat.id,
+                                                 message_thread_id=call.message.message_thread_id)
+                await call.message.edit_text(
+                    f"Удача ✅\n{call.from_user.mention_html('Этот пользователь')} закрыл данное обсуждение.",
+                    reply_markup=telegram_close_thread_keyboard(user_id=call.from_user.id))
+            else:
+                await call.bot.close_general_forum_topic(chat_id=call.message.chat.id)
+                await call.message.edit_text(
+                    text=f"Удача ✅\n{call.from_user.mention_html('Этот пользователь')} закрыл основное обсуждение.",
+                    reply_markup=telegram_close_thread_keyboard(user_id=call.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await call.message.edit_text(f"Ошибка ❌\nДанное обсуждение уже закрыто",
+                                             reply_markup=telegram_close_thread_keyboard(user_id=call.from_user.id))
 
-    async def inline_open_thread(call: CallbackQuery, callback_data: OpenThread) -> None:
+    async def telegram_open_thread_callback_handler(call: CallbackQuery, callback_data: OpenThread) -> None:
         """
         Query, what opens thread
         :param call: CallbackQuery object
@@ -135,13 +186,22 @@ class Threads(BasicFeature):
 
         if callback_data.user_id != call.from_user.id or not call.message.chat.is_forum:
             return
-        config = await SolutionSimpler.open_topic(msg=call.message, call=call)
-        await call.message.edit_text(
-            config[0],
-            reply_markup=telegram_open_thread_keyboard(user_id=call.from_user.id) if config[1] else
-            delete_keyboard(admin_id=call.from_user.id)
-        )
-
+        try:
+            if call.message.message_thread_id:
+                await call.bot.reopen_forum_topic(chat_id=call.message.chat.id,
+                                                  message_thread_id=call.message.message_thread_id)
+                await call.message.edit_text(
+                    f"Удача ✅\n{call.from_user.mention_html('Этот пользователь')} открыл данное обсуждение.",
+                    reply_markup=telegram_open_thread_keyboard(user_id=call.from_user.id))
+            else:
+                await call.bot.reopen_general_forum_topic(chat_id=call.message.chat.id)
+                await call.message.edit_text(
+                    f"Удача ✅\n{call.from_user.mention_html('Этот пользователь')} открыл основное обсуждение",
+                    reply_markup=telegram_open_thread_keyboard(user_id=call.from_user.id))
+        except TelegramBadRequest as ex:
+            if ex.message == "Bad Request: TOPIC_NOT_MODIFIED":
+                await call.message.edit_text(f"Ошибка ❌\nДанное обсуждение уже открыто.",
+                                             reply_markup=telegram_open_thread_keyboard(user_id=call.from_user.id))
         """
         Telegram feature settings
         """
@@ -191,7 +251,8 @@ class Threads(BasicFeature):
         [telegram_hide_general_topic_cmd_handler, [Command(commands=["hide_general"]),
                                                    UserHasPermissions(["can_manage_topics"]),
                                                    BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
-                                                   ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
+                                                   ~(F.chat.type == ChatType.PRIVATE),
+                                                   IsSettingEnabled(telegram_db_name)]],
         [telegram_unhide_general_topic_cmd, [Command(commands=["unhide_general", "show_general"]),
                                              UserHasPermissions(["can_manage_topics"]),
                                              BotHasPermissions(["can_manage_topics"]), F.chat.is_forum,
@@ -199,5 +260,5 @@ class Threads(BasicFeature):
     ]
     telegram_callback_handlers = [
         [telegram_close_thread_callback_handler, [CloseThread.filter()]],
-        [telegram_reopen_topic_cmd_handler, [OpenThread.filter()]]
+        [telegram_open_thread_callback_handler, [OpenThread.filter()]]
     ]

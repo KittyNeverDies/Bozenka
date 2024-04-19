@@ -1,15 +1,3 @@
-from dataclasses import dataclass
-
-
-@dataclass
-class QueueMember:
-    """
-    Queue Member for waiting to get generated
-    content by AI
-    """
-    content_type: str   # Example "text2text"
-    data: dict          # Example
-
 
 # List of text generative categories, what we support
 text2text_generative_libraries = [
@@ -28,5 +16,4 @@ image_generative_size = [
     "1024x576",
     "576x1024",
     "1024x680",
-    "680x1024"
-]
+    "680x1024"]

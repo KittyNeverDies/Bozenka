@@ -8,12 +8,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
 from bozenka.instances.telegram.filters import IsSettingEnabled
+from bozenka.instances.telegram.filters.is_bot_joined import IsBotJoined
 from bozenka.instances.telegram.utils.simpler import SolutionSimpler
 
 
 class Welcome(BasicFeature):
     """
-    A class of pins related commands
+    A class of welcome messages
     All staff related to it will be here
     """
 
@@ -31,17 +32,26 @@ class Welcome(BasicFeature):
                 logging.log(msg=f"Saing welcome for user_id={new.id}, chat_id={msg.chat.id}",
                             level=logging.INFO)
                 await msg.answer(
-                    f"Пользователь {new.mention_html()} переехал в конфу, благодаря {msg.from_user.mention_html()}👋",
+                    f"Пользователь {new.mention_html()} пишел в группу, благодаря {msg.from_user.mention_html()}👋",
                 )
                 await msg.delete()
-            else:
-                logging.log(msg=f"Saing welcome to administrators for chat_id={msg.chat.id}",
-                            level=logging.INFO)
-                await msg.answer("Здраствуйте администраторы чата 👋\n"
-                                 "Я - <b>бозенька</b>, мультифункциональный бот, разрабатываемый Bozo Developement\n"
-                                 "Выдайте мне <b>полные права администратора</b> для моей полной работы.\n"
-                                 "Чтобы настроить функционал, используйте /setup или кнопку под сообщением", )
-                await SolutionSimpler.auto_settings(msg=msg, session=session_maker)
+
+    async def telegram_owner_welcome(msg: Message, session_maker: async_sessionmaker) -> None:
+        """
+        Message handler.
+        Sends welcome message after adding bot to chat.
+        Sending welcome message to administrators.
+        :param msg: Message telegram object
+        :param session_maker: AsyncSessionmaker object
+        :return: None
+        """
+        logging.log(msg=f"Saing welcome to administrators for chat_id={msg.chat.id}",
+                    level=logging.INFO)
+        await msg.answer("Здраствуйте администраторы чата 👋\n"
+                         "Я -  мультифункциональный бот, который может помогать вам в вашей работе с чатомю\n"
+                         "Выдайте мне <b>полные права администратора</b> для моей полной работы.\n"
+                         "Чтобы настроить функционал, используйте /setup", )
+        await SolutionSimpler.auto_settings(msg=msg, session=session_maker)
 
     async def telegram_leave_handler(msg: Message, bot: Bot) -> None:
         """
@@ -56,7 +66,7 @@ class Welcome(BasicFeature):
         logging.log(msg=f"Saing goodbye for user_id={msg.left_chat_member.id}, chat_id={msg.chat.id}",
                     level=logging.INFO)
         await msg.answer(
-            f"Пользователь {msg.left_chat_member.mention_html()} съехал с конфы, благодаря {msg.from_user.mention_html()}👋"
+            f"Пользователь {msg.left_chat_member.mention_html()} ушел из группы, благодаря {msg.from_user.mention_html()}👋"
         )
 
     # Telegram feature settings
@@ -70,6 +80,7 @@ class Welcome(BasicFeature):
                                    "\nПриветсвенные сообщения новым и ушедшим пользователям.",
     telegram_cmd_avaible = False  # Is a feature have a commands
     telegram_message_handlers = [
+        [telegram_owner_welcome, [F.content_type == ContentType.NEW_CHAT_MEMBERS, IsBotJoined(True)]],
         [telegram_leave_handler, [F.content_type == ContentType.LEFT_CHAT_MEMBER, IsSettingEnabled(telegram_db_name)]],
         [telegram_join_handler, [F.content_type == ContentType.NEW_CHAT_MEMBERS, IsSettingEnabled(telegram_db_name)]]
     ]

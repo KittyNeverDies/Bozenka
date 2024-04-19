@@ -1,30 +1,32 @@
-'''
-
 import logging
 from typing import Any
 
 import g4f
+import g4f.Provider
 from aiogram import F
-from aiogram.filters import Command
+from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from gpt4all import GPT4All
+from g4f.Provider import RetryProvider
 
-from bozenka.database.tables.telegram import TelegramChatSettings
-from bozenka.features.main import BasicFeature
-from bozenka.generative import text2text_generative_libraries
-from bozenka.generative.gpt4all import model_path, check
-from bozenka.generative.gpt4free import generate_gpt4free_providers, generate_gpt4free_models
-from bozenka.instances.telegram.utils.callbacks_factory import DeleteMenu
-from bozenka.instances.telegram.utils.callbacks_factory import Gpt4FreeProvsModelPage, Gpt4FreeProviderPage, \
-    Gpt4AllSelect, Gpt4AllModel, GptCategory, Gpt4freeResult, \
-    Gpt4FreeProvider, GptBackMenu, Gpt4FreeModel, Gpt4FreeCategory, Gpt4FreeModelPage, GptStop
+from bozenka.generative.providers.main import BasicAiGenerativeProvider
+from bozenka.instances.telegram.utils.callbacks_factory import GptStop, GptCategory, GptBackMenu, Gpt4FreeCategory, \
+    Gpt4FreeProviderPage, Gpt4FreeProvsModelPage, Gpt4FreeProvider, Gpt4FreeModelPage, Gpt4FreeModel, Gpt4freeResult
 from bozenka.instances.telegram.utils.delete import delete_keyboard
-from bozenka.instances.telegram.utils.simpler import AnsweringGPT4Free, AnsweringGpt4All
+from bozenka.instances.telegram.utils.simpler import AIGeneration
 
 
+class DeleteMenu(CallbackData, prefix="delete"):
+    """
+       Callback with information to delete message
+    """
+    user_id_clicked: int
 
+
+class TextToText(CallbackData, prefix='text2text'):
+    category_name: str
+    user_id: int
 
 
 # Helper
@@ -42,19 +44,6 @@ def items_list_generator(page: int, list_of_items, count_of_items: int) -> list[
             continue
         items.append(item)
     return items
-
-
-def text_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
-    """
-    Generating menu for response from GPT
-    :param user_id:
-    :return:
-    """
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())],
-        [InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
-    ])
-    return kb
 
 
 def telegram_gpt4free_providers_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
@@ -229,105 +218,65 @@ def gpt4free_models_by_provider_keyboard(user_id: int, provider: str, page: int)
     return builder.as_markup()
 
 
-# Gpt4All related keyboards
-def generate_gpt4all_page(user_id: int) -> InlineKeyboardMarkup:
+def text_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     """
-    Generating list of GPT4All models.
+    Generating menu for response from GPT
     :param user_id:
     :return:
     """
-    models = GPT4All.list_models()
-
-    builder = InlineKeyboardBuilder()
-
-    for model in models:
-        builder.row(InlineKeyboardButton(
-            text=model["name"],
-            callback_data=Gpt4AllModel(user_id=str(user_id), index=str(models.index(model))).pack())
-        )
-    builder.row(InlineKeyboardButton(text="🔙 Вернуться к списку",
-                                     callback_data=GptBackMenu(user_id=user_id, back_to="g4fcategory").pack()))
-    builder.row(InlineKeyboardButton(text="Спасибо, не надо ❌",
-                                     callback_data=GptStop(user_id=str(user_id)).pack()))
-    return builder.as_markup()
-
-
-def gpt4all_model_menu(user_id: int, index: int) -> InlineKeyboardMarkup:
-    """
-    Generating menu for selection on of GPT4ALL models
-    :param user_id:
-    :param index:
-    """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Выбрать ✅",
-                              callback_data=Gpt4AllSelect(user_id=user_id, index=str(index)).pack())],
-        [InlineKeyboardButton(text="🔙 Вернуться к списку",
-                              callback_data=GptBackMenu(user_id=user_id, back_to="g4amodels").pack())],
-        [InlineKeyboardButton(text="Спасибо, не надо ❌",
-                              callback_data=GptStop(user_id=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо, удали сообщение ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())],
+        [InlineKeyboardButton(text="Завершить диалог 🚫", callback_data=GptStop(user_id=str(user_id)).pack())]
     ])
     return kb
 
 
-
-
-class TextGeneratrion(BasicFeature):
+def generate_gpt4free_providers():
     """
-    A class, what have inside all handlers / functions
-    related to text generation of bozenka
+    Generates list of g4f providers
+    :return:
+    """
+    return {prov: g4f.Provider.ProviderUtils.convert[prov] for prov in g4f.Provider.__all__
+            if prov != "BaseProvider" and prov != "AsyncProvider" and prov != "RetryProvider" and
+            g4f.Provider.ProviderUtils.convert[prov].working}
+
+
+def generate_gpt4free_models():
+    """
+    Generates list of g4f models
+    :return:
+    """
+    models = {}
+    for model_name, model in g4f.models.ModelUtils.convert.items():
+        if type(model.best_provider) is RetryProvider:
+            for pr in model.best_provider.providers:
+                if pr.__name__ in models:
+                    models[pr.__name__].append(model_name)
+                else:
+                    models[pr.__name__] = [model_name]
+        else:
+            if model.best_provider.__name__ in models:
+                models[model.best_provider.__name__].append(model_name)
+            else:
+                models[model.best_provider.__name__] = [model_name]
+    print(models)
+    return models
+
+
+class Gpt4Free(BasicAiGenerativeProvider):
+    """
+    Object of Gpt4Free library generation
+    for handlers and queue generation
     """
 
-    async def telegram_already_answering_handler(msg: Message, state: FSMContext) -> None:
+    @staticmethod
+    async def generate_telegram(msg: Message, state: FSMContext) -> None:
         """
-        Giving response, if answering user now,
-        but he still asks something
-        :param msg: Message telegram object
-        :param state: FSM state of bot
-        :return: Nothing
+        Generates response for telegram user
+        :param msg: Message from user
+        :param state: FSM context
+        :return: None
         """
-        await msg.answer(
-            "Подождите пожалуйста, мы уже генерируем ответ для вас, подождите, когда мы ответим на ваш передыдущий вопрос",
-            reply_markup=delete_keyboard(admin_id=msg.from_user.id))
-
-    async def telegram_conversation_cmd_handler(msg: Message, state: FSMContext) -> None:
-        """
-        /conversation command handler, start
-        :param msg: Message telegram object
-        :param state: FSM state of bot
-        :return:
-        """
-        if await state.get_state():
-            return
-        await msg.answer("Пожалуста, выберите сервис для ИИ.",
-                         reply_markup=telegram_text_categories_keyboard
-                         (user_id=msg.from_user.id))
-
-    async def telegram_cancel_cmd_handler(msg: Message, state: FSMContext) -> None:
-        """
-        Canceling dialog with generative model
-        Works on command /cancel
-        :param msg: Message telegram object
-        :param state: FSM state of bot
-        :return:
-        """
-        current = await state.get_state()
-        if current is None:
-            return
-        await state.clear()
-        await msg.answer("Удача ✅\n"
-                         "Диалог отменён!", reply_markup=delete_keyboard(admin_id=msg.from_user.id))
-
-    # G4F telegram category
-    # All handlers and other stuff
-    # All code and comments
-    async def telegram_g4f_generate_handler(msg: Message, state: FSMContext) -> None:
-        """
-        Generating answer if GPT4Free model and provider has been selected
-        :param msg: Message telegram object
-        :param state: FSM state of bot
-        :return:
-        """
-        await state.set_state(AnsweringGPT4Free.answering)
 
         info = await state.get_data()
 
@@ -340,26 +289,26 @@ class TextGeneratrion(BasicFeature):
             for message in info["ready_to_answer"]:
                 current_messages.append(message)
 
-        if not info.get("set_provider"):
-            info["set_provider"] = None
+        if not info.get("provider"):
+            info["provider"] = None
 
         current_messages.append({"role": "user", "content": msg.text})
 
         response = ""
         try:
             response = await g4f.ChatCompletion.create_async(
-                model=info["set_model"],
+                model=info["model"],
                 messages=current_messages,
-                provider=None if info["set_provider"] is None else providers[info["set_provider"]],
+                provider=None if info["provider"] is None else providers[info["provider"]],
                 stream=False
             )
 
         except NameError or SyntaxError:
             try:
                 response = g4f.ChatCompletion.create(
-                    model=info["set_model"],
+                    model=info["model"],
                     messages=current_messages,
-                    provider=None if info["set_provider"] is None else providers[info["set_provider"]],
+                    provider=None if info["provider"] is None else providers[info["provider"]],
                     stream=False
                 )
             except Exception as S:
@@ -374,22 +323,9 @@ class TextGeneratrion(BasicFeature):
             await reply.edit_text(text=response, reply_markup=text_response_keyboard(user_id=msg.from_user.id))
             current_messages.append({"role": "assistant", "content": response})
             await state.update_data(ready_to_answer=current_messages)
-        await state.set_state(AnsweringGPT4Free.ready_to_answer)
+        await state.set_state(AIGeneration.ready_to_answer)
 
-    async def telegram_instart_conversation_handler(call: CallbackQuery, callback_data: GptBackMenu,
-                                                    state: FSMContext) -> None:
-        """
-        Query, what shows when clicking on button in /start menu
-        :param call: CallbackQuery class
-        :param state: FSMContext aiogram class
-        :param callback_data: GptBackMenu class
-        :return: Nothing
-        """
-        if call.from_user.id != callback_data.user_id or await state.get_state():
-            return
-        await call.message.edit_text("Пожалуста, выберите сервис для ИИ.",
-                                     reply_markup=telegram_text_categories_keyboard(user_id=call.from_user.id))
-
+    @staticmethod
     async def telegram_g4f_providers_handlers(call: CallbackQuery, callback_data: Gpt4FreeCategory,
                                               state: FSMContext) -> None:
         """
@@ -407,10 +343,10 @@ class TextGeneratrion(BasicFeature):
 
         await call.answer("Вы выбрали провайдеры 🤖")
 
-        await state.set_state(AnsweringGPT4Free.set_provider)
         await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
                                      reply_markup=telegram_gpt4free_providers_keyboard(user_id=call.from_user.id, page=0))
 
+    @staticmethod
     async def telegram_g4f_models_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
         """
         Query, what creating models selecting menu
@@ -422,13 +358,12 @@ class TextGeneratrion(BasicFeature):
         if call.from_user.id != callback_data.user_id:
             return
 
-        await state.set_state(AnsweringGPT4Free.set_model)
-
         await call.answer("Вы выбрали модели 🤖")
 
         await call.message.edit_text("Выберите модель, с которой будете общаться 🤖",
                                      reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id, page=0))
 
+    @staticmethod
     async def telegram_g4f_model_ready_handler(call: CallbackQuery, callback_data: Gpt4FreeModel,
                                                state: FSMContext) -> None:
         """
@@ -442,16 +377,17 @@ class TextGeneratrion(BasicFeature):
             return
 
         await state.update_data(model=callback_data.model)
-        await state.set_state(AnsweringGPT4Free.ready_to_answer)
+        await state.set_state(AIGeneration.ready_to_answer)
 
         await call.answer("Вы можете начать общаться 🤖")
 
-        await call.message.edit_text("Удача ✅\n"
-                                     "Вы теперь можете спокойно вести диалог 🤖\n"
-                                     f"Вы выбрали модель <b>{callback_data.model}</b>👾\n"
-                                     "Чтобы прекратить общение, используйте /cancel ",
-                                     reply_markup=delete_keyboard(admin_id=call.from_user.id))
+        await call.message.edit_text("Отлично ✅\n\n"
+                                     "Вы теперь можете спокойно вести диалог с нейронной сетью 🤖\n"
+                                     f"Вы выбрали модель <b>{callback_data.model}</b> у библиотеки <b>Gpt4Free</b>👾\n"
+                                     "Чтобы прекратить общение, используйте /cancel или кнопку под этим и следующим сообщением.",
+                                     reply_markup=text_response_keyboard(user__id=call.from_user.id))
 
+    @staticmethod
     async def telegram_g4f_next_model_handler(call: CallbackQuery, callback_data: Gpt4FreeModelPage,
                                               state: FSMContext) -> None:
         """
@@ -466,11 +402,14 @@ class TextGeneratrion(BasicFeature):
 
         await call.answer(f"Вы перелистнули на страницу {callback_data.page + 1}📄")
 
-        await call.message.edit_text("Выберите модель, с которой будете общаться 🤖",
+        await call.message.edit_text("Выберите пожалуйста модель нейронной сети 👾\n\n"
+                                     "Режим модели - мы будем использовать выбранную вами модель нейронной сети с помощью переченя из веб ресурсов, с помощью которых мы будем генерировать ответ\n"
+                                     "Учитывайте, что перечень из провайдеров (веб сервисов) может не работать!",
                                      reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id,
                                                                            page=callback_data.page))
 
-    async def telegram_g4f_category_handler(call: CallbackQuery, callback_data: GptCategory | GptBackMenu, state: FSMContext) -> None:
+    @staticmethod
+    async def telegram_g4f_category_handler(call: CallbackQuery, callback_data: TextToText | GptBackMenu, state: FSMContext) -> None:
         """
         Query, what creating providers selecting menu.
         :param state: FSMContext aiogram class
@@ -484,14 +423,17 @@ class TextGeneratrion(BasicFeature):
         logging.log(msg=f"Selected gpt4free category by user_id={call.from_user.id}",
                     level=logging.INFO)
 
-        if type(callback_data) == GptCategory:
-            await state.update_data(category=callback_data.category)
+        if type(callback_data) == TextToText:
+            await state.update_data(category="text2text", name="Gpt4Free")
 
         await call.answer("Вы выбрали Gpt4Free 🤖")
-        await call.message.edit_text("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖",
+        await call.message.edit_text("Библиотека Gpt4Free\nВыберите, что лучше вам выбрать: модель или провайдера 🤖\n\n"
+                                     "Провайдер - конкретный веб ресурс, с помощью которого мы будем обращаться к модели нейронной сети и генерировать ответ\n"
+                                     "Модель - мы будем использовать выбранную вами модель с помощью переченя из веб ресурсов, с помощью которых мы будем генерировать ответ",
                                      reply_markup=gpt4free_categories_keyboard(user_id=call.from_user.id))
         await call.answer("Выберите, по какому пункту мы будем вести диалог с нейронной сети 🤖")
 
+    @staticmethod
     async def telegram_g4f_back_provider_handler(call: CallbackQuery, callback_data: GptBackMenu,
                                                  state: FSMContext) -> None:
         """
@@ -506,12 +448,14 @@ class TextGeneratrion(BasicFeature):
 
         logging.log(msg=f"Back to providers menu by user_id={call.from_user.id}",
                     level=logging.INFO)
-        await state.set_state(AnsweringGPT4Free.set_provider)
 
-        await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻",
+        await call.message.edit_text("Выберите пожалуйста одного из провайдеров 👨‍💻\n\n"
+                                     "Если выбирать по провайдеру - конкретный веб ресурс, с помощью которого мы будем обращаться к модели нейронной сети и генерировать ответ\n"
+                                     "Учитывайте, что провайдеры могут быть недоступны или не работать, так что будьте аккуратны.",
                                      reply_markup=telegram_gpt4free_providers_keyboard(page=0, user_id=callback_data.user_id))
         await call.answer("Выберите пожалуйста одного из провайдеров 👨‍💻")
 
+    @staticmethod
     async def telegram_g4f_by_provider_models(call: CallbackQuery, callback_data: Gpt4FreeProvider,
                                               state: FSMContext) -> None:
         """
@@ -528,9 +472,10 @@ class TextGeneratrion(BasicFeature):
                     level=logging.INFO)
 
         await state.update_data(provider=callback_data.provider)
-        await state.set_state(AnsweringGPT4Free.set_model)
 
-        await call.message.edit_text("Выберите пожалуйста модель ИИ 👾",
+        await call.message.edit_text("Выберите пожалуйста модель нейронной сети 👾\n\n"
+                                     "Режим модели - мы будем использовать выбранную вами модель нейронной сети с помощью переченя из веб ресурсов, с помощью которых мы будем генерировать ответ\n"
+                                     "Учитывайте, что перечень из провайдеров (веб сервисов) может не работать!",
                                      reply_markup=gpt4free_models_by_provider_keyboard(
                                          user_id=callback_data.user_id,
                                          provider=callback_data.provider,
@@ -538,6 +483,7 @@ class TextGeneratrion(BasicFeature):
                                      ))
         await call.answer("Выберите пожалуйста модель ИИ 👾")
 
+    @staticmethod
     async def telegram_g4f_provider_ready_handler(call: CallbackQuery, callback_data: Gpt4freeResult, state: FSMContext) -> None:
         """
         Query, what says about getting ready to questions for ChatGPT from Gpt4Free.
@@ -553,18 +499,19 @@ class TextGeneratrion(BasicFeature):
                     level=logging.INFO)
 
         await state.update_data(model=callback_data.model)
-        await state.set_state(AnsweringGPT4Free.ready_to_answer)
+        await state.set_state(AIGeneration.ready_to_answer)
 
         logging.log(msg=f"Loaded GPT answering status for user_id={call.from_user.id}",
                     level=logging.INFO)
 
-        await call.message.edit_text("Удача ✅\n"
-                                     "Вы теперь можете спокойно вести диалог 🤖\n"
-                                     f"Вы выбрали модель <b>{callback_data.model}</b>👾, от провайдера <b>{callback_data.provider}</b>👨‍💻\n"
-                                     "Чтобы прекратить общение, используйте /cancel ",
-                                     reply_markup=delete_keyboard(admin_id=callback_data.user_id))
+        await call.message.edit_text("Отлично ✅\n\n"
+                                     "Вы теперь можете спокойно вести диалог с нейронной сетью 🤖\n"
+                                     f"Вы выбрали модель <b>{callback_data.model}</b>👾, от провайдера <b>{callback_data.provider}</b>👨‍💻у библиотеки <b>Gpt4Free</b>👾\n"
+                                     "Чтобы прекратить общение, используйте /cancel или кнопку под этим и следующим сообщением.",
+                                     reply_markup=text_response_keyboard(user_id=call.from_user.id))
         await call.answer("Вы теперь можете спокойно вести диалог 🤖")
 
+    @staticmethod
     async def telegram_g4f_models_by_provider_handler(call: CallbackQuery, callback_data: Gpt4FreeProvsModelPage,
                                                       state: FSMContext) -> None:
         """
@@ -586,6 +533,7 @@ class TextGeneratrion(BasicFeature):
                                      ))
         await call.answer(f"Вы перелистали на страницу {callback_data.page + 1}📄")
 
+    @staticmethod
     async def telegram_next_g4f_providers_handler(call: CallbackQuery, callback_data: Gpt4FreeProviderPage,
                                                   state: FSMContext) -> None:
         """
@@ -604,196 +552,30 @@ class TextGeneratrion(BasicFeature):
                                                                                        page=callback_data.page))
         await call.answer(f"Вы перелистнули на страницу {callback_data.page + 1}📄")
 
-    # G4A telegram handlers section
-    # All code and commentaries here
-    # All handlers here
-
-    async def telegram_g4a_generate_handler(msg: Message, state: FSMContext) -> None:
-        """
-        Generating answer if Gpt4All has been selected
-        :param msg: Message telegram object
-        :param state: FSM state of bot
-        :return:
-        """
-        await state.set_state(AnsweringGpt4All.answering)
-
-        models = GPT4All.list_models()
-        info = await state.get_data()
-        answer = ""
-
-        main_msg = await msg.answer("Пожалуйста подождите, мы генерируем вам ответ ⏰\n"
-                                    "Если что-то пойдет не так, мы вам сообщим 👌",
-                                    reply_markup=text_response_keyboard(user_id=msg.from_user.id))
-
-        if not check(models[info["model"]]["filename"]):
-            main_msg = await main_msg.edit_text(main_msg.text + "\nПодождите пожалуста, мы скачиваем модель...",
-                                                reply_markup=main_msg.reply_markup)
-
-        try:
-            # Setting Gpt4All model
-            model = GPT4All(model_name=models[info['model']]['filename'],
-                            model_path=model_path,
-                            allow_download=True)
-            # Setting our chat session if exist
-            model.current_chat_session = [] if not info.get("ready_to_answer") else info["ready_to_answer"]
-            # Generating answer
-            with model.chat_session():
-                answer = model.generate(msg.text)
-                await state.update_data(ready_to_answer=model.current_chat_session)
-
-        except Exception as S:
-            answer = "Простите, произошла ошибка 😔\nЕсли это продолжается, пожалуйста используйте /cancel"
-            logging.log(msg=f"Get an exception for generating answer={S}",
-                        level=logging.ERROR)
-        finally:
-            await main_msg.edit_text(answer, reply_markup=text_response_keyboard(user_id=msg.from_user.id))
-
-        await state.set_state(AnsweringGpt4All.ready_to_answer)
-
-    async def telegram_g4a_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
-        """
-        Query, what shows list for gpt4all models
-        :param state: FSMContext aiogram class
-        :param call: CallbackQuery telegram class
-        :param callback_data: GptCategory class
-        :return: None
-        """
-        if callback_data.user_id != call.from_user.id:
-            return
-        await state.set_state(AnsweringGpt4All.set_model)
-        await call.message.edit_text("Выберите пожалуйста модель ИИ 👾",
-                                     reply_markup=generate_gpt4all_page(user_id=call.from_user.id))
-
-    async def telegram_g4a_back_handler(call: CallbackQuery, callback_data: GptCategory, state: FSMContext) -> None:
-        """
-        Query, what shows list for gpt4all models back
-        :param state: FSMContext aiogram class
-        :param call: CallbackQuery telegram class
-        :param callback_data: GptCategory class
-        :return: None
-        """
-        if callback_data.user_id != call.from_user.id:
-            return
-        await state.set_state(AnsweringGpt4All.set_model)
-        await call.message.edit_text("Выберите пожалуйста модель ИИ 👾",
-                                     reply_markup=generate_gpt4all_page(user_id=call.from_user.id))
-
-    async def telegram_g4a_infomration_handler(call: CallbackQuery, callback_data: Gpt4AllModel,
-                                               state: FSMContext) -> None:
-        """
-        Query, what show information about clicked gpt4all model from list
-        :param state: FSMContext aiogram class
-        :param call: CallbackQuery telegram class
-        :param callback_data: Gpt4AllModel class
-        :return: None
-        """
-        if callback_data.user_id != call.from_user.id:
-            return
-        models = GPT4All.list_models()
-        name = models[callback_data.index]['name']
-        await call.message.edit_text(f"{name}\n"
-                                     f"Обученно на основе {models[callback_data.index]['parameters']} строк 👨‍💻",
-                                     reply_markup=gpt4all_model_menu(user_id=call.from_user.id,
-                                                                     index=callback_data.index))
-
-    async def telegram_g4a_end_handler(call: CallbackQuery, callback_data: Gpt4AllSelect,
-                                       state: FSMContext) -> None:
-        """
-        Query, what says about getting ready for question for Gpt4All model
-        :param state: FSMContext aiogram class
-        :param call: CallbackQuery telegram class
-        :param callback_data: Gpt4AllSelect class
-        :return: None
-        """
-        if callback_data.user_id != call.from_user.id:
-            return
-        await state.update_data(model=callback_data.index)
-        await state.set_state(AnsweringGpt4All.ready_to_answer)
-        models = GPT4All.list_models()
-
-        await call.message.edit_text("Удача ✅\n"
-                                     "Вы теперь можете спокойно вести диалог 🤖\n"
-                                     f"Вы выбрали модель <b>{models[callback_data.index]['name']}</b>👾 от Gpt4All\n"
-                                     "Чтобы прекратить общение, используйте /cancel ",
-                                     reply_markup=delete_keyboard(admin_id=callback_data.user_id))
-
-    async def telegram_pages_handler(call: CallbackQuery) -> None:
-        """
-        Query, made for helping purposes.
-        Shows current page.
-        :param call: CallbackQuery telegram class
-        :return: None
-        """
-        logging.log(msg=f"Showed helping info for user_id={call.from_user.id}",
-                    level=logging.INFO)
-        await call.answer("Здесь расположается текущая странница 📃")
-
-    async def telegram_stop_dialog_handler(call: CallbackQuery, callback_data: GptStop, state: FSMContext) -> None:
-        """
-        Query, what stops dialog
-        :param call: CallbackQuery telegram class
-        :param callback_data: GptStop class
-        :param state: None
-        """
-        # Checking user_id of user
-        if callback_data.user_id != call.from_user.id:
-            return
-        # Answering something
-        await call.answer("Хорошо ✅")
-        current_state = await state.get_state()
-        if current_state in [AnsweringGPT4Free.answering, AnsweringGPT4Free.ready_to_answer, AnsweringGpt4All.ready_to_answer, AnsweringGpt4All.answering]:
-            await call.message.edit_text(text=call.message.text + "\n\nДиалог остановлен ✅\n",
-                                         reply_markup=delete_keyboard(admin_id=call.from_user.id))
-        else:
-            await call.message.delete()
-        # Clearing state
-        await state.clear()
-
-    # Telegram feature settings
-    telegram_category = "user"
-    telegram_db_name = TelegramChatSettings.text_generation
-    telegram_setting_in_list = True
-    telegram_setting_name = "ИИ ЧатБот 🤖"
-    telegram_setting_description = "<b>ИИ ЧатБот </b>🤖" \
-                                   "\nЕсть поддержка:\n" \
-                                   "- Моделей Gpt4All\n" \
-                                   "- Провайдеров Gpt4Free и моделей\n" \
-                                   "Для использования:\n" \
-                                   "<pre>/conversations</pre>" \
-                                   "\nНаходится в разработке, планируется в будущем."
-    telegram_commands: dict[str: str] = {
-        'conversation': 'Starts conversation with text generative ai'
+    generative_functions = {
+        # Format is social_network_name: generative_function
+        "telegram": generate_telegram
     }
-    telegram_cmd_avaible = True  # Is a feature have a commands
-    telegram_message_handlers = (
-        [telegram_conversation_cmd_handler, [Command(commands=["conversation"])]],
-        [telegram_g4a_generate_handler, [AnsweringGpt4All.ready_to_answer, ~Command(commands=["cancel"])]],
-        [telegram_g4f_generate_handler, [AnsweringGPT4Free.ready_to_answer, ~Command(commands=["cancel"])]],
-        [telegram_already_answering_handler, [AnsweringGPT4Free.answering, AnsweringGpt4All.answering]]
-    )
-    telegram_callback_handlers = (
-        # g4a
-        [telegram_g4a_handler, [GptCategory.filter(F.category == "Gpt4All")]],
-        [telegram_g4a_infomration_handler, [Gpt4AllModel.filter()]],
-        [telegram_g4a_end_handler, [Gpt4AllSelect.filter()]],
-        # g4f
-        [telegram_g4f_category_handler, [GptCategory.filter(F.category == "Gpt4Free")]],
-        [telegram_g4f_category_handler, [GptBackMenu.filter(F.back_to == "g4fcategory")]],
-        # categories
-        [telegram_g4f_models_handler, [Gpt4FreeCategory.filter(F.category == "models")]],
-        [telegram_g4f_providers_handlers, [Gpt4FreeCategory.filter(F.category == "providers")]],
-        # providers list
-        [telegram_g4f_providers_handlers, [GptBackMenu.filter(F.back_to == "providers")]],
-        [telegram_next_g4f_providers_handler, [Gpt4FreeProviderPage.filter()]],
-        # models by provider list
-        [telegram_g4f_models_by_provider_handler, [Gpt4FreeProvsModelPage.filter()]],
-        [telegram_g4f_by_provider_models, [Gpt4FreeProvider.filter()]],
-        # models list
-        [telegram_g4f_next_model_handler, [Gpt4FreeModelPage.filter()]],
-        # end features
-        [telegram_g4f_model_ready_handler, [Gpt4FreeModel.filter()]],
-        [telegram_g4f_provider_ready_handler, [Gpt4freeResult.filter()]],
-        # stop talking
-        [telegram_stop_dialog_handler, [GptStop.filter()]]
-    )
-'''
+    handlers_functions = {
+        "telegram": [
+            # g4f
+            [telegram_g4f_category_handler, [TextToText.filter(F.category_name == "Gpt4Free")]],
+            [telegram_g4f_category_handler, [GptBackMenu.filter(F.back_to == "g4fcategory")]],
+            # categories
+            [telegram_g4f_models_handler, [Gpt4FreeCategory.filter(F.category == "models")]],
+            [telegram_g4f_providers_handlers, [Gpt4FreeCategory.filter(F.category == "providers")]],
+            # providers list
+            [telegram_g4f_providers_handlers, [GptBackMenu.filter(F.back_to == "providers")]],
+            [telegram_next_g4f_providers_handler, [Gpt4FreeProviderPage.filter()]],
+            # models by provider list
+            [telegram_g4f_models_by_provider_handler, [Gpt4FreeProvsModelPage.filter()]],
+            [telegram_g4f_by_provider_models, [Gpt4FreeProvider.filter()]],
+            # models list
+            [telegram_g4f_next_model_handler, [Gpt4FreeModelPage.filter()]],
+            # end features
+            [telegram_g4f_model_ready_handler, [Gpt4FreeModel.filter()]],
+            [telegram_g4f_provider_ready_handler, [Gpt4freeResult.filter()]],
+        ]
+    }
+    category_of_generation: str = "text2text"
+    name_of_generation: str = "Gpt4Free"

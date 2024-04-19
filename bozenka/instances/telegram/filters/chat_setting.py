@@ -22,6 +22,7 @@ class IsSettingEnabled(Filter):
         :return: Is config enabled
         """
         if msg.chat.type != ChatType.PRIVATE:
+            print(await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=self.setting))
             return await get_chat_config_value(chat_id=msg.chat.id, session=session_maker, setting=self.setting)
         else:
             return True

@@ -1,12 +1,11 @@
-from bozenka.generative.gpt4all import Gpt4All
-from bozenka.generative.kadinsky import KadinskyApiGenetartion
-from bozenka.generative.gpt4free import Gpt4Free
+from bozenka.generative.providers import *
 
 basic_generatives = [
-    KadinskyApiGenetartion,
+    FusionBrain,
     Gpt4Free,
     Gpt4All
 ]
+
 
 # The dictionary to be created, categorized by `category_of_generation`
 generative_dict = {}

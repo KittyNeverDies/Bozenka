@@ -1,3 +1,4 @@
+'''
 import logging
 from typing import Callable
 
@@ -11,7 +12,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from bozenka.database.tables.telegram import TelegramChatSettings
 from bozenka.features.main import BasicFeature
 from bozenka.generative import image_generative_size, image_generative_categories
-from bozenka.generative.kadinsky import kadinsky_gen
+from bozenka.generative.text_to_image import kadinsky_gen
 from bozenka.instances.telegram.filters import IsSettingEnabled
 from bozenka.instances.telegram.utils.callbacks_factory import ImageGenerationCategory, ImageGeneration, DeleteMenu, \
     GptStop
@@ -32,22 +33,6 @@ def telegram_image_response_keyboard(user_id: int) -> InlineKeyboardMarkup:
     return kb
 
 
-def telegram_image_resolution_keyboard(user_id: int, category: str) -> InlineKeyboardMarkup:
-    """
-    Create keyboard with list of resolution to generate image
-    :param category: Category name
-    :param user_id: User_id of called user
-    :return: InlineKeyboardMarkup
-    """
-    builder = InlineKeyboardBuilder()
-    for size in image_generative_size:
-        builder.row(InlineKeyboardButton(text=size,
-                                         callback_data=ImageGeneration(
-                                             user_id=user_id,
-                                             category=category,
-                                             size=size
-                                         ).pack()))
-    return builder.as_markup()
 
 
 def telegram_image_generation_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
@@ -148,7 +133,9 @@ class ImageGeneratrion(BasicFeature):
         try:
 
             model_id = kadinsky_gen.get_model()
-            width, height = data["set_size"].split("x")
+            width, height = data.get("set_size").split("x")
+            if height is None and width is None:
+                width, height = "500", "500"
             generating = kadinsky_gen.generate(model=model_id,
                                                prompt=msg.text,
                                                width=int(width),
@@ -200,3 +187,4 @@ class ImageGeneratrion(BasicFeature):
         [telegram_end_generation_handler, [ImageGeneration.filter()]],
         [telegram_imagine_handler, [F.data == "dialogimage"]]
     ]
+'''

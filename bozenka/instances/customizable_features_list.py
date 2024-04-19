@@ -10,9 +10,8 @@ customizable_features = [
     Threads,
     ChatInformation,
     # User related category
-    ImageGeneratrion,
-    TextGeneratrion,
     Welcome,
+    AiFeature
 ]
 
 text_transcription = {

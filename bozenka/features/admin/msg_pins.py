@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import F
 from aiogram.enums import ChatType
 from aiogram.filters import Command
@@ -22,7 +24,7 @@ def telegram_pin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMarkup
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Открепить сообщение 📌",
                               callback_data=UnpinMsg(user_id=user_id, msg_id=msg_id).pack())],
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо, удали сообщение ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
 
@@ -35,9 +37,9 @@ def telegram_unpin_msg_keyboard(user_id: int, msg_id: int) -> InlineKeyboardMark
     :return: InlineKeyboardMarkup
     """
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Открепить сообщение 📌",
+        [InlineKeyboardButton(text="Закрепить сообщение 📌",
                               callback_data=PinMsg(user_id=user_id, msg_id=msg_id).pack())],
-        [InlineKeyboardButton(text="Спасибо ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
+        [InlineKeyboardButton(text="Спасибо, удали сообщение ✅", callback_data=DeleteMenu(user_id_clicked=str(user_id)).pack())]
     ])
     return kb
 
@@ -55,9 +57,8 @@ class Pins(BasicFeature):
         :param callback_data:
         :return:
         """
-        if callback_data.user_id == call.from_user.id:
+        if callback_data.user_id != call.from_user.id:
             return
-
         await call.message.chat.pin_message(message_id=callback_data.msg_id)
         await call.message.edit_text("Удача ✅\n"
                                      "Сообщение было закреплено 📌",
@@ -71,10 +72,9 @@ class Pins(BasicFeature):
         :param callback_data:
         :return:
         """
-        if callback_data.user_id == call.from_user.id:
+        if callback_data.user_id != call.from_user.id:
             return
-
-        await call.message.chat.pin_message(message_id=callback_data.msg_id)
+        await call.message.chat.unpin_message(message_id=callback_data.msg_id)
         await call.message.edit_text("Удача ✅\n"
                                      "Сообщение было откреплено 📌",
                                      reply_markup=telegram_unpin_msg_keyboard(user_id=call.from_user.id,
@@ -155,6 +155,7 @@ class Pins(BasicFeature):
     telegram_commands: dict[str: str] = {
         'pin': 'Pin fast any message in chat',
         'unpin': 'Unpin fast any message in chat',
+        'unpin_all': 'Unpin all messages in chat (DANGEROUS!)',
     }
     telegram_cmd_avaible = True  # Is a feature have a commands
     # Telegram Handler
@@ -166,8 +167,8 @@ class Pins(BasicFeature):
         [telegram_unpin_cmd, [Command(commands="unpin"), UserHasPermissions(["can_pin_messages"]),
                               BotHasPermissions(["can_pin_messages"]), F.reply_to_message,
                               ~(F.chat.type == ChatType.PRIVATE)]],
-        [telegram_unpinall_cmd, [Command(commands="unpin_all"), IsAdminFilter(True, False),
-                                 BotHasPermissions(["can_pin_messages"]), F.reply_to_message.text,
+        [telegram_unpinall_cmd, [Command(commands="unpin_all"), IsAdminFilter(True, True),
+                                 BotHasPermissions(["can_pin_messages"]),
                                  ~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name)]],
         [telegram_help_pin_cmd, [Command(commands="pin"), UserHasPermissions(["can_pin_messages"]),
                                  BotHasPermissions(["can_pin_messages"]), ~(F.chat.type == ChatType.PRIVATE)]],
