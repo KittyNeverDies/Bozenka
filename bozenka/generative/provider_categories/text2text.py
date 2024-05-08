@@ -5,6 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from .basic_category import GenerativeCategory
 from ..generative_dict import generative_dict
+from ...instances.telegram.utils.simpler import AIGeneration
 
 
 class Text2Text(CallbackData, prefix='text2text'):
@@ -47,7 +48,8 @@ class Text2TextCategory(GenerativeCategory):
         :param state: FSMContext aiogram object
         :return: None
         """
-        if (await state.get_state()) is not None:
+        status = await state.get_state()
+        if status is not None and status is not AIGeneration.selection:
             await call.answer("Закончите предыдущй диалог / генерацию изображений для того, чтобы продолжить", show_alert=True)
             return
 
@@ -57,6 +59,7 @@ class Text2TextCategory(GenerativeCategory):
             kb.row(InlineKeyboardButton(text=i,
                                         callback_data=Text2Text(category_name=i,
                                                                 user_id=call.from_user.id).pack()))
+        kb.row(InlineKeyboardButton(text="Вернуться 🔙", callback_data="back"))
 
         await call.message.edit_text(
             f"Чатбот ИИ\n\nДиалог с искуственным интелектом / нейросетью\nВыберите библиотеку или API, чтобы продолжить:",

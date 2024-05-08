@@ -13,6 +13,7 @@ class ChatInformation(BasicFeature):
     (Private, public, etc)
     """
 
+    @staticmethod
     async def telegram_basic_chat_info_handler(msg: Message) -> None:
         """
         Shows information about chat by command `/info`

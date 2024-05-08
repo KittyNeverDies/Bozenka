@@ -32,7 +32,7 @@ class Welcome(BasicFeature):
                 logging.log(msg=f"Saing welcome for user_id={new.id}, chat_id={msg.chat.id}",
                             level=logging.INFO)
                 await msg.answer(
-                    f"Пользователь {new.mention_html()} пишел в группу, благодаря {msg.from_user.mention_html()}👋",
+                    f"Пользователь {new.mention_html()} пришел в группу, благодаря {msg.from_user.mention_html()}👋",
                 )
                 await msg.delete()
 
@@ -77,7 +77,8 @@ class Welcome(BasicFeature):
     telegram_setting_in_list = True
     telegram_setting_name = "Приветсвенные сообщения 👋"
     telegram_setting_description = "<b>Приветсвенные сообщения 👋</b>" \
-                                   "\nПриветсвенные сообщения новым и ушедшим пользователям.",
+                                   "\nПриветсвенные сообщения новым и ушедшим пользователям.\nВсе новые сообщения входе и выходе из группы будут удалятся и заменятся на сообщение от бота\n" \
+                                   "Требуется права на удаление сообщений."
     telegram_cmd_avaible = False  # Is a feature have a commands
     telegram_message_handlers = [
         [telegram_owner_welcome, [F.content_type == ContentType.NEW_CHAT_MEMBERS, IsBotJoined(True)]],

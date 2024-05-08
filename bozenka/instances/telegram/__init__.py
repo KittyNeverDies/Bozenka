@@ -27,6 +27,8 @@ async def register_all_features(list_of_features: list, dispatcher: Dispatcher, 
                 cmd_list.append(BotCommand(command=command, description=description))
 
         for message_handler in feature.telegram_message_handlers:
+            logging.log(msg=f"{feature}", level=logging.INFO)
+            logging.log(msg=f"{message_handler}", level=logging.INFO)
             dispatcher.message.register(message_handler[0], *message_handler[1])
 
         for callback_query_handler in feature.telegram_callback_handlers:

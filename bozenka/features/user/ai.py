@@ -52,6 +52,16 @@ class AiFeature(BasicFeature):
         }, [msg, state, message_queue]))
 
     @staticmethod
+    async def telegram_answering_handler(msg: Message) -> None:
+        """
+        Working if user send request while we are already answering his question
+        :param msg: Message telegram object
+        :return: None
+        """
+        await msg.reply("<b>Не так быстро </b>✋\n\nМы уже генерируем ответ на ваш запрос.\n"
+                        "Пожалуйста, подождите пока мы ответим на предыдущий ваш запрос, перед тем как задать новый")
+
+    @staticmethod
     async def cancel_telegram_handler(msg: Message, state: FSMContext) -> None:
         """
         Cancel generation by generative AI
@@ -100,14 +110,16 @@ class AiFeature(BasicFeature):
     telegram_setting_name = "Искуственный Интелект 🤖"
     current_comands = ""
     for i in commands:
-        current_comands += f"{i.command} - {i.description}\n"
+        current_comands += f"/{i.command} - {i.description}\n"
     telegram_setting_description = "<b>Приветсвенные сообщения 🤖</b>" \
                                    "\nИскуственный интелект, для работы с текстом и создания изображений.\n" \
-                                   f"Текущие команды, доступные для использования:<pre>{current_comands}</pre>",
+                                   f"Текущие команды, доступные для использования:<pre>{current_comands}</pre>"
     telegram_cmd_avaible = False  # Is a feature have a commands
     telegram_message_handlers = [
-        [telegram_stop_dialog_handler, [Command('cancel')]],
+        [cancel_telegram_handler, [Command('cancel')]],
         [telegram_ready_to_answer_hanlder, [F.chat.type == ChatType.PRIVATE, AIGeneration.ready_to_answer]],
-        [telegram_ready_to_answer_hanlder, [IsSettingEnabled(telegram_db_name), AIGeneration.ready_to_answer]],
+        [telegram_ready_to_answer_hanlder, [~(F.chat.type == ChatType.PRIVATE), IsSettingEnabled(telegram_db_name), AIGeneration.ready_to_answer]],
     ]
-    telegram_callback_handlers = []
+    telegram_callback_handlers = [
+        [telegram_stop_dialog_handler, [GptStop.filter()]]
+    ]

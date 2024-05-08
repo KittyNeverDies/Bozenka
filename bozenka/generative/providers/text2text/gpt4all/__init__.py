@@ -38,7 +38,8 @@ def check(model_filename: str) -> bool:
     :param model_filename: File name of gpt4all model
     :return: Does it exist
     """
-    print(os.path.exists("models\\" + model_filename))
+    logging.log(msg=f'Model with name {model_filename} exists?', level=logging.INFO)
+    logging.log(msg=f'Exists - {os.path.exists(model_path + model_filename)}', level=logging.INFO)
     return os.path.exists("models\\" + model_filename)
 
 
@@ -123,9 +124,15 @@ class Gpt4All(BasicAiGenerativeProvider):
             # Setting Gpt4All model
             model = GPT4All(model_name=models[data["model"]]["filename"],
                             model_path=model_path,
-                            allow_download=True)
+                            allow_download=True,
+                            device="gpu")
             # Setting our chat session if exist
-            model.current_chat_session = [] if not data.get("chat_history") else data["chat_history"]
+            """
+                    model.
+            model.current_chat_session = []
+            model.current_chat_session = 
+            """
+
             # Generating answer
             with model.chat_session():
                 answer = model.generate(msg.text)
@@ -133,7 +140,7 @@ class Gpt4All(BasicAiGenerativeProvider):
 
         except Exception as S:
             answer = "Простите, произошла ошибка 😔\nЕсли это продолжается, пожалуйста используйте /cancel или кнокпу под сообщением."
-            logging.log(msg=f"Get an exception for generating answer={S}",
+            logging.log(msg=f"Get an exception for generating answer by Gpt4All ={S}",
                         level=logging.ERROR)
         finally:
             await main_msg.edit_text(answer, reply_markup=text_response_keyboard(user_id=msg.from_user.id))

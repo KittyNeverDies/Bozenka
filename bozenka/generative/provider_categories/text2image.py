@@ -49,12 +49,11 @@ class Text2ImageCategory(GenerativeCategory):
         :param state: FSMContext telegram object
         :return: None
         """
-        if await state.get_state() is not None:
+        status = await state.get_state()
+        if status is not None and status is not AIGeneration.selection:
             await call.answer("Закончите предыдущй диалог / генерацию изображений для того, чтобы продолжить",
                               show_alert=True)
             return
-
-        await state.set_state(AIGeneration.selection)
 
         kb = InlineKeyboardBuilder()
 
@@ -62,6 +61,7 @@ class Text2ImageCategory(GenerativeCategory):
             kb.row(InlineKeyboardButton(text=i,
                                         callback_data=Text2Image(category_name=i,
                                                                  user_id=call.from_user.id).pack()))
+        kb.row(InlineKeyboardButton(text="Вернуться 🔙", callback_data="back"))
 
         await call.message.edit_text(
             f"Генерация изобразений 🖼\n\nГенерация изображения с помощью искуственного интелекта\nВыберите библиотеку или API, чтобы продолжить:",

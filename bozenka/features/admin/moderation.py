@@ -85,6 +85,7 @@ class Moderation(BasicFeature):
     All staff related to it will be here
     """
 
+    @staticmethod
     async def telegram_ban_callback_handler(call: CallbackQuery, callback_data: BanData,
                                             session_maker: async_sessionmaker) -> None:
         """
@@ -125,6 +126,7 @@ class Moderation(BasicFeature):
 
         logging.log(msg=f"Banned user @{banned_user.user.full_name} user_id=f{banned_user.user.id}", level=logging.INFO)
 
+    @staticmethod
     async def telegram_unban_callback_handler(call: CallbackQuery, callback_data: UnbanData,
                                               session_maker: async_sessionmaker) -> None:
         """
@@ -164,6 +166,7 @@ class Moderation(BasicFeature):
         logging.log(msg=f"Unbanned user @{unbanned_user.user.full_name} user_id=f{unbanned_user.user.id}",
                     level=logging.INFO)
 
+    @staticmethod
     async def telegram_ban_cmd_handler(msg: Message, command: CommandObject, session_maker: async_sessionmaker) -> None:
         """
         /ban command function, supports time and reasons.
@@ -246,6 +249,7 @@ class Moderation(BasicFeature):
                                                 f"<code>{msg.chat.title}</code>.\n",
                                            reply_markup=delete_keyboard(admin_id=banned_user.user.id))
 
+    @staticmethod
     async def telegram_unban_cmd_handler(msg: Message, command: CommandObject,
                                          session_maker: async_sessionmaker) -> None:
         """
@@ -309,6 +313,7 @@ class Moderation(BasicFeature):
                     reply_markup=delete_keyboard(admin_id=unbanned_user.user.id)
                 )
 
+    @staticmethod
     async def telegram_mute_callback_handler(call: CallbackQuery, callback_data: MuteData,
                                              session_maker: async_sessionmaker) -> None:
         """
@@ -348,6 +353,7 @@ class Moderation(BasicFeature):
 
         logging.log(msg=f"Muted user @{muted_user.user.full_name} user_id=f{muted_user.user.id}", level=logging.INFO)
 
+    @staticmethod
     async def telegram_unmute_callback_handler(call: CallbackQuery, callback_data: UnmuteData,
                                                session_maker: async_sessionmaker) -> None:
         """
@@ -387,6 +393,7 @@ class Moderation(BasicFeature):
         logging.log(msg=f"Unbanned user @{unmuted_user.user.full_name} user_id=f{unmuted_user.user.id}",
                     level=logging.INFO)
 
+    @staticmethod
     async def telegram_mute_cmd_handler(msg: Message, command: CommandObject,
                                         session_maker: async_sessionmaker) -> None:
         """
@@ -472,6 +479,7 @@ class Moderation(BasicFeature):
                          f"сообщения {msg.reply_to_message.from_user.mention_html('вам')} в чате {msg.chat.title}.\n",
                     reply_markup=delete_keyboard(admin_id=mute_user.user.id))
 
+    @staticmethod
     async def telegram_unmute_cmd_handler(msg: Message, session_maker: async_sessionmaker) -> None:
         """
         Handler of command /unmute
@@ -507,6 +515,7 @@ class Moderation(BasicFeature):
 
     # Help moderation telegram
     # Code part
+    @staticmethod
     async def telegram_help_ban_handler(msg: Message) -> None:
         """
         Shows help message for /ban
@@ -518,6 +527,7 @@ class Moderation(BasicFeature):
                          "Ответьте на сообщение, чтобы заблокировать пользователя",
                          reply_markup=delete_keyboard(msg.from_user.id))
 
+    @staticmethod
     async def telegram_help_unban_handler(msg: Message) -> None:
         """
         Shows help message for /unban
@@ -529,6 +539,7 @@ class Moderation(BasicFeature):
                          "Ответьте на сообщение, чтобы разблокировать пользователя",
                          reply_markup=delete_keyboard(msg.from_user.id))
 
+    @staticmethod
     async def telegram_help_mute_handler(msg: Message) -> None:
         """
         Shows help message for /mute
@@ -541,6 +552,7 @@ class Moderation(BasicFeature):
                          "Ответьте на сообщение, чтобы замутить пользователя",
                          reply_markup=delete_keyboard(msg.from_user.id))
 
+    @staticmethod
     async def telegram_help_unmute_handler(msg: Message) -> None:
         """
         Shows help message for /unmute

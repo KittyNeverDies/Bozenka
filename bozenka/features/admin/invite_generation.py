@@ -35,6 +35,7 @@ class Invite(BasicFeature):
     All codes will be here
     """
 
+    @staticmethod
     async def telegram_invite_command_handler(msg: Message) -> None:
         """
         Generating invite to group by /invite command
@@ -51,6 +52,7 @@ class Invite(BasicFeature):
                                                   chat_name=msg.chat.full_name)
         )
 
+    @staticmethod
     async def telegram_revoke_callback_handler(call: CallbackQuery, callback_data: RevokeCallbackData) -> None:
         """
         Handler of CallbackQuery, revokes link after pressing button

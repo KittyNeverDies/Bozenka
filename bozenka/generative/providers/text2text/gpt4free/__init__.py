@@ -13,7 +13,6 @@ from g4f.Provider import RetryProvider
 from bozenka.generative.providers.main import BasicAiGenerativeProvider
 from bozenka.instances.telegram.utils.callbacks_factory import GptStop, GptCategory, GptBackMenu, Gpt4FreeCategory, \
     Gpt4FreeProviderPage, Gpt4FreeProvsModelPage, Gpt4FreeProvider, Gpt4FreeModelPage, Gpt4FreeModel, Gpt4freeResult
-from bozenka.instances.telegram.utils.delete import delete_keyboard
 from bozenka.instances.telegram.utils.simpler import AIGeneration
 
 
@@ -120,7 +119,8 @@ def gpt4free_models_keyboard(user_id: int, page: int) -> InlineKeyboardMarkup:
     :return:
     """
     builder = InlineKeyboardBuilder()
-    full_list = g4f.ModelUtils.convert.keys()
+    from g4f.models import ModelUtils
+    full_list = ModelUtils.convert.keys()
     models = items_list_generator(page=page, list_of_items=full_list, count_of_items=4)
     pages = [len(full_list) // 4 - 1 if page - 1 == -1 else page - 1,
              0 if page + 1 >= len(full_list) // 4 else page + 1]
@@ -360,7 +360,9 @@ class Gpt4Free(BasicAiGenerativeProvider):
 
         await call.answer("Вы выбрали модели 🤖")
 
-        await call.message.edit_text("Выберите модель, с которой будете общаться 🤖",
+        await call.message.edit_text("Выберите пожалуйста модель нейронной сети 👾\n\n"
+                                     "Режим модели - мы будем использовать выбранную вами модель нейронной сети с помощью переченя из веб ресурсов, с помощью которых мы будем генерировать ответ\n"
+                                     "Учитывайте, что перечень из провайдеров (веб сервисов) может не работать!",
                                      reply_markup=gpt4free_models_keyboard(user_id=call.from_user.id, page=0))
 
     @staticmethod
@@ -385,7 +387,7 @@ class Gpt4Free(BasicAiGenerativeProvider):
                                      "Вы теперь можете спокойно вести диалог с нейронной сетью 🤖\n"
                                      f"Вы выбрали модель <b>{callback_data.model}</b> у библиотеки <b>Gpt4Free</b>👾\n"
                                      "Чтобы прекратить общение, используйте /cancel или кнопку под этим и следующим сообщением.",
-                                     reply_markup=text_response_keyboard(user__id=call.from_user.id))
+                                     reply_markup=text_response_keyboard(user_id=call.from_user.id))
 
     @staticmethod
     async def telegram_g4f_next_model_handler(call: CallbackQuery, callback_data: Gpt4FreeModelPage,
@@ -473,9 +475,8 @@ class Gpt4Free(BasicAiGenerativeProvider):
 
         await state.update_data(provider=callback_data.provider)
 
-        await call.message.edit_text("Выберите пожалуйста модель нейронной сети 👾\n\n"
-                                     "Режим модели - мы будем использовать выбранную вами модель нейронной сети с помощью переченя из веб ресурсов, с помощью которых мы будем генерировать ответ\n"
-                                     "Учитывайте, что перечень из провайдеров (веб сервисов) может не работать!",
+        await call.message.edit_text("Выберите пожалуйста модель нейронной сети, доступные у провайдера 👾\n\n"
+                                     "Учитывайте, что провайдер может не работать и быть не доступным!",
                                      reply_markup=gpt4free_models_by_provider_keyboard(
                                          user_id=callback_data.user_id,
                                          provider=callback_data.provider,

@@ -151,7 +151,7 @@ class Setup(BasicFeature):
     """
     # Telegram feature settings
     telegram_setting_in_list = False
-    telegram_commands = {"setup": 'Command to setup bot features in chat'}
+    telegram_commands = {"setup": 'Command to setup bot and edit features in chat'}
     telegram_cmd_avaible = True
     telegram_category = None
     telegram_message_handlers = [

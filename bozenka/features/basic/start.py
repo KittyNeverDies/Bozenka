@@ -5,7 +5,6 @@ from aiogram.types import InlineKeyboardMarkup, Message, CallbackQuery, InlineKe
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bozenka.features.main import BasicFeature
-from bozenka.generative import text2text_generative_libraries
 from bozenka.instances.customizable_features_list import categorized_customizable_features, text_transcription
 from bozenka.instances.telegram.utils.callbacks_factory import HelpCategory, HelpBackCategory, HelpFeature, HelpBack, \
     GptCategory
@@ -22,18 +21,6 @@ telegram_main_menu = InlineKeyboardMarkup(
         ]
     )
 
-def telegram_text_categories_keyboard(user_id: int) -> InlineKeyboardMarkup:
-    """
-    Create list keyboard list of gpt libraries, available in the bot
-    :param user_id: User_id of user
-    :return: InlineKeyboardMarkup
-    """
-    builder = InlineKeyboardBuilder()
-    for category in text2text_generative_libraries:
-        builder.row(InlineKeyboardButton(text=category,
-                                         callback_data=GptCategory(user_id=str(user_id), category=category).pack()))
-    return builder.as_markup()
-
 
 # Help related keyboards
 def main_help_keyboard() -> InlineKeyboardMarkup:
@@ -45,7 +32,7 @@ def main_help_keyboard() -> InlineKeyboardMarkup:
     for category in categorized_customizable_features:
         kb.row(InlineKeyboardButton(text=text_transcription[category],
                                     callback_data=HelpCategory(category_name=category).pack()))
-
+    kb.row(InlineKeyboardButton(text="Вернуться 🔙", callback_data="back"))
     return kb.as_markup()
 
 
@@ -122,8 +109,9 @@ class Start(BasicFeature):
         :param callback_data: HelpFeature object
         :return: None
         """
+        print(categorized_customizable_features[callback_data.feature_category][callback_data.feature_index].telegram_setting_description)
         await call.message.edit_text(
-            categorized_customizable_features[callback_data.feature_category][callback_data.feature_index]. telegram_setting_description,
+            categorized_customizable_features[callback_data.feature_category][callback_data.feature_index].telegram_setting_description,
             reply_markup=help_feature_keyboard(category=callback_data.feature_category))
         await call.answer()
 
@@ -197,7 +185,6 @@ class Start(BasicFeature):
         await call.message.edit_text(f"""
 {me.mention_html()} - это мультифункциональный (в будущем кроссплатформенный) бот.\n
 Он умеет работать с групповыми чатами и готовыми нейронными сетями для генерации текста и изображений.
-Бозенька разрабатывается командой, которая состоит на данный момент из одного человека.\n
 <b>Исходный код проекта</b>\n
 Исходный код находится под лицензией GPL-3.0, исходный код проекта можно посмотреть всегда <a href="https://github.com/kittyneverdies/bozenka/">здесь</a>
         """, reply_markup=kb, disable_web_page_preview=True)

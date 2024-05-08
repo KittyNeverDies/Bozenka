@@ -50,6 +50,7 @@ class Pins(BasicFeature):
     All staff related to it will be here
     """
 
+    @staticmethod
     async def telegram_pin_callback_handler(call: CallbackQuery, callback_data: PinMsg) -> None:
         """
         Query, what pins message
@@ -65,6 +66,7 @@ class Pins(BasicFeature):
                                      reply_markup=telegram_pin_msg_keyboard(user_id=call.from_user.id,
                                                                             msg_id=callback_data.msg_id))
 
+    @staticmethod
     async def telegram_unpin_callback_handler(call: CallbackQuery, callback_data: UnpinMsg) -> None:
         """
         Query, what unpins message
@@ -80,6 +82,7 @@ class Pins(BasicFeature):
                                      reply_markup=telegram_unpin_msg_keyboard(user_id=call.from_user.id,
                                                                               msg_id=callback_data.msg_id))
 
+    @staticmethod
     async def telegram_pin_cmd(msg: Message) -> None:
         """
         /pin command function, pins replied command
@@ -92,6 +95,7 @@ class Pins(BasicFeature):
                          reply_markup=telegram_pin_msg_keyboard(msg_id=msg.reply_to_message.message_id,
                                                                 user_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_unpin_cmd(msg: Message) -> None:
         """
         /unpin command function, unpins replied command
@@ -104,6 +108,7 @@ class Pins(BasicFeature):
                          reply_markup=telegram_unpin_msg_keyboard(msg_id=msg.reply_to_message.message_id,
                                                                   user_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_unpinall_cmd(msg: Message) -> None:
         """
         /unpin_all command function, unpins all messages in chat
@@ -115,6 +120,7 @@ class Pins(BasicFeature):
                          "Все сообщения были откреплены 📌",
                          reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_help_pin_cmd(msg: Message) -> None:
         """
         Shows help message for /mute
@@ -126,6 +132,7 @@ class Pins(BasicFeature):
                          "Ответьте на сообщение, чтобы закрепить сообщение",
                          reply_markup=delete_keyboard(msg.from_user.id))
 
+    @staticmethod
     async def telegramm_help_unpin_cmd(msg: Message) -> None:
         """
         Shows help message for /mute

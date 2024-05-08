@@ -1,10 +1,9 @@
 SQLAlchemy~=2.0.20
 alembic~=1.12.0
 nextcord~=2.6.0
-gpt4all~=2.0.2
+gpt4all~=2.5.1
 aiogram~=3.4.1
 varname==0.12.2
-g4f~=0.1.6.2
 requests~=2.31.0
 diffusers~=0.25.0
 torch~=2.1.2

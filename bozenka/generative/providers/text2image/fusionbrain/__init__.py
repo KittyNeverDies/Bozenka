@@ -153,7 +153,7 @@ class FusionBrainAPI:
                                        headers=self.AUTH_HEADERS) as response:
                     data = await response.json()
                     if data['status'] == 'DONE':
-                        logging.log("Generating of image done", level=logging.INFO)
+                        logging.log(msg="Generating of image done", level=logging.INFO)
                         return data['images']
 
             attempts -= 1
@@ -264,7 +264,7 @@ class FusionBrain(BasicAiGenerativeProvider):
         if call.from_user.id != callback_data.user_id or await state.get_state():
             return
 
-        await state.update_data(category="text2image", name="Kadinsky")
+        await state.update_data(category="text2image", name="FusionBrain")
         await state.set_state(AIGeneration.selection)
         await call.message.edit_text("Пожалуста, выберите размер изображения 🖼",
                                      reply_markup=telegram_image_resolution_keyboard(user_id=call.from_user.id,

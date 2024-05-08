@@ -31,7 +31,6 @@ async def register_all_categories(dp: Dispatcher, telegram_bot: Bot) -> None:
             dp.callback_query.register(telegram_handler[0], *telegram_handler[1])
 
     for category in categories:
-        print(category.category_command)
         dp.message.register(category.telegram_menu, Command(category.category_command))
         dp.callback_query.register(category.telegram_start_menu, F.data == category.start_menu_callback_data)
 

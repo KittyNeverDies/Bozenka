@@ -45,6 +45,7 @@ class Threads(BasicFeature):
     All staff related to it will be here
     """
 
+    @staticmethod
     async def telegram_close_topic_cmd_handler(msg: Message) -> None:
         """
         /close command function. Closing thread
@@ -67,6 +68,7 @@ class Threads(BasicFeature):
                 await msg.answer("Ошибка ❌\nДанное обсуждение уже закрыто.",
                                  reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_reopen_topic_cmd_handler(msg: Message) -> None:
         """
         /open command function. Opens thread
@@ -89,6 +91,7 @@ class Threads(BasicFeature):
                 await msg.answer("Ошибка ❌\nДанное обсуждение уже открыто.",
                                  reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_close_general_topic_cmd_handler(msg: Message) -> None:
         """
         /close_general command function. Closes general thread
@@ -104,6 +107,7 @@ class Threads(BasicFeature):
                 await msg.answer(f"Ошибка ❌\nДанное обсуждение уже закрыто.",
                                  reply_markup=telegram_close_thread_keyboard(user_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_reopen_general_topic_cmd(msg: Message) -> None:
         """
         /open_general command function. Opens general thread
@@ -119,6 +123,7 @@ class Threads(BasicFeature):
                 await msg.answer("Ошибка ❌\nДанное обсуждение уже открыто.",
                                  reply_markup=telegram_open_thread_keyboard(user_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_hide_general_topic_cmd_handler(msg: Message) -> None:
         """
         /hide_general command function. Hides general thread
@@ -134,6 +139,7 @@ class Threads(BasicFeature):
                 await msg.answer(f"Ошибка ❌\nОсновное обсуждение уже скрыто.",
                                  reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_unhide_general_topic_cmd(msg: Message) -> None:
         """
         /show_general command function. Shows back general thread.
@@ -149,6 +155,7 @@ class Threads(BasicFeature):
                 await msg.answer(f"Ошибка ❌\nДанное обсуждение уже публично.",
                                  reply_markup=delete_keyboard(admin_id=msg.from_user.id))
 
+    @staticmethod
     async def telegram_close_thread_callback_handler(call: CallbackQuery, callback_data: CloseThread) -> None:
         """
         Query, what close thread

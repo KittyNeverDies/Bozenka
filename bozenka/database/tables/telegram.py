@@ -52,7 +52,7 @@ class TelegramChatSettings(MainModel):
     hi_command = Column(Boolean, default=False, unique=False)
     invite_generator = Column(Boolean, default=True, unique=False)
     chat_info = Column(Boolean, default=True, unique=False)
-    results_in_dm = Column(Boolean, default=True, unique=False)
+    results_in_dm = Column(Boolean, default=False, unique=False)
     restrict_notification = Column(Boolean, default=True, unique=False)
 
     ai_working = Column(Boolean, default=False, unique=False)
