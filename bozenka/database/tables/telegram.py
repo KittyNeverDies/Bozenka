@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from bozenka.database.main import MainModel
 
 
-class Users(MainModel):
+class TelegramUsers(MainModel):
     """
     Telegram users table, contains:
 
@@ -30,7 +30,7 @@ class Users(MainModel):
         return f"<User:{self.user_id}:{self.chat_id}>"
 
 
-class ChatSettings(MainModel):
+class TelegramChatSettings(MainModel):
     """
     Telegram of chat settings table, contains:
 
@@ -52,11 +52,10 @@ class ChatSettings(MainModel):
     hi_command = Column(Boolean, default=False, unique=False)
     invite_generator = Column(Boolean, default=True, unique=False)
     chat_info = Column(Boolean, default=True, unique=False)
-    results_in_dm = Column(Boolean, default=True, unique=False)
+    results_in_dm = Column(Boolean, default=False, unique=False)
     restrict_notification = Column(Boolean, default=True, unique=False)
 
-    text_generation = Column(Boolean, default=False, unique=False)
-    image_generation = Column(Boolean, default=False, unique=False)
+    ai_working = Column(Boolean, default=False, unique=False)
     # openai_token = Column(Text)
 
 
@@ -69,8 +68,8 @@ async def get_chat_configuration(chat_id: int, session: async_sessionmaker):
     """
     async with session() as session:
         async with session.begin():
-            (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id)))
-            return (await session.execute(select(ChatSettings).where(ChatSettings.chat_id == chat_id))).one_or_none()
+            (await session.execute(select(TelegramChatSettings).where(TelegramChatSettings.chat_id == chat_id)))
+            return (await session.execute(select(TelegramChatSettings).where(TelegramChatSettings.chat_id == chat_id))).one_or_none()
 
 
 async def get_chat_config_value(chat_id: int, session: async_sessionmaker, setting) -> bool:
@@ -83,8 +82,25 @@ async def get_chat_config_value(chat_id: int, session: async_sessionmaker, setti
     """
     async with session() as session:
         async with session.begin():
-            rows = (await session.execute(select(setting.db_name).where(ChatSettings.chat_id == chat_id))).one()
-            return rows[0]
+            rows = (await session.execute(select(setting).where(TelegramChatSettings.chat_id == chat_id))).one_or_none()
+            if rows:
+                return rows[0]
+            return False
+
+
+async def is_chat_exist(chat_id: int, session: async_sessionmaker) -> bool:
+    """
+    Check if chat_id exist in database or not
+    :param chat_id: id of telegram chat
+    :param session: async sessionmaker
+    :return: Bool, does chat_id exist or not
+    """
+    async with session() as session:
+        async with session.begin():
+            rows = (await session.execute(select(TelegramChatSettings).where(TelegramChatSettings.chat_id == chat_id))).one_or_none()
+            if rows:
+                return True
+            return False
 
 
 async def get_user_info(user_id: int, chat_id: int, session: async_sessionmaker) -> Row[tuple[Any, ...] | Any] | None:
@@ -97,6 +113,6 @@ async def get_user_info(user_id: int, chat_id: int, session: async_sessionmaker)
     """
     async with session() as session:
         async with session.begin():
-            return (await session.execute(select(Users).where(Users.user_id == user_id and Users.chat_id == chat_id))).one_or_none()
+            return (await session.execute(select(TelegramUsers).where(TelegramUsers.user_id == user_id and TelegramUsers.chat_id == chat_id))).one_or_none()
 
 

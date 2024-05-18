@@ -1,6 +1,6 @@
 
 # List of text generative categories, what we support
-text_generative_categories = [
+text2text_generative_libraries = [
     "Gpt4Free",
     "Gpt4All",
 ]
@@ -16,5 +16,4 @@ image_generative_size = [
     "1024x576",
     "576x1024",
     "1024x680",
-    "680x1024"
-]
+    "680x1024"]

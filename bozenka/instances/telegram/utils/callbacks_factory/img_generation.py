@@ -9,10 +9,3 @@ class ImageGenerationCategory(CallbackData, prefix="igc"):
     category: str
 
 
-class ImageGeneration(CallbackData, prefix="igc"):
-    """
-    Callback with information related to image
-    """
-    user_id: int
-    category: str
-    size: str
