@@ -68,6 +68,7 @@ List of features in Telegram instance working right now
 - With our love & your support <3
 </details>
 
+Right now I am developing web part of the project. Checkout [telegram channel](https://t.me/bozodevelopment)
 
 ### Positive / Negative things in the project?
 
@@ -85,7 +86,7 @@ List of features in Telegram instance working right now
 No, at least not for now. There will be only beta tests, in which the bot will run on a server for one to two weeks. \
 You are need to launch it by yourself.
 
-### Installation
+### Installation for current state
 Bozenka was created using python, please, be sure you have installed it in your system with pip.
 
 1. Install all requirements for bozenka by writing this command: `pip install requirements.txt`
