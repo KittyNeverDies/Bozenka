@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if query %} 
+Bozenka: {{query}}
+{% else %}
+Bozenka: Communities
+{% endif %}
+{% endblock %}
+
+{% block style %}
+    .community-card {
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+      }
+      .community-card:hover {
+        transform: translateY(-5px);
+      }
+{% endblock %}
+
+{% block content %}
+<main class="responsive">
+    <div class="grid">
+      <!--List of Tags for filtering stuff :)-->
+      <div class="s3">
+
+        <form method="get" action="{% url 'index' %}">
+        <article>
+          <h6 class="padding">Filters</h6>
+          <button class="border small-round small padding" on_click="clearFilters()">
+            <i>close</i>
+            <span>Clear filters</span>
+          </button>
+          <button type="submit" class="border small-round small padding">
+            <i>check</i>
+            <span>Apply Filters</span>
+          </button>
+          <div class="padding" style="padding-top: 15px; padding-bottom: 15px;">
+            <b style="font-size: 16px; margin-bottom: 100px;">Community category</b>
+                {% for tag in tags %}
+                    <div class="max">
+                        <label class="checkbox">
+                            <input type="checkbox" name="tags" value="{{tag.name}}" {% if tag.name in selected_tags %}checked{% endif %} />
+                            <span>
+                                <i style="padding-right: 5px;">{{tag.icon}}</i> {{tag.name}}
+                            </span>
+                        </label>
+                    </div>
+                {% endfor %}
+          </div>
+          <div class="padding" style="padding-top: 15px; padding-bottom: 15px;">
+            <b style="font-size: 16px; padding-bottom: 35px;">Count of Members</b>
+            <label class="slider large">
+                <input type="range" value="25">
+                <input type="range" value="150">
+                <span></span>
+                <div class="tooltip"></div>
+                <div class="tooltip"></div>
+            </label>
+          </div>
+          <div class="padding" style="padding-top: 15px; padding-bottom: 15px;">
+            <b style="font-size: 16px; padding-bottom: 35px;">Members Growth</b>
+            <label class="slider large">
+                <input type="range" value="25">
+                <input type="range" value="150">
+                <span></span>
+                <div class="tooltip"></div>
+                <div class="tooltip"></div>
+            </label>
+          </div>
+        </article>
+      </div>
+
+      <div class="s8">
+        <!-- Search bar :) -->
+          <nav class="no-space padding">
+            <div style="flex: auto;" class="field large border fill left-round">
+              <input type="text" name="q" placeholder="Write to search" id="search-input" {% if query %} value="{{query}}" {% endif %}/>
+            </div>
+            <button type="submit" class="border right-round extra fill">
+              <i>search</i>
+              <span>Search</span>
+            </button>
+          </nav>
+        </form>
+
+        <div id="community-list">
+          <!-- Community example, on click should open community page-->
+            {% if communities_list %}
+            <ul>
+            {% for community in communities_list %}
+             <article class="community-card">
+                <a class="row padding">
+                  <img class="circle" src="{{community.icon.url}}" alt="{{community.name}}"/>
+                  <div class="max">
+                    <h5>{{community.name}}</h5><i>person</i>{{community.members_count|stringformat:"d"}} members <i>sdk</i>Created at {{community.creation_date}}
+                    <div>{{community.short_description}}</div>
+                  </div>
+                </a>
+                <div>
+                    <!-- List of tags for community -->
+                    {% for tag in community.tags.all %}
+                    <a class="chip fill"><i style="padding-right: 5px;">{{tag.icon}}</i>{{tag.name}}</a>
+                    {% endfor %}
+                </div>
+             </article>
+            {% endfor %}
+            </ul>
+            {% else %}
+            <article>
+                <h5>Sorry...</h5>
+                <div>There no communties, that met your requirements</div>
+                <button class="small-round fill small">
+                  <i>close</i>
+                  <span>Clear filters</span>
+                </button>
+
+            </article>
+            {% endif %}
+
+      </div>
+    </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block js %}
+  function clearFilters() {
+    var checkboxes = document.getElementsByName('tags');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = false;
+    }
+    document.forms[0].submit();
+}
+
+{% endblock %}
+

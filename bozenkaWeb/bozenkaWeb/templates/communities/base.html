@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!---                                                                     
+  All head content should be here                                                                  
+  -->
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/beercss@3.5.6/dist/cdn/beer.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.5.6/dist/cdn/beer.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.0/dist/cdn/material-dynamic-colors.min.js"></script>
+  <script>
+    async function loadColorTheme() {
+        // Changing theme
+        let theme = await ui("theme", "#0080FF");
+    }     
+  </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+  * {
+    font-family: "Montserrat", sans-serif;
+    transition: all 0.2s ease;
+
+  }
+  .chip.fill {
+    transition: all 0.3s ease;
+  }
+  .checkbox{
+    transition: all 0.3s ease;
+  }
+
+  .page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #fff; /* or any other background color you prefer */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* make sure it's on top of everything */
+  }
+
+  .community-card {
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+  }
+  .community-card:hover {
+    transform: translateY(-5px);
+  }
+
+
+  .page-loader.animate-out {  
+    animation: fadeOut 0.5s forwards;
+  }
+
+  @keyframes fadeOut {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+</style>
+  <link rel="icon" href="assets/logo.png"/>
+</head>
+<body onload="loadColorTheme()">
+  <div class="page-loader">
+    <progress class="circle"></progress>
+  </div>
+  <!-- Navigation bar at top -->
+  <header>
+    <nav>
+      <h5 class="max" onclick="transitionToPage('/');">Bozenka</h5>
+      <button class="circle transparent" onclick="transitionToPage('account/auth');">
+        <i>login</i>
+        <div class="tooltip bottom no-space">Autherization</div>
+      </button>
+      <button class="circle transparent">
+        <i>group</i>
+        <div class="tooltip bottom no-space">Communities</div>
+      </button>
+      <label class="switch icon">
+        <input type="checkbox" id="theme-switch" onchange="toggleTheme()"/>
+        <span>
+          <i id="theme-icon">light_mode</i>
+        </span>
+      </label>
+    </nav>
+  </header>
+    {% block content %}
+    {% endblock %}
+</body>
+<script>
+    // Theme toggling function
+    function toggleTheme() {
+      // Changing theme ;)
+      let newMode = document.getElementById("theme-switch").checked ? "dark" : "light";
+      ui("mode", newMode);
+
+      let themeIcon = document.getElementById("theme-icon");
+      themeIcon.textContent = newMode == "dark" ? "dark_mode" : "light_mode";
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('theme-switch').addEventListener('change', toggleTheme);
+    });
+    async function onPageLoad() {
+
+      // Fading out animation :)
+      const pageLoader = document.querySelector('.page-loader');
+      pageLoader.classList.add('animate-out');
+      
+      // Changing color theme
+      let theme = await ui("theme", "#0080FF");
+      let is_dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.getElementById('theme-switch').checked = is_dark  ? true : false;
+      document.getElementById("theme-icon").textContent = is_dark ? "dark_mode" : "light_mode";
+      ui("mode", is_dark ? "dark" : 'light')
+
+    }
+
+    // Call changeColorTheme when the page loads
+    window.onload = onPageLoad;
+
+    window.transitionToPage = function(href) {
+      document.querySelector('body').style.opacity = 0
+      setTimeout(function() {
+          window.location.href = href
+      }, 500)
+  }
+
+    document.addEventListener('DOMContentLoaded', function(event) {
+        document.querySelector('body').style.opacity = 1
+    })
+    // Call changeColorTheme when the page loads
+    window.onload = onPageLoad;
+</script>
+</html>

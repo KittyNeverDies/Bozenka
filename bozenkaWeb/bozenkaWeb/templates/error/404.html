@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bozenka: Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bozenka: Manage Your Community Across Platforms. Streamline management on Discord, Telegram, and VK.">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/beercss@3.5.6/dist/cdn/beer.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.5.6/dist/cdn/beer.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.0/dist/cdn/material-dynamic-colors.min.js"></script>
+  <link rel="icon" href="assets/logo.png"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap');
+    * {
+      font-family: "Montserrat", sans-serif;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    .chip.fill, .checkbox {
+      transition: all 0.3s ease;
+    }
+    .page-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .community-card {
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+    .community-card:hover {
+      transform: translateY(-5px);
+    }
+    .page-loader.animate-out {
+      animation: fadeOut 0.5s forwards;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    .hero-section {
+      padding: 80px 0;
+      text-align: center;
+      background-color: var(--background);
+    }
+    .features-section {
+      padding: 60px 0;
+    }
+    .feature-card {
+      height: 100%;
+      padding: 20px;
+      transition: transform 0.3s ease;
+      background-color: var(--surface-container-highest);
+      text-align: center;
+      border-radius: 10px;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    .cta-section {
+      padding: 80px 0;
+      text-align: center;
+    }
+    body::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    body::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 4px;
+    }
+    body::-webkit-scrollbar-thumb:hover {
+      background-color: #aaa;
+    }
+    body::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    header nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-shadow: var(--shadow);
+    }
+    header nav h5 {
+      margin: 0;
+    }
+    header nav button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .col {
+      flex: 1;
+      min-width: 280px;
+    }
+    .center-align {
+      text-align: center;
+    }
+    .large {
+      font-size: 1.2em;
+    }
+    button {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition:`` background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+    footer {
+      padding: 20px 0;
+      background-color: var(--surface-container);
+      color: var(--on-surface);
+    }
+  </style>
+</head>
+<body onload="loadColorTheme()" class="scroll">
+  <div class="page-loader">
+    <progress class="circle"></progress>
+  </div>
+
+  <!-- Navigation bar at top -->
+  <header class="fixed">
+    <nav>
+      <h5 class="max">Bozenka</h5>
+      <button class="circle transparent">
+        <i>login</i>
+        <div class="tooltip bottom no-space">Autherization</div>
+      </button>
+      <button class="circle transparent">
+        <i>group</i>
+        <div class="tooltip bottom no-space">Communities</div>
+      </button>
+      <label class="switch icon">
+        <input type="checkbox" id="theme-switch" onchange="toggleTheme()"/>
+        <span>
+          <i id="theme-icon">light_mode</i>
+        </span>
+      </label>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero-section">
+      <div class="container">
+        <h1 style="font-size:90pt;" class="center-align">(>_<)</h1>
+        <h1 class="center-align">Oops, 404 error</h1>
+        <p class="large">Page, what you are looking for doesn't exist.</p>
+        <button class="large small-round" onclick="transitionToPage('/')">
+          <i>arrow_back</i>
+          <span>Back to home page.</span>
+        </button>
+      </div>
+    </section>
+
+  <footer class="center-align">
+    <p>&copy; 2024 Bozenka. All rights reserved.</p>
+    <nav class="center-align">
+      <a href="#privacy-policy">Privacy Policy</a>
+      <a href="#terms-of-service">Terms of Service</a>
+      <a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer">Source Code</a>
+    </nav>
+  </footer>
+  </main>
+  <script>
+    // Theme toggling function
+    function toggleTheme() {
+      let newMode = document.getElementById("theme-switch").checked ? "dark" : "light";
+      ui("mode", newMode);
+
+      let themeIcon = document.getElementById("theme-icon");
+      themeIcon.textContent = newMode === "dark" ? "dark_mode" : "light_mode";
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('theme-switch').addEventListener('change', toggleTheme);
+    });
+
+    async function onPageLoad() {
+      // Fading out animation
+      const pageLoader = document.querySelector('.page-loader');
+      pageLoader.classList.add('animate-out');
+
+      // Changing color theme
+      let theme = await ui("theme", "#0080FF");
+      let is_dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.getElementById('theme-switch').checked = is_dark ? true : false;
+      document.getElementById("theme-icon").textContent = is_dark ? "dark_mode" : "light_mode";
+      ui("mode", is_dark ? "dark" : 'light');
+    }
+
+    window.transitionToPage = function(href) {
+      document.querySelector('body').style.opacity = 0
+      setTimeout(function() {
+          window.location.href = href
+      }, 500)
+  }
+
+    document.addEventListener('DOMContentLoaded', function(event) {
+        document.querySelector('body').style.opacity = 1
+    })
+
+    // Call changeColorTheme when the page loads
+    window.onload = onPageLoad;
+  </script>
+</body>
+</html>

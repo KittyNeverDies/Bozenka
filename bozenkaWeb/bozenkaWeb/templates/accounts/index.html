@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Bozenka: Authorization
+{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+{% block content %}
+<main class="responsive">
+    <main class="absolute center">
+    <article>
+    
+        <div class="tabs center-align min">
+          <!--
+            List of tabs.
+            Login &
+          -->
+          <a class="active vertical" data-ui="#tab1">
+            <i>login</i>
+            <span>Login</span>
+          </a>
+          <a class="vertical" data-ui="#tab2">
+            <i>person_add</i>
+            <span>Register</span>
+          </a>
+       </div>
+        <!--
+          Tabs content.
+          Login & Register
+        -->
+        <div class="page padding active" id="tab1">
+          <form method="post">
+            {% csrf_token %}  
+            <div class="field label prefix border fill medium-divider">
+                <i>person</i>
+                <input type="text" name="username" maxlength="65" required="" id="id_username">
+                <label>Username</label>
+            </div>
+            <div class="field label prefix border fill medium-divider">
+                <i>key</i>
+                <input type="password" name="password" maxlength="65" required="">
+                <label>Password</label>
+            </div>
+            <button class="small-round fill" type="submit">
+                <i>login</i>
+                <span>Login</span>
+            </button>
+          </form>
+        </div>
+        <div class="page padding" id="tab2">
+          <form method="post">
+            {% csrf_token %}
+            <div class="field label prefix border fill medium-divider">
+              <i>person</i>
+              <input type="text" name="username" maxlength="150" required="">
+              <label>Your Login</label>
+            </div>
+            <div class="field label prefix border fill medium-divider">
+              <i>mail</i>
+              <input type="email" name="email" maxlength="254">
+              <label>Email</label>
+            </div>
+            <div class="field label prefix border fill medium-divider">
+              <i>key</i>
+              <input type="password" name="password1" autocomplete="new-password" required="">
+              <label>Password</label>
+            </div>
+            <div class="field label prefix border fill medium-divider">
+              <i>key</i>
+              <input type="password" name="password2" autocomplete="new-password" required="">
+              <label>Password</label>
+            </div>
+            <button class="small-round fill" type="submit">
+              <i>person_add</i>
+              <span>Register</span>
+            </button>
+          </form>
+        </div>
+      </article>
+    </main>
+</main>
+{% endblock %}
+
+{% block js %}
+  function clearFilters() {
+    var checkboxes = document.getElementsByName('tags');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = false;
+    }
+    document.forms[0].submit();
+}
+
+{% endblock %}
+

@@ -1,0 +1,26 @@
+<div class="auth-container">
+    <ul class="nav nav-tabs" id="authTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="authTabsContent">
+        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+            <form method="post">
+                {% csrf_token %}
+                {{ login_form.as_p }}
+                <button type="submit" name="login">Login</button>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+            <form method="post">
+                {% csrf_token %}
+                {{ register_form.as_p }}
+                <button type="submit" name="register">Register</button>
+            </form>
+        </div>
+    </div>
+</div>

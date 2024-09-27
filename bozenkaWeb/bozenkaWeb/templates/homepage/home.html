@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Bozenka: Home
+{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+{% block content %}
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1>Manage Your Community Across Platforms</h1>
+        <p class="large">Streamline your community management on Discord, Telegram, and VK with Bozenka project.</p>
+        <button class="large small-round" onclick="scrollToElement()">
+          <i>keyboard_double_arrow_down</i>
+          <span>Get Started</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="container">
+        <h2 class="center-align" id="info">Key Features</h2>
+        <div class="grid">
+          <div class="col s12 m4">
+            <div class="card feature-card">
+              <i class="extra">group</i>
+              <h3 class="center-align">Unified Management</h3>
+              <p>Manage all your communities from a single dashboard and don't care about different social networks.</p>
+            </div>
+          </div>
+          <div class="col s12 m4">
+            <div class="card feature-card">
+              <i class="extra">analytics</i>
+              <h3 class="center-align">Analytics</h3>
+              <p>Get insights into your community's engagement and growth without any problems and limits.</p>
+            </div>
+          </div>
+          <div class="col s12 m4">
+            <div class="card feature-card">
+              <i class="extra">auto_awesome</i>
+              <h3 class="center-align">Automation</h3>
+              <p>Automate repetitive tasks and moderation.</p>
+            </div>
+          </div>
+          <div class="col s12 m4">
+            <div class="card feature-card">
+              <i class="extra">code</i>
+              <h3 class="center-align">Open Source & Freedom</h3>
+              <p>Help in development, launch for yourself and understand how it works inside. All code is licensed under GPL-V3</p>
+            </div>
+          </div>
+          <div class="col s12 m4">
+            <div class="card feature-card">
+              <i class="extra">groups</i>
+              <h3 class="center-align">Socialization</h3>
+              <p>Connect with like-minded people and find a community that shares your interests.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <h2 class="center-align">Ready to Elevate Your Community Management?</h2>
+        <p class="large">Start your journey of nextgen community management now. Stay tuned for updates.</p>
+        <a href="https://t.me/bozodevelopment"><button class="large">Join our telegram channel</button></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="center-align">
+    <p>&copy; 2024 Bozenka. All rights reserved.</p>
+    <nav class="center-align">
+      <a href="#privacy-policy">Privacy Policy</a>
+      <a href="#terms-of-service">Terms of Service</a>
+      <a href="https://github.com/kittyneverdies/Bozenka" target="_blank" rel="noopener noreferrer">Source Code</a>
+    </nav>
+  </footer>
+{% endblock %}
+
+{% block js %}
+    function scrollToElement() {
+      document.getElementById("info").scrollIntoView({ behavior: 'smooth' });
+    }
+
+{% endblock %}
+
