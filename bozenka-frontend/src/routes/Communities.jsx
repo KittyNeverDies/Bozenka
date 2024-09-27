@@ -332,7 +332,7 @@ function CommunityCard() {
     // const { icon, name, small_description, id } = community;
 
     return (
-        <Card sx={{ width: '100%', mt: 1 }}>
+        <Card sx={{m: 1 }}>
             <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
             <Dropdown>
                 <MenuButton size='sm' variant='plain' sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
@@ -427,22 +427,39 @@ function CommunitiesSearch() {
                     
                     <Input
                         sx={{
-                            '&::before': {
-                                border: '1.5px solid var(--Input-focusedHighlight)',
-                                transform: 'scaleX(0)',
-                                left: '2.5px',
-                                right: '2.5px',
-                                bottom: 0,
-                                top: 'unset',
-                                transition: 'transform .15s cubic-bezier(0.1,0.9,0.2,1)',
-                                borderRadius: 0,
-                                borderBottomLeftRadius: '64px 20px',
-                                borderBottomRightRadius: '64px 20px',
+                            '--Input-focusedThickness': '1px',
+                            bgcolor: 'background.surface',
+                            borderRadius: 'lg',
+                            '&:hover': {
+                              bgcolor: 'background.level1',
+                              borderColor: 'primary.300',
                             },
-                            '&:focus-within::before': {
-                                transform: 'scaleX(1)',
+                            '&:focus-within': {
+                              borderColor: 'background.level2',
+                              bgcolor: 'background.level1',
                             },
-                        }}
+                            '&:focus': {
+                              outline: 'none',
+                            },
+                            mt: 1,
+                            mb: 1,
+                            py: 1.5,
+                            px: 2,
+                            fontSize: 'sm',
+                            fontWeight: 'md',
+                            border: '1px solid',
+                            borderColor: 'neutral.300',
+                            transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
+                            '&::placeholder': {
+                              color: 'neutral.500',
+                              fontStyle: 'italic',
+                            },
+                            '&:disabled': {
+                              bgcolor: 'neutral.100',
+                              color: 'neutral.400',
+                              cursor: 'not-allowed',
+                            },
+                          }}
                         placeholder='Search for communities...'
                         startDecorator={<SearchIcon />}
                         endDecorator={
