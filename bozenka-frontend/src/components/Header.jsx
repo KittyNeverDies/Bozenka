@@ -260,7 +260,7 @@ export default function JoyHeader() {
             borderColor: 'divider',
             position: 'absolute',
             bottom: 0,
-            width: '-webkit-fill'
+            width: '100%'
           }}
         >
           <Avatar size="md" />
