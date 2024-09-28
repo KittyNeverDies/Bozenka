@@ -119,13 +119,8 @@ const RegisterPage = () => {
             sx={{
               width: '100%',
               mt: 2,
-              backgroundColor: '#1976d2',
-              color: '#fff',
               fontWeight: 'bold',
               p: 1.5,
-              '&:hover': {
-                backgroundColor: '#1565c0',
-              },
               transition: 'background-color 0.3s ease',
             }}
           >
@@ -141,7 +136,6 @@ const RegisterPage = () => {
             to="/login"
             variant="outlined"
             sx={{
-              width: '100%',
               borderColor: '#1976d2',
               color: '#1976d2',
               fontWeight: 'bold',
@@ -152,7 +146,7 @@ const RegisterPage = () => {
               transition: 'background-color 0.3s ease',
             }}
           >
-            Login
+            Go to login page
           </Button>
         </Box>
       </Card>

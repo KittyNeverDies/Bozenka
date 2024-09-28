@@ -1,71 +1,156 @@
 import { Box, Button, Input, Typography, Card } from '@mui/joy';
-import Alert from '@mui/joy/Alert';
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Alert from '@mui/joy/Alert';
 
-function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+
+import MailRoundedIcon from '@mui/icons-material/MailRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
+import LockRoundedIcon from '@mui/icons-material/LockRounded';
+
+const LoginPage = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [alert, setAlert] = useState({ message: null, type: 'danger' });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (username === '' || password === '') {
-      setError('Please fill in all fields');
+    setAlert({ message: null, type: 'danger' });
+
+    const { username, email, password, confirmPassword } = formData;
+
+    if (!username || !email || !password || !confirmPassword) {
+      setAlert({ message: 'Please fill in all fields', type: 'danger' });
+    } else if (password !== confirmPassword) {
+      setAlert({ message: 'Passwords do not match', type: 'danger' });
     } else {
-      // Api soon.
+      setAlert({ message: 'Registration successful! Redirecting to dashboard...', type: 'success' });
+      setTimeout(() => {
+        // Implement redirect logic here
+      }, 2000);
     }
   };
 
-  return (
-    <Box sx={{ 
-        maxWidth: 400, 
-        mx: 'auto', 
-        p: 4, mt: 10, 
-        marginBottom: 30, 
-        textAlign: 'center' 
-    }}>
-      <Card sx={{
-        [`& ${inputClasses}`]: {
+  const inputStyles = {
+    width: '100%',
+    '--Input-focusedThickness': '1px',
+    bgcolor: 'background.surface',
+    borderRadius: 'lg',
+    '&:hover': {
+      bgcolor: 'background.level1',
+      borderColor: 'primary.300',
+    },
+    '&:focus-within': {
+      borderColor: 'background.level2',
+      bgcolor: 'background.level1',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+    mb: 2,
+    py: 1.5,
+    px: 2,
+    fontSize: 'sm',
+    fontWeight: 'md',
+    border: '1px solid',
+    borderColor: 'neutral.300',
+    transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
+    '&::placeholder': {
+      color: 'neutral.500',
+      fontStyle: 'italic',
+    },
+    '&:disabled': {
+      bgcolor: 'neutral.100',
+      color: 'neutral.400',
+      cursor: 'not-allowed',
+    },
+  };
 
-        }
-      }}>
-        <Typography variant="h2" level='title-lg'>
+  const inputFields = [
+    { name: 'email',  type: 'email', placeholder: 'Write your email', autoComplete: 'email', icon: <MailRoundedIcon/> },
+    { name: 'password', type: 'password', placeholder: 'Write your password', autoComplete: 'password', icon: <LockRoundedIcon/> }
+  ];
+
+  return (
+    <Box sx={{ maxWidth: 480, mx: 'auto', p: 4, mt: 4, mb: 15 }}>
+      {alert.message && (
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Alert color={alert.type} variant="soft" sx={{ width: '100%' }}>
+            {alert.message}
+          </Alert>
+        </Box>
+      )}
+      <Card sx={{ p: 4, backgroundColor: '#fff', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
+        <Typography variant="h2" level="h4" sx={{ fontWeight: 'bold', color: 'text.primary', fontSize: '1.75rem' }}>
           Login
         </Typography>
-        <form onSubmit={handleSubmit}>
-          <Input
-            placeholder="Username"
-            type="text"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Input
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Button variant="solid" type="submit">
+        <Typography sx={{ mb: 3, color: 'text.primary' }}>
+          Login into account here, to work with unified community management.
+
+        </Typography>
+        <form onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {inputFields.map((field) => (
+            <Input
+              key={field.name}
+              name={field.name}
+              type={field.type}
+              placeholder={field.placeholder}
+              value={formData[field.name]}
+              onChange={handleChange}
+              sx={inputStyles}
+              startDecorator={field.icon}
+              aria-label={`${field.name} input field`}
+              autoComplete={field.autoComplete}
+            />
+          ))}
+          <Button
+            variant="solid"
+            type="submit"
+            sx={{
+              width: '100%',
+              mt: 2,
+              fontWeight: 'bold',
+              p: 1.5,
+              transition: 'background-color 0.3s ease',
+            }}
+          >
             Login
           </Button>
-          
-          {error && (
-
-            <Alert color='danger' variant='soft' sx={{mt: 1, textAlign: 'center'}}>{error}</Alert>
-          )}
         </form>
-        <Box sx={{ textAlign: 'left', mt: 2 }}>
-          <Button component={Link} to="/register" variant="outlined">
-            Register
+        <Box sx={{ textAlign: 'center', mt: 3 }}>
+          <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+            Don't have a account?
+          </Typography>
+          <Button
+            component={Link}
+            to="/register"
+            variant="outlined"
+            sx={{
+              borderColor: '#1976d2',
+              color: '#1976d2',
+              fontWeight: 'bold',
+              
+              p: 1.5,
+              '&:hover': {
+                backgroundColor: '#e3f2fd',
+              },
+              transition: 'background-color 0.3s ease',
+            }}
+          >
+            Go to registration page
           </Button>
         </Box>
       </Card>
     </Box>
   );
-}
+};
 
 export default LoginPage;
+

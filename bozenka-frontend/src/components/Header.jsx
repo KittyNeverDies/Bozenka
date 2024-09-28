@@ -91,6 +91,7 @@ export default function JoyHeader() {
             transition: 'all 0.2s sizeIn'
           }}
         >
+        <Link to='/login'>
           <IconButton onClick={() => {}}
             sx={{
             transition: 'transform 0.2s ease, background-color 0.2s ease',
@@ -109,6 +110,7 @@ export default function JoyHeader() {
           variant="outlined">
             <LoginIcon />
           </IconButton>
+          </Link>
         </Tooltip>
         <Tooltip title="Communities"  variant="outlined" size="sm">
           <Link to='/communities'>
