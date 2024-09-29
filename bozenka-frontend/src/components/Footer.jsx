@@ -4,7 +4,13 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
 const Footer = () => {
   return (
-    <Box sx={{ py: 4, backgroundColor: 'neutral.outlined' }}>
+    <Box sx={{ 
+      py: 4, 
+      backgroundColor: 'background.surface',
+      borderTop: '1px solid', 
+      
+      borderColor: 'background.level2',
+    }}>
       <Container maxWidth="lg">
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>

@@ -13,6 +13,10 @@
     background-color: transparent;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--joy-palette-background-body);
     

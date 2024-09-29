@@ -1,3 +1,6 @@
+import { useRef } from 'react';
+import {Link} from 'react-router-dom';
+
 
 // MUI joy elements
 import Typography from '@mui/joy/Typography';
@@ -11,6 +14,8 @@ import GroupIcon from "@mui/icons-material/Group";
 import GroupsIcon from "@mui/icons-material/Groups";
 import CodeIcon from "@mui/icons-material/Code";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 
 
 
@@ -47,6 +52,12 @@ function HomePage(){
     Home page of bozenka.
     Should be placed in main :)
     */
+
+    
+    const KeyFeatures = useRef(null)
+
+    const scrollToFeatures = () => KeyFeatures.current.scrollIntoView()    
+
     const features = [
         {
             icon: <GroupIcon sx={{fontSize: 50}}/>,
@@ -106,8 +117,19 @@ function HomePage(){
                     <Button variant="soft" size="lg" sx={{
                         justifyContent: "center",
                         p: 2,
+                        transition: 'transform 0.2s ease, background-color 0.2s ease',
                         border: '1px',
-                    }}>
+                        '&:hover': {
+                            transform: 'scale(1.05)',
+                            bgcolor: 'primary.lightBg',
+                            borderRadius: '',
+                        },
+                        '&:active': {
+                            transform: 'scale(1.20)'
+                        }
+                    }} endDecorator={<KeyboardDoubleArrowDownRoundedIcon/>}
+                    onClick={scrollToFeatures}
+                    >
                         Get started
                     </Button>
                 </Box>
@@ -119,7 +141,7 @@ function HomePage(){
                 ml: 1,
                 mr: 1,
             }}>
-            <Typography level='h1' sx={{
+            <Typography level='h1' ref={KeyFeatures} sx={{
                 textAlign: "center",
                 paddingTop: 10,
                 paddingBottom: 4
@@ -140,7 +162,9 @@ function HomePage(){
             <Box sx={{
                 paddingTop: 18,
                 height: 500,
-
+                
+                backgroundImage: ({ palette }) =>
+                    `linear-gradient(to bottom, ${palette.background.body}, ${palette.background.level1})`,
                 paddingBottom: 3,
             }}>
                 <Typography level='h1' element="h1" sx={{
@@ -156,12 +180,24 @@ function HomePage(){
                     Start your journey of nextgen community management now. Stay tuned for updates.
                 </Typography>
                 <Box textAlign="center" sx={{p:5}}>
-                    <Button variant="soft" size="lg" sx={{
+                    <Link to="https://t.me/bozodevelopment/">
+                    <Button variant="soft" size="lg" endDecorator={<OpenInNewRoundedIcon/>} sx={{
                         justifyContent: "center",
-                        p: 2
+                        p: 2,
+                        
+                        transition: 'transform 0.2s ease, background-color 0.2s ease',
+                        '&:hover': {
+                            transform: 'scale(1.05)',
+                            bgcolor: 'primary.lightBg',
+                            borderRadius: '',
+                        },
+                        '&:active': {
+                            transform: 'scale(1.20)'
+                        }
                     }}>
                         Check out telegram channel
                     </Button>
+                    </Link>
                 </Box>
             </Box>
         </>

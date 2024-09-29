@@ -54,6 +54,7 @@ export default function JoyHeader() {
         p: 2,
         position: 'stinky',
         borderBottom: '1px solid',
+        backgroundColor: 'background.surface',
         borderColor: 'background.level2',
       }}
     >
