@@ -12,7 +12,7 @@ import Card from '@mui/joy/Card';
 import Chip from '@mui/joy/Chip';
 import Grid from '@mui/joy/Grid';
 import List from '@mui/joy/List';
-import ListItem from '@mui/joy/ListItem';
+import ListItem, {listItemClasses} from '@mui/joy/ListItem';
 import ListItemButton from '@mui/joy/ListItemButton';
 import ListItemContent from '@mui/joy/ListItemContent';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
@@ -33,6 +33,9 @@ import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PersonIcon from '@mui/icons-material/Person';
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded';
+import MultipleStopRoundedIcon from '@mui/icons-material/MultipleStopRounded';
+import FilterNoneRoundedIcon from '@mui/icons-material/FilterNoneRounded';
+import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
 function TabsSegmentedControls() {
   const [selectedTab, setSelectedTab] = React.useState(0);
@@ -301,13 +304,16 @@ function Community() {
                         </Chip>
                     </Grid>
                 </Card>
+                
                 <Card sx={{marginTop: 2}} size='sm'>
-                    <Typography level='title-lg' sx={{paddingLeft: 2, paddingTop: 2}}>
+                    <Typography level='title-lg' sx={{paddingLeft: 2, paddingTop: 2}}
+                      startDecorator={<GroupRoundedIcon/>}
+                    >
                         Links
                     </Typography>
                     <List>
                         <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm'}}>
+                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
                                 <ListItemDecorator>
                                 <OpenInNewIcon /></ListItemDecorator>
                                 <ListItemContent>Vkontakte</ListItemContent>
@@ -316,7 +322,7 @@ function Community() {
                         </ListItem>
                         
                         <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm'}}>
+                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
                                 <ListItemDecorator>
                                 <OpenInNewIcon /></ListItemDecorator>
                                 <ListItemContent>Discord</ListItemContent>
@@ -325,7 +331,42 @@ function Community() {
                         </ListItem>
                         
                         <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm'}}>
+                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                                <ListItemDecorator>
+                                <OpenInNewIcon /></ListItemDecorator>
+                                <ListItemContent>Telegram</ListItemContent>
+                                <KeyboardArrowRight />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                </Card>
+                
+                <Card sx={{marginTop: 2}} size='sm'>
+                    <Typography level='title-lg' startDecorator={<MultipleStopRoundedIcon/>} sx={{paddingLeft: 2, paddingTop: 2}}>
+                        Contacts
+                    </Typography>
+                    
+                    <List>
+                        <ListItem sx={{margin: 0.2}}>
+                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                                <ListItemDecorator>
+                                <OpenInNewIcon /></ListItemDecorator>
+                                <ListItemContent>Vkontakte</ListItemContent>
+                                <KeyboardArrowRight />
+                            </ListItemButton>
+                        </ListItem>
+                        
+                        <ListItem sx={{margin: 0.2}}>
+                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                                <ListItemDecorator>
+                                <OpenInNewIcon /></ListItemDecorator>
+                                <ListItemContent>Discord</ListItemContent>
+                                <KeyboardArrowRight />
+                            </ListItemButton>
+                        </ListItem>
+                        
+                        <ListItem sx={{margin: 0.2}}>
+                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
                                 <ListItemDecorator>
                                 <OpenInNewIcon /></ListItemDecorator>
                                 <ListItemContent>Telegram</ListItemContent>
