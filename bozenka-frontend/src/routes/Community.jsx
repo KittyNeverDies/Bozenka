@@ -35,6 +35,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded';
 import MultipleStopRoundedIcon from '@mui/icons-material/MultipleStopRounded';
 import FilterNoneRoundedIcon from '@mui/icons-material/FilterNoneRounded';
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
 function TabsSegmentedControls() {
@@ -48,6 +49,7 @@ function TabsSegmentedControls() {
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       date: '2022-01-01',
       category: 'Vk',
+      views: '1'
     },
     {
       title: 'Post 2',
@@ -55,6 +57,7 @@ function TabsSegmentedControls() {
       content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
       date: '2022-01-02',
       category: 'Telegram',
+      views: '10'
     },
     // Add more posts here...
   ];
@@ -187,8 +190,9 @@ function TabsSegmentedControls() {
             Knowledge Library
         </Tab>
       </TabList>
-      <Card sx={{marginTop: 2}}>
+      <Card sx={{marginTop: 2, paddingBottom: 6}}>
         <TabPanel value={0}>
+          {/* Description of community */}
           <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum suscipit repellat, architecto at dolore odio neque eos dolorum hic aliquam velit sapiente dignissimos molestiae pariatur ducimus! Soluta voluptate ad tenetur!</p>
 
           
@@ -198,37 +202,46 @@ function TabsSegmentedControls() {
           
           </TabPanel>
           <TabPanel value={2}>
-          <TabPanel value={2}>
-    <Grid container spacing={1}>
-      {posts.map((post, index) => (
-        <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-          <Card sx={{ height: '100%'}}>
+            <Typography level='h2' sx={{mb: 2}}>
+              Posts
+            </Typography>
+            <Grid container spacing={1}>
+              {posts.map((post, index) => (
+                <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                  <Card sx={{ height: '100%'}}>
             
-            <Typography level="title-lg" sx={{marginBottom: -1}}>
-              {post.title}
-            </Typography>
-            <Typography startDecorator={<PersonIcon/>} level="body-xs">
-              by {post.author}
-            </Typography>
-            <Typography level="body-sm">
-              {post.content}
-            </Typography>
-            <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                    <Typography level="title-lg" sx={{marginBottom: -1}}>
+                      {post.title}
+                    </Typography>
+                    <Typography startDecorator={<PersonIcon/>} level="body-xs">
+                      by {post.author}
+                    </Typography>
+                    <Typography level="body-sm">
+                      {post.content}
+                    </Typography>
+                    
+                    <Box>
+                      <Typography startDecorator={<CalendarMonthRoundedIcon/>} sx={{m: 0.2}} level="body-xs">
+                        Posted at {post.date}
+                      </Typography>
+                      <Chip variant="soft" startDecorator={<OpenInNewIcon/>} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
+                        {post.category}
+                      </Chip>
               
-              <Typography startDecorator={<CalendarMonthRoundedIcon/>} level="body-xs">
-                  Posted at {post.date}
-              </Typography>
-              <Chip variant="soft" startDecorator={<OpenInNewIcon/>} color="primary" size="md" sx={{borderRadius: 'sm'}}>
-                {post.category}
-              </Chip>
-            </Box>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
-</TabPanel>
+                      <Chip variant="soft" startDecorator={<VisibilityRoundedIcon/>} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
+                        {post.views} views
+                      </Chip>
+                    </Box>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
           </TabPanel>
           <TabPanel value={3}>
+          
+          <Typography level='h2' sx={{mb: 2}}>
+              Knowledge Library
+          </Typography>
           <AccordionGroup
                 color="neutral"
                 size="sm"
@@ -236,21 +249,20 @@ function TabsSegmentedControls() {
                 sx={{
                     borderRadius: 'md',
                     
-        [`& .${accordionClasses.root}`]: {
-            marginTop: '0.5rem',
-            transition: '0.2s ease',
-            '& button:not([aria-expanded="true"])': {
-              transition: '0.2s ease',
-              paddingBottom: '0.625rem',
-            },
-            '& button:hover': {
-              background: 'transparent',
-            },
-          }
+                    [`& .${accordionClasses.root}`]: {
+                      marginTop: '0.5rem',
+                      transition: '0.2s ease',
+                      '& button:not([aria-expanded="true"])': {
+                        transition: '0.2s ease',
+                        paddingBottom: '0.625rem',
+                      },
+                      '& button:hover': {
+                        background: 'transparent',
+                      },
+                    }
                 }}
                 variant="plain"
                 transition="0.2s">
-                  
                   <Accordion>
                     <AccordionSummary>
                         <Avatar color="primary">
