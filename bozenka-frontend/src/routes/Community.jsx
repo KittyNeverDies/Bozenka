@@ -41,6 +41,24 @@ function TabsSegmentedControls() {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
 
+  const posts = [
+    {
+      title: 'Post 1',
+      author: 'John Doe',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      date: '2022-01-01',
+      category: 'Vk',
+    },
+    {
+      title: 'Post 2',
+      author: 'Jane Doe',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      date: '2022-01-02',
+      category: 'Telegram',
+    },
+    // Add more posts here...
+  ];
+
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
@@ -180,7 +198,35 @@ function TabsSegmentedControls() {
           
           </TabPanel>
           <TabPanel value={2}>
-            Sorry for this joke. I'm sorry for this joke.
+          <TabPanel value={2}>
+    <Grid container spacing={1}>
+      {posts.map((post, index) => (
+        <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+          <Card sx={{ height: '100%'}}>
+            
+            <Typography level="title-lg" sx={{marginBottom: -1}}>
+              {post.title}
+            </Typography>
+            <Typography startDecorator={<PersonIcon/>} level="body-xs">
+              by {post.author}
+            </Typography>
+            <Typography level="body-sm">
+              {post.content}
+            </Typography>
+            <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+              
+              <Typography startDecorator={<CalendarMonthRoundedIcon/>} level="body-xs">
+                  Posted at {post.date}
+              </Typography>
+              <Chip variant="soft" startDecorator={<OpenInNewIcon/>} color="primary" size="md" sx={{borderRadius: 'sm'}}>
+                {post.category}
+              </Chip>
+            </Box>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
+</TabPanel>
           </TabPanel>
           <TabPanel value={3}>
           <AccordionGroup
