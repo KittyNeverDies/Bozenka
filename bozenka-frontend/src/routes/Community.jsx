@@ -319,7 +319,7 @@ function Community() {
                     </Box>
                 </Card>
                 <Card sx={{marginTop: 2}}>
-                    <Typography level='title-sm' 
+                    <Typography level='title-lg'
                         startDecorator={<LocalOfferRoundedIcon/>}>
                         Tags
                     </Typography>
@@ -327,24 +327,13 @@ function Community() {
                     <Grid>
                         <Chip variant="soft" color="primary" 
                             startDecorator={<CalendarMonthRoundedIcon/>} 
-                            sx={
-                                {
-                                    borderRadius: 'sm',
-                                    m: 0.5
-                                }
-                            }>
-                            BAY BLADE
+                            sx={{borderRadius: 'sm', m: 0.5}}>
+                            Tag 1
                         </Chip>
-                        
                         <Chip variant="soft" color="primary" 
                             startDecorator={<CalendarMonthRoundedIcon/>} 
-                            sx={
-                                {
-                                    borderRadius: 'sm',
-                                    m: 0.5
-                                }
-                            }>
-                            BAY BLADE
+                            sx={{borderRadius: 'sm', m: 0.5}}>
+                            Tag 2
                         </Chip>
                     </Grid>
                 </Card>
@@ -391,32 +380,31 @@ function Community() {
                     </Typography>
                     
                     <List>
-                        <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                                <ListItemDecorator>
-                                <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>Vkontakte</ListItemContent>
-                                <KeyboardArrowRight />
-                            </ListItemButton>
-                        </ListItem>
-                        
-                        <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                                <ListItemDecorator>
-                                <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>Discord</ListItemContent>
-                                <KeyboardArrowRight />
-                            </ListItemButton>
-                        </ListItem>
-                        
-                        <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                                <ListItemDecorator>
-                                <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>Telegram</ListItemContent>
-                                <KeyboardArrowRight />
-                            </ListItemButton>
-                        </ListItem>
+                      <ListItem sx={{margin: 0.2}}>
+                        <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                            <ListItemDecorator>
+                              <Avatar size="md" variant='outlined' />
+                            </ListItemDecorator>
+                            <ListItemContent sx={{ml: 1.5}}>
+                                <Typography level="title-sm">User1</Typography>
+                                <Typography level="body-sm">Owner</Typography>
+                            </ListItemContent>
+                            <KeyboardArrowRight />
+                          </ListItemButton>
+                      </ListItem>
+                      
+                      <ListItem sx={{margin: 0.2}}>
+                        <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                            <ListItemDecorator>
+                              <Avatar size="md" variant='outlined' />
+                            </ListItemDecorator>
+                            <ListItemContent sx={{ml: 1.5}}>
+                                <Typography level="title-sm">User2</Typography>
+                                <Typography level="body-sm">Administration</Typography>
+                            </ListItemContent>
+                            <KeyboardArrowRight />
+                          </ListItemButton>
+                      </ListItem>
                     </List>
                 </Card>
             </Stack>
