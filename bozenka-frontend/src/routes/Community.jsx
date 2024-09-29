@@ -180,9 +180,7 @@ function TabsSegmentedControls() {
           
           </TabPanel>
           <TabPanel value={2}>
-            <Grid>
-              <Card size={4}>OBAMA NIGGER DEVELOPER OF HUMSTER COMBAT IS KIDDNAPED FROM AFRICA !!!!</Card>
-            </Grid>
+            Sorry for this joke. I'm sorry for this joke.
           </TabPanel>
           <TabPanel value={3}>
           <AccordionGroup

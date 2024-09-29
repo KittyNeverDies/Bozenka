@@ -466,7 +466,14 @@ function CommunitiesSearch() {
                         <>
                             
                             {searchTerm && (
-                                <Button variant='plain' startDecorator={<CancelIcon />} onClick={handleClear}>
+                                <Button variant='soft' 
+                                    sx={{borderRadius: 'sm', 
+                                        px: 2, py: 0.5,
+                                        border: '1px solid',
+                                        borderColor: 'primary.200',
+                                        transition: 'background-color 0.2s'
+                                    }} 
+                                    startDecorator={<CancelIcon />} onClick={handleClear}>
                                     Clear
                                 </Button>
                             )}
