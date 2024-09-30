@@ -45,16 +45,16 @@ const RegisterPage = () => {
 
     if (!username || !email || !password || !confirmPassword) {
       setAlert({ 
-        message: 'Please fill in all fields', 
+        message: 'Please fill in all fields of form to register', 
         type: 'danger',
-        useWaitAnimation: true,
+        useWaitAnimation: false,
         open: true,
       });
     } else if (password !== confirmPassword) {
       setAlert({ 
         message: 'Passwords do not match', 
         type: 'danger',
-        useWaitAnimation: true,
+        useWaitAnimation: false,
         open: true,
        });
     } else {

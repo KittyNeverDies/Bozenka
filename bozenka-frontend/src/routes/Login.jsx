@@ -20,7 +20,7 @@ const LoginPage = () => {
     useWaitAnimation: null,
     open: false,
   });
-  
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -35,7 +35,7 @@ const LoginPage = () => {
 
     if (!email || !password) {
       setAlert({
-        message: 'Please fill in all fields',
+        message: 'Please fill in all fields of form to login',
         type: 'danger',
         useWaitAnimation: false,
         open: true,
