@@ -331,30 +331,41 @@ function RangeSliders() {
 function CommunityCard() {
     // const { icon, name, small_description, id } = community;
 
+    
+
     return (
         <Card sx={{m: 1 }}>
             <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
             <Dropdown>
-                <MenuButton size='sm' variant='plain' sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
+                <MenuButton size='sm' variant='plain'
+                sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
                     <MoreVertIcon />
                 </MenuButton>
                 <Menu size='sm'>
-                    <MenuItem color='danger'>
+                    <MenuItem color='danger' sx={{
+                        transition: 'background-color 0.3s'
+                    }}>
                         <ListItemDecorator sx={{ color: 'inherit' }}>
                             <ReportIcon />
                         </ListItemDecorator>
                         Report
                     </MenuItem>
                     <Divider />
-                    <MenuItem>
+                    <MenuItem sx={{
+                        transition: 'background-color 0.3s'
+                    }}>
                         Discord
                         <OpenInNewIcon />
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem sx={{
+                        transition: 'background-color 0.3s'
+                    }}>
                         Telegram
                         <OpenInNewIcon />
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem sx={{
+                        transition: 'background-color 0.3s'
+                    }}>
                         Vkontakte
                         <OpenInNewIcon />
                     </MenuItem>
