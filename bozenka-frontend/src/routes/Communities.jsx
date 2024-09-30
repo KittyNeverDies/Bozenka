@@ -189,6 +189,16 @@ function RangeSliders() {
                     sx={{
                         width: 150,
                         marginLeft: 1,
+                        transition: 'transform 0.2s ease, background-color 0.2s ease',
+                        border: '1px',
+                        '&:hover': {
+                            transform: 'scale(1.05)',
+                            bgcolor: 'primary.lightBg',
+                            borderRadius: '',
+                        },
+                        '&:active': {
+                            transform: 'scale(1.20)'
+                        }
                     }}>
                     Clear Filters
                 </Button>
@@ -201,14 +211,19 @@ function RangeSliders() {
                     
         [`& .${accordionClasses.root}`]: {
             marginTop: '0.5rem',
-            transition: '0.2s ease',
+            transition: '0.2s ease, background-color 0.4 ease, transform 0.2 ease',
             '& button:not([aria-expanded="true"])': {
               transition: '0.2s ease',
               paddingBottom: '0.625rem',
             },
             '& button:hover': {
-              background: 'transparent',
+              background: 'transparent'
             },
+            
+            '& button:active': {
+                backgroundColor: 'background.level1',
+                borderRadius: 'md'
+            }
           }
                 }}
                 variant="plain"
