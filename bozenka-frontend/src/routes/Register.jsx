@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Alert from '@mui/joy/Alert';
 
+import LinearProgress from '@mui/joy/LinearProgress';
+
 
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
+
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -15,11 +19,22 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: '',
   });
-  const [alert, setAlert] = useState({ message: null, type: 'danger' });
+  const [alert, setAlert] = useState({
+    header: null,
+    message: null,
+    type: 'danger',
+    useWaitAnimation: null,
+    open: false,
+  });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  
+  const handleCloseAlert = () => {
+    setAlert((prevAlert) => ({ ...prevAlert, open: false }));
   };
 
   const handleSubmit = (event) => {
@@ -29,11 +44,26 @@ const RegisterPage = () => {
     const { username, email, password, confirmPassword } = formData;
 
     if (!username || !email || !password || !confirmPassword) {
-      setAlert({ message: 'Please fill in all fields', type: 'danger' });
+      setAlert({ 
+        message: 'Please fill in all fields', 
+        type: 'danger',
+        useWaitAnimation: true,
+        open: true,
+      });
     } else if (password !== confirmPassword) {
-      setAlert({ message: 'Passwords do not match', type: 'danger' });
+      setAlert({ 
+        message: 'Passwords do not match', 
+        type: 'danger',
+        useWaitAnimation: true,
+        open: true,
+       });
     } else {
-      setAlert({ message: 'Registration successful! Redirecting to login page...', type: 'success' });
+      setAlert({ 
+        message: 'Registration successful! Redirecting to login page...', 
+        type: 'success',
+        useWaitAnimation: true,
+        open: true,
+      });
       setTimeout(() => {
         // Implement redirect logic here
       }, 2000);
@@ -84,13 +114,49 @@ const RegisterPage = () => {
 
   return (
     <Box sx={{ maxWidth: 480, mx: 'auto', p: 4, mt: 4, mb: 15 }}>
-      {alert.message && (
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Alert color={alert.type} variant="soft" sx={{ width: '100%' }}>
-            {alert.message}
-          </Alert>
-        </Box>
-      )}
+    {alert.open && (
+      <Box sx={{ textAlign: 'left', mb: 2 }}>
+        <Alert
+          color={alert.type}
+          variant="solid"
+          invertedColors
+          sx={{ width: '100%' }}
+          endDecorator={
+          <Button
+              variant="plain"
+              color="neutral"
+              onClick={handleCloseAlert}
+              sx={{ p: 1.5 }}
+            >
+              <CloseRoundedIcon />
+            </Button>}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div sx={{ textAlign: 'left' }}>
+              <Typography level="title-lg">{alert.type === 'success' ? 'Success' : 'Error'}</Typography>
+              <Typography level="body-sm">{alert.message}</Typography>
+            </div>
+          </Box>
+          
+          {alert.useWaitAnimation && (
+            <LinearProgress
+              variant="solid"
+              color={alert.type}
+              size="sm"
+              value={40}
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                borderRadius: 0,
+              }}
+            />
+          )}
+        </Alert>
+      </Box>
+    )}
+      
       <Card sx={{ p: 4, backgroundColor: '#fff', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
         <Typography variant="h2" level="h4" sx={{ fontWeight: 'bold', color: 'text.primary', fontSize: '1.75rem' }}>
           Registration

@@ -1,19 +1,26 @@
 import { Box, Button, Input, Typography, Card } from '@mui/joy';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import LinearProgress from '@mui/joy/LinearProgress';
 import Alert from '@mui/joy/Alert';
-
-
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [alert, setAlert] = useState({ message: null, type: 'danger' });
+  const [alert, setAlert] = useState({
+    header: null,
+    message: null,
+    type: 'danger',
+    useWaitAnimation: null,
+    open: false,
+  });
+  
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -22,20 +29,32 @@ const LoginPage = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setAlert({ message: null, type: 'danger' });
+    setAlert({ message: null, type: 'danger', open: false });
 
-    const { username, email, password, confirmPassword } = formData;
+    const { email, password } = formData;
 
-    if (!username || !email || !password || !confirmPassword) {
-      setAlert({ message: 'Please fill in all fields', type: 'danger' });
-    } else if (password !== confirmPassword) {
-      setAlert({ message: 'Passwords do not match', type: 'danger' });
+    if (!email || !password) {
+      setAlert({
+        message: 'Please fill in all fields',
+        type: 'danger',
+        useWaitAnimation: false,
+        open: true,
+      });
     } else {
-      setAlert({ message: 'Registration successful! Redirecting to dashboard...', type: 'success' });
+      setAlert({
+        message: 'Registration successful! Redirecting to dashboard...',
+        type: 'success',
+        useWaitAnimation: true,
+        open: true,
+      });
       setTimeout(() => {
         // Implement redirect logic here
       }, 2000);
     }
+  };
+
+  const handleCloseAlert = () => {
+    setAlert((prevAlert) => ({ ...prevAlert, open: false }));
   };
 
   const inputStyles = {
@@ -74,16 +93,63 @@ const LoginPage = () => {
   };
 
   const inputFields = [
-    { name: 'email',  type: 'email', placeholder: 'Write your email', autoComplete: 'email', icon: <MailRoundedIcon/> },
-    { name: 'password', type: 'password', placeholder: 'Write your password', autoComplete: 'password', icon: <LockRoundedIcon/> }
+    {
+      name: 'email',
+      type: 'email',
+      placeholder: 'Write your email',
+      autoComplete: 'email',
+      icon: <MailRoundedIcon />,
+    },
+    {
+      name: 'password',
+      type: 'password',
+      placeholder: 'Write your password',
+      autoComplete: 'password',
+      icon: <LockRoundedIcon />,
+    },
   ];
 
   return (
     <Box sx={{ maxWidth: 480, mx: 'auto', p: 4, mt: 4, mb: 15 }}>
-      {alert.message && (
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          <Alert color={alert.type} variant="soft" sx={{ width: '100%' }}>
-            {alert.message}
+      {alert.open && (
+        <Box sx={{ textAlign: 'left', mb: 2 }}>
+          <Alert
+            color={alert.type}
+            variant="solid"
+            invertedColors
+            sx={{ width: '100%' }}
+            endDecorator={
+            <Button
+                variant="plain"
+                color="neutral"
+                onClick={handleCloseAlert}
+                sx={{ p: 1.5 }}
+              >
+                <CloseRoundedIcon />
+              </Button>}
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div sx={{ textAlign: 'left' }}>
+                <Typography level="title-lg">{alert.type === 'success' ? 'Success' : 'Error'}</Typography>
+                <Typography level="body-sm">{alert.message}</Typography>
+              </div>
+            </Box>
+            
+            {alert.useWaitAnimation && (
+              <LinearProgress
+                variant="solid"
+                color={alert.type}
+                size="sm"
+                value={40}
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  borderRadius: 0,
+                }}
+              />
+            )}
           </Alert>
         </Box>
       )}
@@ -93,7 +159,6 @@ const LoginPage = () => {
         </Typography>
         <Typography sx={{ mb: 3, color: 'text.primary' }}>
           Login into account here, to work with unified community management.
-
         </Typography>
         <form onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {inputFields.map((field) => (
@@ -136,7 +201,6 @@ const LoginPage = () => {
               borderColor: '#1976d2',
               color: '#1976d2',
               fontWeight: 'bold',
-              
               p: 1.5,
               '&:hover': {
                 backgroundColor: '#e3f2fd',
@@ -153,4 +217,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
