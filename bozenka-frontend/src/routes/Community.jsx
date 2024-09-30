@@ -12,6 +12,7 @@ import Card from '@mui/joy/Card';
 import Chip from '@mui/joy/Chip';
 import Grid from '@mui/joy/Grid';
 import List from '@mui/joy/List';
+import { Breadcrumbs } from '@mui/joy';
 import ListItem, {listItemClasses} from '@mui/joy/ListItem';
 import ListItemButton from '@mui/joy/ListItemButton';
 import ListItemContent from '@mui/joy/ListItemContent';
@@ -35,6 +36,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded';
 import MultipleStopRoundedIcon from '@mui/icons-material/MultipleStopRounded';
 import FilterNoneRoundedIcon from '@mui/icons-material/FilterNoneRounded';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
@@ -307,7 +309,20 @@ function Community() {
                   }
                 }
             }>
-
+                <Card sx={{p: 0, mb: 2}}>
+                  <Box>
+                    <Breadcrumbs 
+                        separator={<KeyboardArrowRightIcon/>}
+                        sx={{
+                          "--Breadcrumbs-gap": "3px"
+                        }}
+                    >
+                      <Typography level="body-md" sx={{mt: 0}}>Home</Typography>
+                      <Typography level="body-md" sx={{mt: 0}}>Communities</Typography>
+                      <Typography level="body-md" sx={{pt: 0, color: 'primary.plainColor'}}>Community Name</Typography>
+                    </Breadcrumbs>
+                  </Box>
+                </Card>
                 <Card>
                     <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
                     <Box> 
