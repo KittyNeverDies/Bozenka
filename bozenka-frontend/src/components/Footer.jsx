@@ -1,8 +1,21 @@
-import { Box, Container, Typography, Link, Grid } from '@mui/joy';
 
+// MUI joy elements
+import {Box, Container, Typography, Link, Grid } from '@mui/joy';
+
+// MUI material icons.
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
+
+
+/**
+ * @description A functional component that renders footers for all pages.
+ * @returns {JSX.Element}
+ */
 const Footer = () => {
+  /**
+  * @description Footer for all pages in Joy UI Style.
+  * @type {JSX.Element}
+  */
   return (
     <Box sx={{ 
       py: 4, 

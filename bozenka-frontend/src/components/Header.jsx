@@ -27,12 +27,16 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginIcon from '@mui/icons-material/Login';
 
-
+/**
+ * @description A functional component that renders header for all pages.
+ * @returns {JSX.Element}
+ */
 export default function JoyHeader() {
-  /*
-    Joy header element, what represents both header of bozenka
-    & drawer after login.
+  /**
+  * @description Header for all pages in Joy UI Style.
+  * @type {JSX.Element}
   */
+
   const [openLoginDrawer, setOpenLoginDrawer] = React.useState(false);
 
   const toggleLoginDrawer = (isOpen) => (event) => {
@@ -44,6 +48,10 @@ export default function JoyHeader() {
 
   return (
     <>
+    
+    {/* 
+        Joy header content.
+    */}
     <Box
       sx={{
         display: 'flex',
@@ -58,7 +66,9 @@ export default function JoyHeader() {
         borderColor: 'background.level2',
       }}
     >
-        
+        {/* 
+          Menu button
+        */}
         <Tooltip title="Menu"  variant="outlined" size="sm">
           <IconButton
           sx={{
@@ -77,16 +87,29 @@ export default function JoyHeader() {
             onClick={toggleLoginDrawer(true)} variant="outlined">
             <MenuIcon />
           </IconButton>
-        </Tooltip>
-        
+      </Tooltip>
+      
+      {/* 
+        Bozenka logotype
+      */}
+
       <Link to='/' sx={{'textDecoration': 'None'}}>
         <Typography level="h3" component="h1">
           Bozenka
         </Typography>
       </Link>
 
+      
+      {/* 
+        Box of login & communities button
+      */}
       <Box sx={{ display: 'flex', alignItems: 'center' 
       }}>
+
+        
+        {/* 
+          Login button
+        */}
         <Tooltip title="Login"  variant="outlined" size="sm"
           sx={{
             transition: 'all 0.2s sizeIn'
@@ -113,6 +136,11 @@ export default function JoyHeader() {
           </IconButton>
           </Link>
         </Tooltip>
+
+        
+        {/* 
+          Communities button
+        */}
         <Tooltip title="Communities"  variant="outlined" size="sm">
           <Link to='/communities'>
           <IconButton onClick={() => {}} 
@@ -136,6 +164,9 @@ export default function JoyHeader() {
       </Box>
     </Box>
     
+    {/* 
+       Drawer, that opens on menu button click.
+    */}
     <Drawer open={openLoginDrawer} onClose={toggleLoginDrawer(false)}>
         <Box
             role="presentation"

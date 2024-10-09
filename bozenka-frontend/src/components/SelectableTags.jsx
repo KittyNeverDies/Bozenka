@@ -1,4 +1,5 @@
 import Chip from '@mui/joy/Chip';
+import { useState } from 'react';
 
 /**
  * @function SelectableTags
@@ -34,7 +35,8 @@ function SelectableTags({ Tag }) {
                  * @type {Object}
                  */
                 {
-                    m: 0.4
+                    m: 0.4,
+                    borderRadius: 'sm'
                 }
             }
             variant='soft'

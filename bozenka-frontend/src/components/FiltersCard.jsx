@@ -2,6 +2,7 @@
 // Joy UI components
 import Button from '@mui/joy/Button';
 import Card from '@mui/joy/Card';
+import Box from '@mui/joy/Box';
 import Typography from '@mui/joy/Typography';
 import Avatar from '@mui/joy/Avatar';
 import Radio from '@mui/joy/Radio';
@@ -20,6 +21,46 @@ import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import ListRoundedIcon from '@mui/icons-material/ListRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 
+import SelectableTags from './SelectableTags';
+import RangeSlider from './RandeSlider';
+
+
+
+/**
+ * @description A functional component that renders range sliders for filters card
+ * @returns {JSX.Element}
+ */
+function RangeSliders() {    
+    /**
+    * @description Range sliders for filters card
+    * @type {JSX.Element}
+    */
+  
+    return (
+    <>
+      <Box sx={{ width: 250, marginTop: 2}}>
+        <Typography gutterBottom>
+            Community members count range
+        </Typography>
+        <RangeSlider 
+            label="Community members count range"
+            textOfValue="members" maxValue="100" minValue="0" />
+      </Box>
+      
+      <Box sx={{ width: 250 }}>
+        <Typography gutterBottom>
+            Community growth range
+        </Typography>
+        <RangeSlider
+            label="Community members count range" 
+            textOfValue="Members" maxValue="100" minValue="0"
+        />
+      </Box>
+    </>
+    );
+  }
+
+
 
 /**
  * @description A functional component that renders a card with filters to filter communities
@@ -27,9 +68,9 @@ import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
  */
 function FiltersCard() {
     /**
-     * @description The main card that contains all the filters.
-     * @type {JSX.Element}
-     */
+    * @description The main card that contains all the filters.
+    * @type {JSX.Element}
+    */
     return (
         <Card 
             variant="outlined" 
@@ -48,10 +89,6 @@ function FiltersCard() {
                 }
             }}
         >
-            /**
-             * @description The title of the card.
-             * @type {JSX.Element}
-             */
             <Typography level="h4" sx={{
                 paddingTop: 2,
                 paddingLeft: 2,
@@ -66,6 +103,16 @@ function FiltersCard() {
                     sx={{
                         width: 150,
                         marginLeft: 1,
+                        transition: 'transform 0.2s ease, background-color 0.2s ease',
+                        border: '1px',
+                        '&:hover': {
+                            transform: 'scale(1.05)',
+                            bgcolor: 'primary.lightBg',
+                            borderRadius: '',
+                        },
+                        '&:active': {
+                            transform: 'scale(1.20)'
+                        }
                     }}>
                     Clear Filters
                 </Button>
@@ -78,14 +125,19 @@ function FiltersCard() {
                     
         [`& .${accordionClasses.root}`]: {
             marginTop: '0.5rem',
-            transition: '0.2s ease',
+            transition: '0.2s ease, background-color 0.4 ease, transform 0.2 ease',
             '& button:not([aria-expanded="true"])': {
               transition: '0.2s ease',
               paddingBottom: '0.625rem',
             },
             '& button:hover': {
-              background: 'transparent',
+              background: 'transparent'
             },
+            
+            '& button:active': {
+                backgroundColor: 'background.level1',
+                borderRadius: 'md'
+            }
           }
                 }}
                 variant="plain"

@@ -1,4 +1,5 @@
 import Slider from "@mui/joy/Slider";
+import { useState } from 'react';
 
 /**
  * @function RangeSlider
@@ -48,4 +49,5 @@ function RangeSlider(label, textOfValue, maxValue, minValue) {
         </>
     )
 }
-
+ 
+export default RangeSlider; 
