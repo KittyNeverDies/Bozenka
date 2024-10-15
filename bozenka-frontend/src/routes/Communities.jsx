@@ -2,17 +2,18 @@
 import { useState } from 'react';
 
 
-import SearchIcon from '@mui/icons-material/Search';
-import CancelIcon from '@mui/icons-material/Cancel';
-
 import Input from '@mui/joy/Input';
 import Button from '@mui/joy/Button';
 import Card from '@mui/joy/Card';
 import Typography from '@mui/joy/Typography';
 import Box from '@mui/joy/Box';
+import { Breadcrumbs } from '@mui/joy';
 
 // Material UI icons
 import InfoIcon from '@mui/icons-material/Info';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import SearchIcon from '@mui/icons-material/Search';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 // Own elements.
 import FiltersCard from '../components/FiltersCard';
@@ -30,7 +31,9 @@ function CommunitiesSearch() {
     return (
     <>
         <Box sx={{ p: 2 }}>
+            
             <Box sx={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                
                 <FiltersCard />
                 <Box sx={{ flex: 1 }}>
                     

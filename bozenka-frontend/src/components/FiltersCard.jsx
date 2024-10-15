@@ -11,12 +11,15 @@ import Grid from '@mui/joy/Grid';
 import Accordion, { accordionClasses } from '@mui/joy/Accordion';
 import AccordionDetails from '@mui/joy/AccordionDetails';
 import AccordionGroup from '@mui/joy/AccordionGroup';
+import { Breadcrumbs } from '@mui/joy';
+import Stack from '@mui/joy/Stack';
 import AccordionSummary from '@mui/joy/AccordionSummary';
 import ListItemContent from '@mui/joy/ListItemContent';
 
 // Material UI icons
 import InfoIcon from '@mui/icons-material/Info';
 import CancelIcon from '@mui/icons-material/Cancel';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import ListRoundedIcon from '@mui/icons-material/ListRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -72,20 +75,50 @@ function FiltersCard() {
     * @type {JSX.Element}
     */
     return (
+    
+    <Stack sx={{
+                flexDirection: 'column',
+                
+                '@media (max-width: 670px)': { // Mobile responsiveness
+                  width: '120%',
+                  position: 'relative',
+                  left: 'unset',
+                  
+                },
+                mr: 1
+            
+    }}> 
+        
+        <Card sx={{p: 0,
+            width: 'max-content',
+            display: 'flex'
+        }}>
+                  <Box>
+                    <Breadcrumbs 
+                        separator={ <KeyboardArrowRightIcon/>}
+                        sx={{
+                          "--Breadcrumbs-gap": "3px"
+                        }}
+                    >
+                      <Typography level="body-md" sx={{mt: 0}}>Home</Typography>
+                      <Typography level="body-md" sx={{mt: 0, color: 'primary.plainColor'}}>Communities</Typography>
+                    </Breadcrumbs>
+                  </Box>
+        </Card>
         <Card 
             variant="outlined" 
             sx={{ 
                 width: 300, 
-                mr: 2, 
+                mr: 3, 
                 top: 16, // Adjust as needed
                 maxHeight: 'calc(100vh - 32px)', // Adjust as needed
                 overflowY: 'auto',
                 marginBottom: '25px',
                 '@media (max-width: 670px)': { // Mobile responsiveness
-                    width: '100%',
+                    width: '95%',
                     position: 'relative',
                     left: 'unset',
-                    mr: 0,
+                    
                 }
             }}
         >
@@ -254,6 +287,7 @@ function FiltersCard() {
                 </Accordion>
             </AccordionGroup>
         </Card>
+    </Stack>
     );
 }
 

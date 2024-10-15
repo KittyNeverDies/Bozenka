@@ -53,7 +53,7 @@ function Community() {
                   }
                 }
             }>
-                <Card sx={{p: 0, mb: 2}}>
+                <Card sx={{p: 0, display: 'flex', mb: 2}}>
                   <Box>
                     <Breadcrumbs 
                         separator={<KeyboardArrowRightIcon/>}
