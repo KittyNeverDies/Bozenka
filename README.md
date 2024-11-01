@@ -11,7 +11,7 @@
 
 
 
-[Telegram Channel](https://t.me/bozodevelopment/) | [Website](kittyneverdies.github.io/Bozenka/) (UI outdated)
+[Telegram Channel](https://t.me/bozodevelopment/) | [Website](https://kittyneverdies.github.io/Bozenka/) (UI  is outdated)
 
 
 </div>
@@ -44,15 +44,21 @@ For a better understanding of our workflow, please refer to the following overvi
 ### Current State of Development
 - Frontend:
     - [x] Home (Needs improvements) \
-        I think its requires some redesign with visualisation of bozenka works with 3d elements
+        I think its requires some redesign with visualisation of bozenka works with 3d elements. Current redesign is nice, but still requires imnprovements
     - [x] Communities search (Need improvements) \
-        Required toggable filters menu, fixes of range sliders & search hints.
-    - [ ] Community \
-        Already done main things like tab system, mobile support & information with tags and links. It's required to add normal charts to it with grid of posts
+        Required toggable filters menu, fixes of range sliders & search hints. But main functionality is done.
+    - [ x ] Community \
+        Already done main things like tab system, mobile support & information with tags and links. It's required to improve current charts.
     - [x] Registration & Login \
         Should be on one page (for Users eye, not means it should be on one adress) where user can just toggle with animation register and login. Anyway, it's has been done, but need some changes.
     - [ ] Dashboard \
-        Still searching for ideas...
+        Still searching for ideas... Currently in developement. 
+        - [] Homepage \
+            Main start page, if you are already logged in.
+        - [ ] Add, edit & create comunity \
+            Add already exists community from social platforms or create new one on Bozenka platform.
+        - [ ] Manage account \
+            Manage account (change password, email and etc)
 - Backend:
     - [x] Database Models (Refactors in future) \
         Has been writen first after creation of new bozenka project
