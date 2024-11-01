@@ -16,6 +16,7 @@ import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab, { tabClasses } from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
+import TestChart from './GrowthChart';
 
 
 // Material UI icons for Tabs
@@ -27,6 +28,7 @@ import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PersonIcon from '@mui/icons-material/Person';
 
@@ -36,6 +38,75 @@ import PersonIcon from '@mui/icons-material/Person';
 function TabsSegmentedControls() {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
+
+
+  const data = [
+    {
+      name: "03.09",
+      views: 4000,
+      members: 2400,
+      amt: 2400,
+    },
+    {
+      name: "04.09",
+      views: 3000,
+      members: 1398,
+      amt: 2210,
+    },
+    {
+      name: "05.09",
+      views: 2000,
+      members: 9800,
+      amt: 2290,
+    },
+    {
+      name: "06.09",
+      views: 2780,
+      members: 3908,
+      amt: 2000,
+    },
+    {
+      name: "07.09",
+      views: 1890,
+      members: 4800,
+      amt: 2181,
+    },
+    {
+      name: "08.09",
+      views: 2390,
+      members: 3800,
+      amt: 2500,
+    },
+    {
+      name: "09.09",
+      views: 3490,
+      members: 4300,
+      amt: 2100,
+    },
+  ];
+
+
+  const displayData = {
+    members: {
+      title: "The number of members in the community",
+      shortTitle: "Number of members",
+      description: "Total number of community members.",
+      icon: <PeopleRoundedIcon/>,
+    },
+    views: {
+      title: "Views of the posts at this date.",
+      shortTitle: "Views of the posts",
+      description: "Total growth of number of views on posts at this date.",
+      icon: <VisibilityRoundedIcon/>,
+    }
+  
+  }
+
+  const icons = {
+    members: <PeopleRoundedIcon />,
+    views: <VisibilityRoundedIcon/>,
+  };
+
 
   const posts = [
     {
@@ -195,6 +266,9 @@ function TabsSegmentedControls() {
           
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum suscipit repellat, architecto at dolore odio neque eos dolorum hic aliquam velit sapiente dignissimos molestiae pariatur ducimus! Soluta voluptate ad tenetur!
           
+          </TabPanel>
+          <TabPanel value={1}>
+              <TestChart icons={icons} data={data} displayData={displayData} />
           </TabPanel>
           <TabPanel value={2}>
             <Typography level='h2' sx={{mb: 2}}>
