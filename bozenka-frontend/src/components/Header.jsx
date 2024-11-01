@@ -95,7 +95,7 @@ export default function JoyHeader() {
 
       <Link to='/' sx={{'textDecoration': 'None'}}>
         <Typography level="h3" component="h1">
-          Bozenka
+          bozenka
         </Typography>
       </Link>
 
