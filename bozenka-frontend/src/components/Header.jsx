@@ -60,10 +60,12 @@ export default function JoyHeader() {
         textAlign: "center",
         alignItems: 'center',
         p: 2,
-        position: 'stinky',
+        position: 'sticky',
+        top: 0,
         borderBottom: '1px solid',
         backgroundColor: 'background.surface',
         borderColor: 'background.level2',
+        zIndex: 1100,
       }}
     >
         {/* 
@@ -163,7 +165,6 @@ export default function JoyHeader() {
         </Tooltip>
       </Box>
     </Box>
-    
     {/* 
        Drawer, that opens on menu button click.
     */}
