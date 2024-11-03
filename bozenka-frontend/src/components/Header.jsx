@@ -174,19 +174,21 @@ export default function JoyHeader() {
             onClick={toggleLoginDrawer(false)}
             onKeyDown={toggleLoginDrawer(false)}
         >
-            <Typography level="h1"
+            <Typography level="h3"
                 
-                sx={{ paddingLeft: 2, paddingBottom: 1, paddingTop: 2}}
-            >Bozenka</Typography>
-              <Typography
-                id="ellipsis-list-demo"
-                level="body-xs"
-                textTransform="uppercase"
-                sx={{ letterSpacing: '0.15rem', paddingLeft: 2, paddingBottom: 1, paddingTop: 2}}
-                >
+                sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}
+            >Menu</Typography>
+      <Typography
+        id="ellipsis-list-demo"
+        level="body-xs"
+        textTransform="uppercase"
+      sx={{ 
+        letterSpacing: '0.15rem', 
+        paddingLeft: 2, 
+        paddingBottom: 1, 
+        paddingTop: 2}}>
                     Communities
-               </Typography>
-    
+      </Typography>
       <List>
         <ListItem key="Dashboard">
             <ListItemButton>
@@ -237,9 +239,6 @@ export default function JoyHeader() {
             </ListItemButton>
         </ListItem>
       </List>
-      <Divider />
-
-      
       <Typography
                 id="ellipsis-list-demo"
                 level="body-xs"
