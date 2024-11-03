@@ -17,7 +17,13 @@ import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 function HomePageButton({ head, description, icon }) {
   return (
     <Card sx={{
-      width: 200}}>
+      width: 200,
+      transition: 'transform 0.3s, box-shadow 0.3s, background-color 0.3s',
+      '&:hover': { 
+          transform: 'scale(1.05)', 
+          boxShadow: 'md',
+      }
+    }}>
       <Avatar color="primary">{icon}</Avatar>
       <Typography level="title-lg" sx={{ marginBottom: 0 }} element="h1">
         {head}
