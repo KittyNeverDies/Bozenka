@@ -31,10 +31,12 @@ import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 function HomePageButton({ head, description, icon }) {
   return (
     <Card sx={{
+      width: 200,
       transition: 'transform 0.3s, box-shadow 0.3s, background-color 0.3s',
       '&:hover': { 
           transform: 'scale(1.05)', 
           boxShadow: 'md',
+          
       }
     }}>
       <Avatar color="primary">{icon}</Avatar>
@@ -260,7 +262,7 @@ export function DashboardAddCommunity() {
       aria-label="tabs" 
       value={selectedTab} 
       onChange={handleTabChange}
-      orientation='vertical'
+      
       sx={{
         bgcolor: 'transparent',
         width: '100%', // Set width to 100% to make it responsive
@@ -336,6 +338,15 @@ export function DashboardAddCommunity() {
           <Input my={0} sx={inputStyles}  />
           <FormHelperText>
               This name will be displayed on the community page.
+          </FormHelperText>
+        </FormControl>
+        <FormControl sx={{my: 1}}>
+          <FormLabel>
+            Description
+          </FormLabel>
+          <Input my={0} sx={inputStyles}  />
+          <FormHelperText>
+              This description will be displayed on the community page.
           </FormHelperText>
         </FormControl>
       </TabPanel>
