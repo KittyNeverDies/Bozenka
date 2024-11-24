@@ -153,11 +153,11 @@ const LoginPage = () => {
           </Alert>
         </Box>
       )}
-      <Card sx={{ p: 4, backgroundColor: '#fff', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
+      <Card sx={{ p: 4, backgroundColor: 'background.body', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
         <Typography variant="h2" level="h4" sx={{ fontWeight: 'bold', color: 'text.primary', fontSize: '1.75rem' }}>
           Login
         </Typography>
-        <Typography sx={{ mb: 3, color: 'text.primary' }}>
+        <Typography level='body-sm'sx={{ mb: 3 }}>
           Login into account here, to work with unified community management.
         </Typography>
         <form onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
