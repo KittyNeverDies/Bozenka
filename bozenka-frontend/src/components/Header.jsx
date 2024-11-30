@@ -68,28 +68,7 @@ export default function JoyHeader() {
         zIndex: 1100,
       }}
     >
-        {/* 
-          Menu button
-        */}
-        <Tooltip title="Menu"  variant="outlined" size="sm">
-          <IconButton
-          sx={{
-            transition: 'transform 0.2s ease, background-color 0.2s ease',
-            m: 0.5,
-            marginLeft: 1.2,
-            '&:hover': {
-              transform: 'scale(1.05)',
-              bgcolor: 'primary.lightBg',
-              borderRadius: '',
-            },
-            '&:active': {
-              transform: 'scale(1.20)'
-            }
-            }}  
-            onClick={toggleLoginDrawer(true)} variant="outlined">
-            <MenuIcon />
-          </IconButton>
-      </Tooltip>
+
       
       {/* 
         Bozenka logotype
@@ -108,7 +87,28 @@ export default function JoyHeader() {
       <Box sx={{ display: 'flex', alignItems: 'center' 
       }}>
 
-        
+                {/* 
+          Menu button
+        */}
+          <Tooltip title="Menu"  variant="outlined" size="sm">
+            <IconButton
+            sx={{
+              transition: 'transform 0.2s ease, background-color 0.2s ease',
+              m: 0.5,
+              marginRight: 1.2,
+              '&:hover': {
+                transform: 'scale(1.05)',
+                bgcolor: 'primary.lightBg',
+                borderRadius: '',
+              },
+              '&:active': {
+                transform: 'scale(1.20)'
+              }
+            }}  
+            onClick={toggleLoginDrawer(true)} variant="outlined">
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
         {/* 
           Login button
         */}
