@@ -51,9 +51,9 @@ For a better understanding of our workflow, please refer to the following overvi
         Already done main things like tab system, mobile support & information with tags and links. It's required to improve current charts.
     - [x] Registration & Login \
         Should be on one page (for Users eye, not means it should be on one adress) where user can just toggle with animation register and login. Anyway, it's has been done, but need some changes.
-    - [ ] Dashboard \
+    - [ x ] Dashboard \
         Still searching for ideas... Currently in developement. 
-        - [ ] Homepage \
+        - [ x ] Homepage \
             Main start page, if you are already logged in.
         - [ ] Add, edit & create comunity \
             Add already exists community from social platforms or create new one on Bozenka platform.
