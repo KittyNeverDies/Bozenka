@@ -113,7 +113,7 @@ const RegisterPage = () => {
   ];
 
   return (
-    <Box sx={{ maxWidth: 480, mx: 'auto', p: 4, mt: 4, mb: 15 }}>
+    <Box sx={{ maxWidth: 480, mx: 'auto', p: 4}}>
     {alert.open && (
       <Box sx={{ textAlign: 'left', mb: 2 }}>
         <Alert
