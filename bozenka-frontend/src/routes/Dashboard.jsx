@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 
-import {FormControl, FormLabel, FormHelperText} from '@mui/joy';
+import {FormControl, FormLabel, FormHelperText, List, ListItem} from '@mui/joy';
 import Card from '@mui/joy/Card';
 import Input from '@mui/joy/Input';
 import Box from '@mui/joy/Box';
@@ -17,8 +17,14 @@ import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab, { tabClasses } from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
+import Stepper from '@mui/joy/Stepper';
+import Step from '@mui/joy/Step';
+import StepIndicator from '@mui/joy/StepIndicator';
+import Breadcrumbs from '@mui/joy/Breadcrumbs';
+
 
 import TestChart from '../components/GrowthChart';
+
 
 import SearchIcon from '@mui/icons-material/SearchRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
@@ -26,6 +32,9 @@ import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+
 
 // Define a reusable HomePageButton component
 function HomePageButton({ head, description, icon }) {
@@ -53,24 +62,45 @@ function HomePageButton({ head, description, icon }) {
 // Define the DashboardHomepage component
 export function DashboardHomepage() {
   // Define the buttons data
-  const buttons = [
+  const buttons = {
+    'Communities': [
+        {
+          head: 'Manage communities', 
+          description: 'Manage your communities, add administrators, create posts, etc.', 
+          icon: <HandymanRoundedIcon />
+        },
+        {
+          head: 'Community building',
+          description: 'Create or import your own social home or club by interests.',
+          icon: <AddRoundedIcon />
+        },
+      ],
+      "Account": [
+        {
+          head: 'Manage account', 
+          description: 'Manage your security, privacy of your account. Change avatar or name.', 
+          icon: <SettingsRoundedIcon />
+        },
+      ]
+  };
+  const buttonss = [
     {
-      head: 'Search for communities',
+      head: 'Search community',
       description: 'Find your social home or place for ads. Here is freedom of choice.',
       icon: <SearchIcon />,
     },
     {
-      head: 'Add or create your community',
+      head: 'Community-building',
       description: 'Create or import your own social home or club by interests.',
       icon: <AddRoundedIcon />,
     },
     {
-      head: 'Manage your communities',
+      head: 'Manage community',
       description: 'Manage your communities, add administrators, create posts, etc.',
       icon: <HandymanRoundedIcon />
     },
     {
-      head: 'Manage your account',
+      head: 'Manage account',
        description: 'Manage your security, privacy of your account. Change avatar or name.',
 
     }
@@ -146,41 +176,114 @@ export function DashboardHomepage() {
   };
 
   return (
-    <Stack m={2} sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', width: 'auto', mb: 10 }}>
-      {/* Welcome card */}
-      <Card sx={{ width: 'auto', size: 'lg',  py: 5, px: 10, backgroundColor: 'transparent', borderColor: 'transparent', }}>
-        <Stack sx={{ alignItems: 'left', display: 'flex',  justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', height: '100vh' }}>
+    <Box sx={{
+      backgroundColor: 'background.surface', 
+      float: 'left', border: '1px solid', 
+      borderColor: 'background.level2', borderTop: '0px',
+      display: 'flex',
+      flexDirection: 'column',
+      fontFamily: 'Inter',
+      width: '300',
+      minWidth: '14%',
+      boxSizing: 'border-box',
+
+    }}>
+      <Stack sx={{ 
+        alignItems: 'left', 
+        display: 'flex',  
+        justifyContent: 'center', p: 2 
+      }}>
           <Avatar
             src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
             size="lg"
           />
-          <Typography level="h3" mt={1} element="h1">
+          <Typography level="h5" mt={1} element="h5" fontWeight='bold'>
             Welcome, user.
           </Typography>
 
-          <Typography color='neutral' level="body-xl">
-            Total growth: <Typography color="success" level="body-xl" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
+          <Typography color='neutral' level="body-xs">
+            Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
           </Typography>
           
-          <Typography level="body-sm">Have a nice day!</Typography>
-        </Stack>
-      </Card>
+          <Typography level="body-xs">Have a nice day!</Typography>
+      </Stack>
+      
+      <Box sx={{px: 0.8}}>
+        <Button variant='plain' color='neutral'
+                size='sm'
+                startDecorator={<HomeRoundedIcon/>}
+                sx={{
+                  width: '100%',
+                  fontSize: 'xs',
+                  my: 0.2,
+                  justifyContent: 'left',
+                  fontWeight: '500',
+                  transition: '0.2s ease background-color'
+                }}>
+              Home
+          </Button>
+          {Object.keys(buttons).map((button) => (
+            <>
+              <Typography
+              level="body-xs"
+              textTransform="uppercase"
+              sx={{ 
+                letterSpacing: '0.15rem', 
+                paddingLeft: 2, 
+                paddingBottom: 1, 
+                paddingTop: 2}}>
+                          {button}
+              </Typography>
+              {buttons[button].map( (btn) => (
+                              <Button variant='plain'
+                              color='neutral'
+                              size='sm'
+                              sx={{
+                                width: '100%',
+                                fontSize: 'xs',
+                                my: 0.2,
+                                justifyContent: 'left',
+                                
+                                fontWeight: '500',
+                                transition: '0.3s ease background-color'
+                              }}
+                              startDecorator={btn.icon}
+                            >
+                              {btn.head}
+                            </Button>
+              ))}
 
-      {/* Buttons grid */}
-      <Grid container spacing={1} my={1} sx={{ display: 'flex', justifyContent: 'center' }}>
-        {buttons.map((button, index) => (
-          <Grid key={index}>
-            <HomePageButton {...button} />
-          </Grid>
-        ))}
-      </Grid>
+              </>
+          ))}
+        </Box>
+    </Box>
 
-      <Card marginTop={1000000} sx={{ width: 'auto' }}>
+    <Stack m={2} sx={{ display: 'flex', width: 'auto'}}>
+      {/* Welcome card */}
+
+        <Breadcrumbs size='sm' >
+          <Link>
+            Dashboard
+          </Link>
+          
+          <Link>
+            Home
+          </Link>
+        </Breadcrumbs>
+        <Typography level='h2' my={1} px={1}>
+            Home
+        </Typography>
+      <Card sx={{ height: '60vh', mt: 1 }}>
         <TestChart icons={icons} data={data} displayData={displayData}/>
       </Card>  
     </Stack>
+    </Box>
   );
 }
+
+
+
 
 export function DashboardAddCommunity() {
   const [selectedTab, setSelectedTab] = React.useState(0);
@@ -323,12 +426,7 @@ export function DashboardAddCommunity() {
           },
         }}
       >
-        <Tab 
-            key='About' 
-            disableIndicator
-          >
-            Basic information
-        </Tab>
+        <Tab></Tab>
       </TabList>
       <TabPanel value={0}>
         <FormControl>
