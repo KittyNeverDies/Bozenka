@@ -7,6 +7,8 @@ import Typography from '@mui/joy/Typography';
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
 import Card from '@mui/joy/Card';
+import Chip from '@mui/joy/Chip';
+
 
 // MUI icons
 import AnalyticsIcon from "@mui/icons-material/Analytics";
@@ -17,6 +19,8 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+
 
 
 function FeatureCard({ feature }){
@@ -26,22 +30,28 @@ function FeatureCard({ feature }){
     */
     const {icon, name, description} = feature 
     return (
-        <Card sx={{
+        <Card color='primary' invertedColors variant='solid' sx={{
             width: 200,
+            height: 150,
             transition: 'transform 0.3s, box-shadow 0.3s',
             '&:hover': { 
                 transform: 'scale(1.05)', 
                 boxShadow: 'md',
             }
         }}> 
-            <div>
-                <Box sx={{mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', height: 80}}>
-                    {icon}
-                </Box>
-                
-                <Typography level="title-lg" sx={{mb: 1}}>{name}</Typography>
-                <Typography level="body-sm" sx={{}}>{description}</Typography>
-            </div>
+            <Chip
+                size="lg"
+                variant="soft"
+                startDecorator={icon}
+                sx={{ alignSelf: 'flex-start', borderRadius: 'xl', fontWeight: 'bold' }}
+            >
+                {name}
+            </Chip>
+            <Typography level='body-sm' sx={{
+                pt: 2, 
+            }}>{description} </Typography>
+
+
         </Card>
     );
 }
@@ -60,29 +70,29 @@ function HomePage(){
 
     const features = [
         {
-            icon: <GroupIcon sx={{fontSize: 50}}/>,
-            name: "Unified Management",
-            description: "Manage all your communities from a single dashboard and don't care about different social networks."
+            icon: <GroupIcon />,
+            name: "Management",
+            description: "Manage all your communities from a single dashboard."
         },
         {
-            icon: <AnalyticsIcon sx={{fontSize: 50}} />,
+            icon: <AnalyticsIcon  />,
             name: "Analytics",
-            description: "Get insights into your community's engagement and growth without any problems and limits."
+            description: "Effortlessly track your community's engagement and growth."
         },
         {
-            icon: <AutoAwesomeIcon sx={{fontSize: 50}} />,
+            icon: <AutoAwesomeIcon  />,
             name: "Automation",
             description: "Automate repetitive tasks and moderation."
         },
         {
-            icon: <CodeIcon sx={{fontSize: 50}} />,
-            name: "Open Source & Freedom",
-            description: "Help in development, launch for yourself and understand how it works inside. All code is licensed under GPL-V3."
+            icon: <CodeIcon  />,
+            name: "Open Source",
+            description: "Code under GPL-v3 license"
         },
         {
-            icon: <GroupsIcon sx={{fontSize: 50}} />,
+            icon: <GroupsIcon />,
             name: "Socialization",
-            description: "Connect with like-minded people and find a community that shares your interests."
+            description: "Connect with like-minded individuals to form a community."
         }
     ]
 
