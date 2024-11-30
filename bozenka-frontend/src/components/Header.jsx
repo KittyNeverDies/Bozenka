@@ -18,11 +18,12 @@ import List from '@mui/joy/List';
 import { Radio, RadioGroup } from '@mui/joy';
 
 // Material UI icons
-import InterestsIcon from '@mui/icons-material/Interests';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import LogoutIcon from '@mui/icons-material/Logout';
+import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginIcon from '@mui/icons-material/Login';
@@ -60,6 +61,7 @@ export default function JoyHeader() {
         textAlign: "center",
         alignItems: 'center',
         p: 2,
+        size: 'ms',
         position: 'sticky',
         top: 0,
         borderBottom: '1px solid',
@@ -75,8 +77,8 @@ export default function JoyHeader() {
       */}
 
       <Link to='/' sx={{'textDecoration': 'None'}}>
-        <Typography level="h3" component="h1">
-          bozenka
+        <Typography level="h3" component="h3" size='xs'>
+          Bozenka
         </Typography>
       </Link>
 
@@ -89,8 +91,11 @@ export default function JoyHeader() {
 
                 {/* 
           Menu button
-        */}
-          <Tooltip title="Menu"  variant="outlined" size="sm">
+
+                    <Tooltip title="Menu" color='primary' variant="soft" size="md" sx={{
+            boxShadow: 'none',
+            fontWeight: 'bold'                                                 
+          }}>
             <IconButton
             sx={{
               transition: 'transform 0.2s ease, background-color 0.2s ease',
@@ -105,16 +110,18 @@ export default function JoyHeader() {
                 transform: 'scale(1.20)'
               }
             }}  
-            onClick={toggleLoginDrawer(true)} variant="outlined">
+            onClick={toggleLoginDrawer(true)} variant="plain">
               <MenuIcon />
             </IconButton>
           </Tooltip>
+        */}
+
         {/* 
           Login button
         */}
-        <Tooltip title="Login"  variant="outlined" size="sm"
-          sx={{
-            transition: 'all 0.2s sizeIn'
+        <Tooltip title="Login" color='primary' variant="soft" size="md" sx={{
+            boxShadow: 'none',
+            fontWeight: 'bold'
           }}
         >
         <Link to='/login'>
@@ -133,8 +140,8 @@ export default function JoyHeader() {
             }
             }}
           
-          variant="outlined">
-            <LoginIcon />
+          variant="plain">
+            <InputRoundedIcon/>
           </IconButton>
           </Link>
         </Tooltip>
@@ -143,7 +150,10 @@ export default function JoyHeader() {
         {/* 
           Communities button
         */}
-        <Tooltip title="Communities"  variant="outlined" size="sm">
+        <Tooltip title="Communities" color='primary' variant="soft" size="md" sx={{
+            boxShadow: 'none',
+            fontWeight: 'bold'
+          }}>
           <Link to='/communities'>
           <IconButton onClick={() => {}} 
             sx={{
@@ -158,8 +168,8 @@ export default function JoyHeader() {
             '&:active': {
               transform: 'scale(1.20)'
             }
-            }} variant="outlined">
-            <InterestsIcon />
+            }} variant="plain">
+            <GroupRoundedIcon/>
           </IconButton>
           </Link>
         </Tooltip>
