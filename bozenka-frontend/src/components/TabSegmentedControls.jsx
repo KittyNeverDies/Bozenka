@@ -126,6 +126,8 @@ function TabsSegmentedControls() {
       views: '10'
     },
     // Add more posts here...
+    // In other time ...
+    // From backend ..
   ];
 
   const handleTabChange = (event, newValue) => {
@@ -268,6 +270,9 @@ function TabsSegmentedControls() {
           
           </TabPanel>
           <TabPanel value={1}>
+            <Typography level='h2' sx={{mb: 2}}>
+              Stats
+            </Typography>
               <TestChart icons={icons} data={data} displayData={displayData} />
           </TabPanel>
           <TabPanel value={2}>
