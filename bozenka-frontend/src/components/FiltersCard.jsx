@@ -89,22 +89,16 @@ function FiltersCard() {
             
     }}> 
         
-        <Card sx={{p: 0,
-            width: 'max-content',
-            display: 'flex'
-        }}>
-                  <Box>
+
                     <Breadcrumbs 
-                        separator={ <KeyboardArrowRightIcon/>}
-                        sx={{
-                          "--Breadcrumbs-gap": "3px"
-                        }}
+                        size="sm"
+                        separator={ <KeyboardArrowRightIcon sy/>}
+                     
                     >
-                      <Typography level="body-md" sx={{mt: 0}}>Home</Typography>
-                      <Typography level="body-md" sx={{mt: 0, color: 'primary.plainColor'}}>Communities</Typography>
+                      <Typography sx={{mt: 0}}>Home</Typography>
+                      <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Communities</Typography>
                     </Breadcrumbs>
-                  </Box>
-        </Card>
+       
         <Card 
             variant="outlined" 
             sx={{ 

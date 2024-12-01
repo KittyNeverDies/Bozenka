@@ -53,20 +53,19 @@ function Community() {
                   }
                 }
             }>
-                <Card sx={{p: 0, display: 'flex', mb: 2}}>
-                  <Box>
+                  <Box sx={{mb: 2}}>
                     <Breadcrumbs 
+                        size='sm'
                         separator={<KeyboardArrowRightIcon/>}
                         sx={{
                           "--Breadcrumbs-gap": "3px"
                         }}
                     >
-                      <Typography level="body-md" sx={{mt: 0}}>Home</Typography>
-                      <Typography level="body-md" sx={{mt: 0}}>Communities</Typography>
-                      <Typography level="body-md" sx={{pt: 0, color: 'primary.plainColor'}}>Community Name</Typography>
+                      <Typography  sx={{mt: 0}}>Home</Typography>
+                      <Typography  sx={{mt: 0}}>Communities</Typography>
+                      <Typography  sx={{pt: 0, color: 'primary.plainColor'}}>Community Name</Typography>
                     </Breadcrumbs>
                   </Box>
-                </Card>
                 <Card>
                     <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
                     <Box> 
