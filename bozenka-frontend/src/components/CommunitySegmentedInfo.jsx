@@ -35,7 +35,7 @@ import PersonIcon from '@mui/icons-material/Person';
 
 
 
-function TabsSegmentedControls() {
+function CommunitySegmentedInfo() {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
 
@@ -301,7 +301,7 @@ function TabsSegmentedControls() {
                       <Chip variant="soft" startDecorator={<OpenInNewIcon/>} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
                         {post.category}
                       </Chip>
-              
+  
                       <Chip variant="soft" startDecorator={<VisibilityRoundedIcon/>} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
                         {post.views} views
                       </Chip>
@@ -355,4 +355,4 @@ function TabsSegmentedControls() {
     </Tabs>
   );
 }
-export default TabsSegmentedControls;
+export default CommunitySegmentedInfo;

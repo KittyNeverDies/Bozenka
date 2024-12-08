@@ -9,15 +9,13 @@ import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import MenuItem from '@mui/joy/MenuItem';
 import Chip from '@mui/joy/Chip';
 import CardContent from '@mui/joy/CardContent';
-
 import MenuButton from '@mui/joy/MenuButton';
 import Menu from '@mui/joy/Menu';
-
 import Dropdown from '@mui/joy/Dropdown';
+
 
 // MUI material you icons
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ReportIcon from '@mui/icons-material/Report';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
@@ -27,9 +25,13 @@ import InfoIcon from '@mui/icons-material/Info';
 
 
 
-
+/**
+* CommunityCard component, used in community search page.
+* Have inside a Card component with Avatar, description, memebers count,
+* date of creation & other responsive community infromation.
+* @returns {JSX.Element} - The rendered community card.
+*/
 function CommunityCard() {
-
     return (
         <Card sx={{m: 1 }}>
             <Avatar 

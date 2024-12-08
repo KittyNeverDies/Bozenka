@@ -21,6 +21,11 @@ import CommunityCard from '../components/CommunityCard';
 
 
 function CommunitiesSearch() {
+    /**
+    * @description A community search page
+    * @type {JSX.Element}
+    */
+  
     const [searchTerm, setSearchTerm] = useState('');
     const [isFocused, setIsFocused] = useState(false);
 

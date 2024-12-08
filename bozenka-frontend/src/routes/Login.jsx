@@ -60,7 +60,7 @@ const LoginPage = () => {
   const inputStyles = {
     width: '100%',
     '--Input-focusedThickness': '1px',
-    bgcolor: 'background.surface',
+    bgcolor: 'background.level0',
     borderRadius: 'lg',
     '&:hover': {
       bgcolor: 'background.level1',
@@ -153,7 +153,7 @@ const LoginPage = () => {
           </Alert>
         </Box>
       )}
-      <Card sx={{ p: 4, backgroundColor: 'background.body', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
+      <Card sx={{ p: 4, boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <Typography variant="h2" level="h4" sx={{ fontWeight: 'bold', color: 'text.primary', fontSize: '1.75rem' }}>

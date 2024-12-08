@@ -1,3 +1,4 @@
+// Some react stuff
 import { useRef } from 'react';
 import {Link} from 'react-router-dom';
 
@@ -18,16 +19,17 @@ import CodeIcon from "@mui/icons-material/Code";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
-
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 
-
+/**
+* FeatureCard component
+* Card that describes a feature of bozenka.
+* Used in homepage, to be simple.
+* @param {Object} feature - The feature object containing icon, name, and description.
+* @returns {JSX.Element} - The rendered feature card.
+*/
 function FeatureCard({ feature }){
-    /* 
-    Card, what describes feature of bozenka
-    :)
-    */
     const {icon, name, description} = feature 
     return (
         <Card color='primary' invertedColors variant='solid' sx={{
@@ -57,15 +59,13 @@ function FeatureCard({ feature }){
 }
 
 
+/**
+* HomePage component
+* Home page of bozenka utility, what should introduce bozenka for new users.
+* @returns {JSX.Element} - The rendered home page.
+*/
 function HomePage(){
-    /*
-    Home page of bozenka.
-    Should be placed in main :)
-    */
-
-    
     const KeyFeatures = useRef(null)
-
     const scrollToFeatures = () => KeyFeatures.current.scrollIntoView()    
 
     const features = [
@@ -144,6 +144,8 @@ function HomePage(){
                     </Button>
                 </Box>
             </Box>
+
+            {/* Features section. */}
             <Box sx={{
                 backgroundColor: 'background.level1',
                 pb: 5,
@@ -167,8 +169,9 @@ function HomePage(){
                 <FeatureCard key={index} feature={feature} />
                 ))}
             </Box>
+
             </Box>
-            {/* Main introduction page */}
+            {/* Ending of the page */}
             <Box sx={{
                 paddingTop: 18,
                 height: 500,

@@ -2,6 +2,7 @@
 import JoyHeader from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 
+
 // Pages for routing
 import HomePage from "./routes/Homepage.jsx"; 
 import CommunitiesSearch from './routes/Communities.jsx';
@@ -15,27 +16,29 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import '@fontsource/inter';
 
 
+/**
+* App component
+* Base function, defines the application.
+* @returns {JSX.Element} - The rendered application.
+*/
 function App() {
-  /*
-    Base fuction, defines the application.;
-  */
-  return (
-    <div>
-      <JoyHeader />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/communities" element={<CommunitiesSearch />} />
-        <Route path='/community' element={<Community />} />
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/register' element={<RegisterPage />} />
-        <Route path='/dashboard/add' element={<DashboardAddCommunity />} />
-        <Route path='/dashboard/edit' element={<DashboardEditCommunity />} />
-        <Route path='/dashboard' element={<DashboardHomepage />} />
-      </Routes>
-      <Footer/>
-      {/* Rest of your content */}
-    </div>
-  );
+ return (
+   <div>
+     <JoyHeader />
+     <Routes>
+       <Route path="/" element={<HomePage />} />
+       <Route path="/communities" element={<CommunitiesSearch />} />
+       <Route path='/community' element={<Community />} />
+       <Route path='/login' element={<LoginPage />} />
+       <Route path='/register' element={<RegisterPage />} />
+       <Route path='/dashboard/add' element={<DashboardAddCommunity />} />
+       <Route path='/dashboard/edit' element={<DashboardEditCommunity />} />
+       <Route path='/dashboard' element={<DashboardHomepage />} />
+     </Routes>
+     <Footer/>
+   </div>
+ );
 }
+
 
 export default App;

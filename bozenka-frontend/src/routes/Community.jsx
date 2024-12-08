@@ -26,23 +26,25 @@ import MultipleStopRoundedIcon from '@mui/icons-material/MultipleStopRounded';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
-import TabsSegmentedControls from '../components/TabSegmentedControls';
+// Our componenets
+import CommunitySegmentedInfo from '../components/CommunitySegmentedInfo';
 
 
+/**
+* Community page, should be displayed for some community id, 
+* with based information about it. (description, etc).
+* @returns {JSX.Element} - The rendered community page.
+*/
 function Community() {
     return (
-        <Box sx={
-            {
+        <Box sx={{
                 m: 2,
                 display: 'flex',
                 flexDirection: 'row',
                 '@media (max-width: 670px)': { // Mobile responsiveness
                   flexDirection: 'column',
-                }
-            }
-        }>
-            <Stack sx={
-                {
+                }}}>
+            <Stack sx={{
                     flexDirection: 'column',
                     width: 300,
                     '@media (max-width: 670px)': { // Mobile responsiveness
@@ -50,8 +52,7 @@ function Community() {
                       position: 'relative',
                       left: 'unset',
                       mr: 0,
-                  }
-                }
+                  }}
             }>
                   <Box sx={{mb: 2}}>
                     <Breadcrumbs 
@@ -179,7 +180,7 @@ function Community() {
                 </Card>
             </Stack>
             
-            <TabsSegmentedControls sx={{flex: 1}}/>
+            <CommunitySegmentedInfo sx={{flex: 1}}/>
             
         </Box>
     )

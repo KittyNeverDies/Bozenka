@@ -66,7 +66,8 @@ function RangeSliders() {
 
 
 /**
- * @description A functional component that renders a card with filters to filter communities
+ * @description A functional component that renders a card with filters to filter communities.
+ * Used on communities search page.
  * @returns {JSX.Element}
  */
 function FiltersCard() {
@@ -78,23 +79,15 @@ function FiltersCard() {
     
     <Stack sx={{
                 flexDirection: 'column',
-                
                 '@media (max-width: 670px)': { // Mobile responsiveness
                   width: '120%',
                   position: 'relative',
-                  left: 'unset',
-                  
+                  left: 'unset',    
                 },
-                mr: 1
-            
-    }}> 
-        
-
+                mr: 1}}> 
                     <Breadcrumbs 
                         size="sm"
-                        separator={ <KeyboardArrowRightIcon sy/>}
-                     
-                    >
+                        separator={ <KeyboardArrowRightIcon sy/>}>
                       <Typography sx={{mt: 0}}>Home</Typography>
                       <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Communities</Typography>
                     </Breadcrumbs>

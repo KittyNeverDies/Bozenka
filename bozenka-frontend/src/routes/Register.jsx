@@ -1,18 +1,28 @@
-import { Box, Button, Input, Typography, Card } from '@mui/joy';
+
+// Some stuff for React
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
+// MUI joy Elements
+import LinearProgress from '@mui/joy/LinearProgress';
+import { Box, Button, Input, Typography, Card } from '@mui/joy';
 import Alert from '@mui/joy/Alert';
 
-import LinearProgress from '@mui/joy/LinearProgress';
 
-
+// Icons from MUI
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
-
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
-const RegisterPage = () => {
+
+
+/**
+* RegisterPage component
+* Component for the registration page of the application.
+* @returns {JSX.Element} - The rendered registration page.
+*/
+function RegisterPage () {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
