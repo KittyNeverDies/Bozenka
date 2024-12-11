@@ -282,6 +282,7 @@ function CommunitySegmentedInfo() {
             <Grid container spacing={1}>
               {posts.map((post, index) => (
                 <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                  <Box my={0.5}>
                   <Card sx={{ height: '100%'}}>
             
                     <Typography level="title-lg" sx={{marginBottom: -1}}>
@@ -307,6 +308,7 @@ function CommunitySegmentedInfo() {
                       </Chip>
                     </Box>
                   </Card>
+                  </Box>
                 </Grid>
               ))}
             </Grid>
