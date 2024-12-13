@@ -9,7 +9,10 @@ import CommunitiesSearch from './routes/Communities.jsx';
 import LoginPage from './routes/Login.jsx';
 import Community from './routes/Community.jsx';
 import RegisterPage from './routes/Register.jsx';
-import { DashboardAddCommunity, DashboardEditCommunity, DashboardHomepage } from './routes/Dashboard.jsx';
+import {
+  DashboardHomepage, 
+  DashboardBuildCommunity,
+  DashboardLayout } from './routes/Dashboard.jsx';
 
 // Other imports
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -31,9 +34,12 @@ function App() {
        <Route path='/community' element={<Community />} />
        <Route path='/login' element={<LoginPage />} />
        <Route path='/register' element={<RegisterPage />} />
-       <Route path='/dashboard/add' element={<DashboardAddCommunity />} />
-       <Route path='/dashboard/edit' element={<DashboardEditCommunity />} />
-       <Route path='/dashboard' element={<DashboardHomepage />} />
+
+      {/* Dashboard routes */}
+      <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<DashboardHomepage />} />
+          <Route path='build' element={<DashboardBuildCommunity />} />
+      </Route>
      </Routes>
      <Footer/>
    </div>
