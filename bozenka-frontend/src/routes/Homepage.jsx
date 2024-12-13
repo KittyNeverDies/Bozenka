@@ -20,6 +20,7 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { Avatar } from '@mui/joy';
 
 
 /**
@@ -30,30 +31,28 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 * @returns {JSX.Element} - The rendered feature card.
 */
 function FeatureCard({ feature }){
+    /* 
+    Card, what describes feature of bozenka
+    :)
+    */
     const {icon, name, description} = feature 
     return (
-        <Card color='primary' invertedColors variant='solid' sx={{
-            width: 200,
-            height: 150,
+        <Card sx={{
+            width: 220,
             transition: 'transform 0.3s, box-shadow 0.3s',
             '&:hover': { 
                 transform: 'scale(1.05)', 
                 boxShadow: 'md',
             }
         }}> 
-            <Chip
-                size="lg"
-                variant="soft"
-                startDecorator={icon}
-                sx={{ alignSelf: 'flex-start', borderRadius: 'xl', fontWeight: 'bold' }}
-            >
-                {name}
-            </Chip>
-            <Typography level='body-sm' sx={{
-                pt: 2, 
-            }}>{description} </Typography>
-
-
+            <div>
+                <Box sx={{mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', height: 80}}>
+                        {icon}
+                </Box>
+                
+                <Typography level="title-lg" sx={{mb: 1}}>{name}</Typography>
+                <Typography level="body-sm" sx={{}}>{description}</Typography>
+            </div>
         </Card>
     );
 }
@@ -70,27 +69,27 @@ function HomePage(){
 
     const features = [
         {
-            icon: <GroupIcon />,
+            icon: <GroupIcon sx={{fontSize: 50}} />,
             name: "Management",
             description: "Manage all your communities from a single dashboard."
         },
         {
-            icon: <AnalyticsIcon  />,
+            icon: <AnalyticsIcon sx={{fontSize: 50}}   />,
             name: "Analytics",
             description: "Effortlessly track your community's engagement and growth."
         },
         {
-            icon: <AutoAwesomeIcon  />,
+            icon: <AutoAwesomeIcon sx={{fontSize: 50}}   />,
             name: "Automation",
             description: "Automate repetitive tasks and moderation."
         },
         {
-            icon: <CodeIcon  />,
+            icon: <CodeIcon sx={{fontSize: 50}}   />,
             name: "Open Source",
             description: "Code under GPL-v3 license"
         },
         {
-            icon: <GroupsIcon />,
+            icon: <GroupsIcon sx={{fontSize: 50}} />,
             name: "Socialization",
             description: "Connect with like-minded individuals to form a community."
         }
@@ -102,31 +101,39 @@ function HomePage(){
         
             {/* Main introduction page */}
             <Box sx={{
-                height: 500,
-                paddingTop: 10,
+                paddingTop: 2,
                 paddingBottom: 3,
                 backgroundImage: ({ palette }) =>
-                    `linear-gradient(to bottom, ${palette.background.level1}, ${palette.background.body})`,
-                mb: 10
-                
+                    `radial-gradient(circle,  ${palette.background.body}, ${palette.background.level1} 80%, #d8dee9 100%)`,
             }}>
+                <Card sx={{
+                    borderColor: 'none',
+                    m: 2
+                }}>
                 <Typography level='h1' element="h1" sx={{
-                    textAlign: "center",
-                    paddingTop: 10,
+                    textAlign: "left",
+                    paddingTop: 8,
+                    paddingBottom: 0,
+                    my: 0,
+                    px: 2,
                     
                     
                 }}>
                     Manage Your Community Across Platforms
                 </Typography>
             
-                <Typography level='h4' sx={{
-                    textAlign: "center",
+                <Typography level='body-md' sx={{
+                    textAlign: "left",
+                    my: 0,
+                    paddingTop: 0,
+                    fontWeight: 'regular',
+                    px: 2
                 }}>Streamline your community management on Discord, Telegram, and VK with Bozenka project.
                 </Typography>
-                <Box textAlign="center" sx={{p:5}}>
+                <Box sx={{textAlign: 'right'}}>
                     <Button variant="soft" size="lg" sx={{
-                        justifyContent: "center",
-                        p: 2,
+                        justifyContent: "right",
+                        p: 1.5,
                         transition: 'transform 0.2s ease, background-color 0.2s ease',
                         border: '1px',
                         '&:hover': {
@@ -138,80 +145,21 @@ function HomePage(){
                             transform: 'scale(1.20)'
                         }
                     }} endDecorator={<KeyboardDoubleArrowDownRoundedIcon/>}
-                    onClick={scrollToFeatures}
                     >
                         Get started
                     </Button>
                 </Box>
-            </Box>
-
-            {/* Features section. */}
-            <Box sx={{
-                backgroundColor: 'background.level1',
-                pb: 5,
-                borderRadius: 'lg',
-                ml: 1,
-                mr: 1,
-            }}>
-            <Typography level='h1' ref={KeyFeatures} sx={{
-                textAlign: "center",
-                paddingTop: 10,
-                paddingBottom: 4
-            }}>
-                Key Features
-            </Typography>
-            <Box sx={{ 
+                </Card>
+                <Box sx={{ 
                 display: 'flex', 
                 flexWrap: 'wrap', 
-                gap: 4, justifyContent: 'center' 
+                gap: 4, 
+                m: 2
             }}>
                 {features.map((feature, index) => (
                 <FeatureCard key={index} feature={feature} />
                 ))}
             </Box>
-
-            </Box>
-            {/* Ending of the page */}
-            <Box sx={{
-                paddingTop: 18,
-                height: 500,
-                
-                backgroundImage: ({ palette }) =>
-                    `linear-gradient(to bottom, ${palette.background.body}, ${palette.background.level1})`,
-                paddingBottom: 3,
-            }}>
-                <Typography level='h1' element="h1" sx={{
-                    textAlign: "center",
-                    paddingTop: 10,
-                }}>
-                   Ready to Elevate Your Community Management?
-                </Typography>
-            
-                <Typography level='h4' sx={{
-                    textAlign: "center",
-                }}>
-                    Start your journey of nextgen community management now. Stay tuned for updates.
-                </Typography>
-                <Box textAlign="center" sx={{p:5}}>
-                    <Link to="https://t.me/bozodevelopment/">
-                    <Button variant="soft" size="lg" endDecorator={<OpenInNewRoundedIcon/>} sx={{
-                        justifyContent: "center",
-                        p: 2,
-                        
-                        transition: 'transform 0.2s ease, background-color 0.2s ease',
-                        '&:hover': {
-                            transform: 'scale(1.05)',
-                            bgcolor: 'primary.lightBg',
-                            borderRadius: '',
-                        },
-                        '&:active': {
-                            transform: 'scale(1.20)'
-                        }
-                    }}>
-                        Check out telegram channel
-                    </Button>
-                    </Link>
-                </Box>
             </Box>
         </>
     );
