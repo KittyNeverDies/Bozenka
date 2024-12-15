@@ -9,9 +9,11 @@ import CommunitiesSearch from './routes/Communities.jsx';
 import LoginPage from './routes/Login.jsx';
 import Community from './routes/Community.jsx';
 import RegisterPage from './routes/Register.jsx';
+import Page404 from './routes/404.jsx';
 import {
   DashboardHomepage, 
   DashboardBuildCommunity,
+  DashboardControlCommunity,
   DashboardLayout } from './routes/Dashboard.jsx';
 
 // Other imports
@@ -34,12 +36,15 @@ function App() {
        <Route path='/community' element={<Community />} />
        <Route path='/login' element={<LoginPage />} />
        <Route path='/register' element={<RegisterPage />} />
-
+       
       {/* Dashboard routes */}
       <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardHomepage />} />
           <Route path='build' element={<DashboardBuildCommunity />} />
+          <Route path='communities' element={<DashboardControlCommunity />} />
+          <Route path="*" element={<Page404 />}/>
       </Route>
+      <Route path="*" element={<Page404/>}/>
      </Routes>
      <Footer/>
    </div>

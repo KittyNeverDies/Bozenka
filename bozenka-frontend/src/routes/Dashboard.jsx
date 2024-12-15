@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 
 
+// MUI Joy UI controls
 import {FormControl, FormLabel, FormHelperText, List, ListItem} from '@mui/joy';
 import Card from '@mui/joy/Card';
 import Input from '@mui/joy/Input';
@@ -20,13 +21,20 @@ import TabPanel from '@mui/joy/TabPanel';
 import Stepper from '@mui/joy/Stepper';
 import Step from '@mui/joy/Step';
 import StepIndicator from '@mui/joy/StepIndicator';
+import ListItemDecorator from '@mui/joy/ListItemDecorator';
+import ListItemContent from '@mui/joy/ListItemContent';
+import ListItemButton from '@mui/joy/ListItemButton';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 
 
+// Our own controls
 import TestChart from '../components/GrowthChart';
 
 
+// MUI material theme icons
 import SearchIcon from '@mui/icons-material/SearchRounded';
+import PersonIcon from '@mui/icons-material/Person';
+import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
@@ -34,17 +42,16 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 
 export function DashboardLayout(){
-
-
   const buttons = {
     'Communities': [
         {
           head: 'Manage communities', 
           description: 'Manage your communities, add administrators, create posts, etc.', 
-          destination: 'dashboard/communities',
+          destination: 'communities',
           icon: <HandymanRoundedIcon />
         },
         {
@@ -152,7 +159,7 @@ export function DashboardLayout(){
         </Box>
     </Box>
 
-    <Box sx={{p: 2}}>
+    <Box sx={{p: 3}}>
       <Outlet/>
     </Box>
     </Box>
@@ -163,32 +170,6 @@ export function DashboardLayout(){
 
 // Define the DashboardHomepage component
 export function DashboardHomepage() {
-  // Define the buttons data
-
-  const buttonss = [
-    {
-      head: 'Search community',
-      description: 'Find your social home or place for ads. Here is freedom of choice.',
-      icon: <SearchIcon />,
-    },
-    {
-      head: 'Community-building',
-      description: 'Create or import your own social home or club by interests.',
-      icon: <AddRoundedIcon />,
-    },
-    {
-      head: 'Manage community',
-      description: 'Manage your communities, add administrators, create posts, etc.',
-      icon: <HandymanRoundedIcon />
-    },
-    {
-      head: 'Manage account',
-       description: 'Manage your security, privacy of your account. Change avatar or name.',
-
-    }
-  ];
-
-
   
   const data = [
     {
@@ -258,11 +239,9 @@ export function DashboardHomepage() {
   };
 
   return (
-     
     <>
-      {/* Welcome card */}
-
-        <Breadcrumbs size='sm' >
+        <Breadcrumbs size='sm' 
+          separator={<KeyboardArrowRightIcon/>} >
           <Link>
             Dashboard
           </Link>
@@ -270,7 +249,7 @@ export function DashboardHomepage() {
             Home
           </Link>
         </Breadcrumbs>
-        <Typography level='h2' my={1} px={1}>
+        <Typography level='h2' my={2} px={1}>
             Home
         </Typography>
       <Card sx={{ height: '60vh', mt: 1 }}>
@@ -285,7 +264,20 @@ export function DashboardHomepage() {
 
 export function DashboardBuildCommunity() {
   return <>
-    <Card>
+        <Breadcrumbs 
+          size="sm"
+          separator={ <KeyboardArrowRightIcon/>}>
+          <Typography sx={{mt: 0}}>Dashboard</Typography>
+          <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Community building</Typography>
+      </Breadcrumbs>
+    
+      <Typography level='h2' my={2} px={1}>
+            Build Community
+        </Typography>
+    <Card sx={{width: 'auto'}}>
+        <Typography>
+          What you would like to do?
+        </Typography>
         <Button variant="plain" size="lg" sx={{
                         p: 1.5,
                         transition: 'transform 0.2s ease, background-color 0.2s ease',
@@ -324,16 +316,135 @@ export function DashboardBuildCommunity() {
   </>
 }
 
+
 export function DashboardControlCommunity() {
+  const [tabIndex, setTabIndex] = React.useState(0);
+
+  // Sample data for communities
+  const communities = [
+    { id: 1, name: "Community Alpha", avatar: "A" },
+    { id: 2, name: "Community Beta", avatar: "B" },
+    { id: 3, name: "Community Gamma", avatar: "C" },
+    { id: 4, name: "Community Delta", avatar: "D" },
+  ];
+
   return (
-    <Stack m={2} sx={{}}>
-      <Card sx={{ width: 'auto' }}>
-        <Typography level="h3" mt={1} element="h1">
-          Edit your community
+    <>
+          {/* Center Content */}
+    <Breadcrumbs 
+          size="sm"
+          separator={ <KeyboardArrowRightIcon/>}>
+          <Typography sx={{mt: 0}}>Dashboard</Typography>
+          <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Manage Communities</Typography>
+      </Breadcrumbs>
+    
+      <Typography level='h2' my={2} px={1}>
+            Manage communities
         </Typography>
-        <Divider sx={{ my: 2 }} />
-        {/* Edit community form here */}
+    <Stack direction="row" spacing={1} >
+      <Card sx={{ width: 'auto', p: 3}}>
+        <Box sx={{display: 'flex', flexDirection: 'column', my: 1}}> 
+            
+            <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
+            <Typography level="title-lg"
+                sx={{marginBottom: 0}}>
+                  Community
+            </Typography>
+            <Box sx={{display: 'flex', flexDirection: 'row'}}>
+              <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
+                 100 Members
+              </Typography>
+              <Typography 
+                  startDecorator={<CalendarMonthRoundedIcon/>}
+                  level="body-xs">
+                    Created on 9th September, 1999
+              </Typography>
+            </Box>
+            
+            <Typography color='neutral' level="body-xs">
+              Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
+            </Typography>
+        </Box>
+
+        {/* Tab System */}
+        <Tabs value={tabIndex}
+              onChange={(event, value) => setTabIndex(value)}
+              sx={{
+                borderRadius: 'md',
+                          [`& .${tabClasses.root}`]: {
+                            zIndex: 1,
+                            transition: 'transform 0.2s ease, background-color 0.2s ease',
+                            mx: 0.5,
+                            paddingLeft: 1,
+                            paddingRight: 1,
+                            
+                            borderTopLeftRadius: '5px',
+                            borderTopRightRadius: '5px',
+                            '&:hover': {
+                              transform: 'scale(1.05)',
+                              
+                            },
+                            '&[aria-selected="true"]': {
+                              bgcolor: 'primary.softBgColor',
+                              color: 'primary.softColor',
+                              transition: 'all 0.5 ease'
+
+                            },
+                          },
+              }}
+        >
+          <TabList>
+            <Tab>General</Tab>
+            <Tab>Members</Tab>
+            <Tab>Settings</Tab>
+          </TabList>
+          <TabPanel value={0}>
+            <Typography>General information about the community.</Typography>
+          </TabPanel>
+          <TabPanel value={1}>
+            <Typography>Manage members of the community here.</Typography>
+          </TabPanel>
+          <TabPanel value={2}>
+            <Typography>Community settings and configurations.</Typography>
+          </TabPanel>
+        </Tabs>
+      </Card>
+
+      {/* Community List on the Right */}
+      <Card sx={{ width: 250, 
+        p: 2, 
+        float: 'right' ,
+        width: 250, p: 2
+      }}>
+        <Typography level="title-lg" mb={1}>
+          Your Communities
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        <List>
+          {communities.map((community) => (
+
+            <ListItem key={community.id}>
+              <ListItemButton sx={{my: 0.1, borderRadius: 'md', 
+                transition: 'background 0.3s ease'
+              }}>
+                <ListItemDecorator>
+                  <Avatar>{community.avatar}</Avatar>
+                </ListItemDecorator>
+                <ListItemContent sx={{mx: 1}}>
+                  <Typography level='title-md'>
+                    {community.name}
+                  </Typography>
+                  <Typography level='body-xs'>
+                    {community.name}
+                  </Typography>
+                </ListItemContent>
+                </ListItemButton>
+            </ListItem>
+            
+          ))}
+        </List>
       </Card>
     </Stack>
+    </>
   );
 }
