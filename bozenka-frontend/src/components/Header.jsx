@@ -2,12 +2,18 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useLocation } from 'react-router-dom';
+
+
 // Joy UI components
 import Box from '@mui/joy/Box';
 import Typography from '@mui/joy/Typography';
 import Tooltip from '@mui/joy/Tooltip';
 import IconButton from '@mui/joy/IconButton';
 import Drawer from '@mui/joy/Drawer';
+import Stack from '@mui/joy/Stack';
+import Button from '@mui/joy/Button';
 import Divider from '@mui/joy/Divider';
 import ListItem from '@mui/joy/ListItem';
 import ListItemButton from '@mui/joy/ListItemButton';
@@ -27,6 +33,11 @@ import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginIcon from '@mui/icons-material/Login';
+import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import SettingsRoundedIcon from'@mui/icons-material/SettingsRounded';
+import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 
 /**
  * @description A functional component that renders header for all pages.
@@ -38,13 +49,43 @@ export default function JoyHeader() {
   * @type {JSX.Element}
   */
 
-  const [openLoginDrawer, setOpenLoginDrawer] = React.useState(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const location = useLocation(); // Import useLocation from react-router-dom
+  const isDashboard = location.pathname.includes('/dashboard');
+  const isMobile = useMediaQuery('@media (max-width:1000px)'); // Use MUI's useMediaQuery
 
-  const toggleLoginDrawer = (isOpen) => (event) => {
+  const toggleDrawer = (isOpen) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-        return;
+      return;
     }
-    setOpenLoginDrawer(isOpen);
+    setOpenDrawer(isOpen);
+  };
+
+  
+  // Dashboard navigation buttons (moved from Dashboard.jsx)
+  const dashboardButtons = {
+    'Communities': [
+      {
+        head: 'Manage communities',
+        description: 'Manage your communities, add administrators, create posts, etc.',
+        destination: '/dashboard/communities',
+        icon: <HandymanRoundedIcon />
+      },
+      {
+        head: 'Community building',
+        description: 'Create or import your own social home or club by interests.',
+        destination: '/dashboard/build',
+        icon: <AddRoundedIcon />
+      },
+    ],
+    "Account": [
+      {
+        head: 'Manage account',
+        description: 'Manage your security, privacy of your account. Change avatar or name.',
+        destination: '/dashboard/account',
+        icon: <SettingsRoundedIcon />
+      },
+    ]
   };
 
   return (
@@ -116,6 +157,34 @@ export default function JoyHeader() {
           </Tooltip>
         */}
 
+        {
+          /* 
+            Menu button
+          */
+        }
+        {(!isDashboard && !isMobile || isMobile) && (
+          <Tooltip title="Menu" color='primary' variant="soft" size="md" sx={{
+            boxShadow: 'none',
+            fontWeight: 'bold'
+          }}>
+            <IconButton onClick={toggleDrawer(true)} 
+                sx={{
+                  transition: 'transform 0.2s ease, background-color 0.2s ease',
+                  m: 0.5,
+                  marginRight: 1.2,
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                    bgcolor: 'primary.lightBg',
+                    borderRadius: '',
+                  },
+                  '&:active': {
+                    transform: 'scale(1.20)'
+                  }
+                }} >
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
+       )}
         {/* 
           Login button
         */}
@@ -178,142 +247,90 @@ export default function JoyHeader() {
     {/* 
        Drawer, that opens on menu button click.
     */}
-    <Drawer open={openLoginDrawer} onClose={toggleLoginDrawer(false)}>
-        <Box
-            role="presentation"
-            onClick={toggleLoginDrawer(false)}
-            onKeyDown={toggleLoginDrawer(false)}
-        >
-            <Typography level="h3"
-                
-                sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}
-            >Menu</Typography>
-      <Typography
-        id="ellipsis-list-demo"
-        level="body-xs"
-        textTransform="uppercase"
-      sx={{ 
-        letterSpacing: '0.15rem', 
-        paddingLeft: 2, 
-        paddingBottom: 1, 
-        paddingTop: 2}}>
-                    Communities
-      </Typography>
-      <List>
-        <ListItem key="Dashboard">
-            <ListItemButton>
-                <ListItemDecorator>
-                    <AutoGraphIcon/>
-                </ListItemDecorator>
-                <ListItemContent>        
-                    <Typography level="title-sm">
-                        Dashboard
-                    </Typography>
-                    <Typography level="body-sm" noWrap>
-                        Check out all statistics in one place.
-                    </Typography>
-                </ListItemContent>
-                <KeyboardArrowRight/>
-            </ListItemButton>
-        </ListItem>
-        <ListItem key="Communities">
-            <ListItemButton>
-                <ListItemDecorator>
-                    <SettingsSuggestIcon/>
-                </ListItemDecorator>
-                <ListItemContent>        
-                    <Typography level="title-sm">
-                        Manage Communities
-                    </Typography>
-                    <Typography level="body-sm" noWrap>
-                        Set up bozenka to work with your communities 
-                    </Typography>
-                </ListItemContent>
-                <KeyboardArrowRight/>
-            </ListItemButton>
-        </ListItem>
-        <ListItem key="AddCommunity">
-            <ListItemButton>
-                <ListItemDecorator>
-                    <AddCircleIcon/>
-                </ListItemDecorator>
-                <ListItemContent>        
-                    <Typography level="title-sm">
-                        Connect Your Community
-                    </Typography>
-                    <Typography level="body-sm" noWrap>
-                        Connect it, to manage it.
-                    </Typography>
-                </ListItemContent>
-                <KeyboardArrowRight/>
-            </ListItemButton>
-        </ListItem>
-      </List>
-      <Typography
-                id="ellipsis-list-demo"
-                level="body-xs"
-                textTransform="uppercase"
-                sx={{ letterSpacing: '0.15rem', paddingLeft: 2, paddingBottom: 1, paddingTop: 2}}
-                >
-                    Account
-               </Typography>
-      <List>
-        <ListItem key="LogOut">
-            <ListItemButton>
-                <ListItemDecorator>
-                    <LogoutIcon/>
-                </ListItemDecorator>
-                <ListItemContent>        
-                    <Typography level="title-sm">
-                        Logout of Account
-                    </Typography>
-                    <Typography level="body-sm" noWrap>
-                        Get out of bozenka account. Why?
-                    </Typography>
-                </ListItemContent>
-                <KeyboardArrowRight/>
-            </ListItemButton>
-        </ListItem>
-        
-      <ListItem key="AccountSettings">
-            <ListItemButton>
-                <ListItemDecorator>
-                    <SettingsSuggestIcon/>
-                </ListItemDecorator>
-                <ListItemContent>        
-                    <Typography level="title-sm">
-                        Account Settings
-                    </Typography>
-                    <Typography level="body-sm" noWrap>
-                        Control your account and set account settings.
-                    </Typography>
-                </ListItemContent>
-                <KeyboardArrowRight/>
-            </ListItemButton>
-        </ListItem>
-      </List>
-      <Box
-          sx={{
-            display: 'flex',
-            gap: 1,
-            p: 1.5,
-            pb: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            position: 'absolute',
-            bottom: 0,
-            width: '100%'
-          }}
-        >
-          <Avatar size="md" />
-          <div>
-            <Typography level="title-sm">Username</Typography>
-            <Typography level="body-sm">joined 20 Jun 2023</Typography>
-          </div>
-        </Box>
+    
+    <Drawer open={openDrawer} onClose={toggleDrawer(false)}>
+
+      <Box sx={{
+        backgroundColor: 'background.surface', 
+        borderColor: 'background.level2', borderTop: '0px',
+        display: 'flex',
+        flexDirection: 'column',
+        fontFamily: 'Inter',
+        boxSizing: 'border-box',
+      }}>
+        <Stack sx={{ 
+          alignItems: 'left', 
+          display: 'flex',  
+          justifyContent: 'center', p: 2 
+        }}>
+          <Avatar
+            src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
+            size="lg"
+          />
+          <Typography level="h5" mt={1} element="h5" fontWeight='bold'>
+            Welcome, user.
+          </Typography>
+
+          <Typography color='neutral' level="body-xs">
+            Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
+          </Typography>
+          
+          <Typography level="body-xs">Have a nice day!</Typography>
+        </Stack>
       
+        <Box sx={{px: 0.8}}>
+          <Link to="/dashboard/">
+            <Button variant='plain' color='neutral'
+                size='sm'
+                startDecorator={<HomeRoundedIcon/>}
+                sx={{
+                  width: '100%',
+                  fontSize: 'xs',
+                  my: 0.2,
+                  justifyContent: 'left',
+                  fontWeight: '500',
+                  transition: '0.2s ease background-color'
+                }}>
+              Home
+            </Button>
+            </Link>
+          {Object.keys(dashboardButtons).map((button) => (
+            <>
+              <Typography
+              level="body-xs"
+              textTransform="uppercase"
+              sx={{ 
+                letterSpacing: '0.15rem', 
+                paddingLeft: 2, 
+                paddingBottom: 1, 
+                paddingTop: 2}}>
+                  {button}
+              </Typography>
+              {dashboardButtons[button].map( (btn) => (
+                            <Link to={btn.destination}>
+                              <Button variant='plain'
+                              color='neutral'
+                              size='sm'
+                              sx={{
+                                width: '100%',
+                                fontSize: 'xs',
+                                my: 0.2,
+                                justifyContent: 'left',
+                                
+                                fontWeight: '500',
+                                transition: '0.3s ease background-color'
+                              }}
+                              startDecorator={btn.icon}
+                            >
+                              {btn.head}
+                            </Button>
+                          </Link>
+              ))}
+              </>
+          ))}
+        </Box>
     </Box>
-  </Drawer>
+    </Drawer>
   </>
   );
 }

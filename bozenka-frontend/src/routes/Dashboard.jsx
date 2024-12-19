@@ -1,6 +1,7 @@
 // React related components
 import * as React from 'react';
 import { Outlet, Link } from 'react-router-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 // MUI Joy UI controls
@@ -39,6 +40,8 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -70,11 +73,18 @@ export function DashboardLayout(){
         },
       ]
   };
-  
 
+  const isMobile = useMediaQuery('@media (max-width:1000px)'); // Use MUI's useMediaQuery
 
   return(
-    <Box sx={{ display: 'flex', height: '100vh' }}>
+    <>
+    <Box sx={{ display: 'flex', height: '100vh',
+
+      '@media (max-width:1000px)': {
+        height: '100%'
+      }
+     }}>
+    {(!isMobile) && (
       <Box sx={{
         backgroundColor: 'background.surface', 
         float: 'left', border: '1px solid', 
@@ -82,8 +92,8 @@ export function DashboardLayout(){
         display: 'flex',
         flexDirection: 'column',
         fontFamily: 'Inter',
-        width: '300',
-        minWidth: '14%',
+        width: '300px',
+        minWidth: '22%',
         boxSizing: 'border-box',
       }}>
         <Stack sx={{ 
@@ -158,11 +168,18 @@ export function DashboardLayout(){
           ))}
         </Box>
     </Box>
+    )}
 
-    <Box sx={{p: 3}}>
+    <Box sx={{p: 3,
+      width: '70%',
+      '@media (max-width:1000px)': {
+        width: '100%'
+      }
+    }}>
       <Outlet/>
     </Box>
     </Box>
+    </>
   )
 }
 
@@ -252,7 +269,8 @@ export function DashboardHomepage() {
         <Typography level='h2' my={2} px={1}>
             Home
         </Typography>
-      <Card sx={{ height: '60vh', mt: 1 }}>
+      <Card sx={{ height: '60vh', mt: 1, width: 'min-content'
+       }}>
         <TestChart icons={icons} data={data} displayData={displayData}/>
       </Card>  
     </>
@@ -274,8 +292,9 @@ export function DashboardBuildCommunity() {
       <Typography level='h2' my={2} px={1}>
             Build Community
         </Typography>
+    <Box sx={{display: 'flex', justifyContent: 'center', width: '100%', my: 3}}>
     <Card sx={{width: 'auto'}}>
-        <Typography>
+        <Typography level='body-md' sx={{textAlign: 'center'}}>
           What you would like to do?
         </Typography>
         <Button variant="plain" size="lg" sx={{
@@ -289,11 +308,15 @@ export function DashboardBuildCommunity() {
                         },
                         '&:active': {
                             transform: 'scale(1.20)'
-                        }
-                    }} 
+                        },
+                        display: 'flex',
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                    }}
+                    startDecorator={<AutoAwesomeIcon sx={{ marginBottom: 1, fontSize: '50px'}}/>}
                     >
                   
-                        I want to edit my community
+                        I want to import my community
         </Button>
         <Button variant="plain" size="lg" sx={{
                         p: 1.5,
@@ -306,13 +329,19 @@ export function DashboardBuildCommunity() {
                         },
                         '&:active': {
                             transform: 'scale(1.20)'
-                        }
+                        },
+                        display: 'flex',
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
                     }} 
+                    
+                    startDecorator={<AddCircleIcon sx={{ marginBottom: 1, fontSize: '50px'}}/>}
                     >
                   
                         I want to create my community
         </Button>
     </Card>
+    </Box>
   </>
 }
 
@@ -341,9 +370,17 @@ export function DashboardControlCommunity() {
       <Typography level='h2' my={2} px={1}>
             Manage communities
         </Typography>
-    <Stack direction="row" spacing={1} >
-      <Card sx={{ width: 'auto', p: 3}}>
-        <Box sx={{display: 'flex', flexDirection: 'column', my: 1}}> 
+      <Stack  direction={{ xs: 'column-reverse', md: 'row' }}  spacing={1} >
+        <Card sx={{ 
+          width: {xs: '95%', md: '70%'}, p: 3,
+          minWidth: '70%', 
+          
+          }}>
+          <Box sx={{
+            display: 'flex', 
+            flexDirection: 'column', my: 1,
+            overflow: 'auto' 
+          }}> 
             
             <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
             <Typography level="title-lg"
@@ -362,7 +399,12 @@ export function DashboardControlCommunity() {
             </Box>
             
             <Typography color='neutral' level="body-xs">
-              Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
+              Total growth: <Typography 
+                                color="success" 
+                                level="body-xs" 
+                                startDecorator={<TrendingUpRoundedIcon/>}> 
+                                50% from last day 
+                </Typography>
             </Typography>
         </Box>
 
@@ -391,15 +433,18 @@ export function DashboardControlCommunity() {
 
                             },
                           },
-              }}
-        >
+              }}>
           <TabList>
             <Tab>General</Tab>
-            <Tab>Members</Tab>
             <Tab>Settings</Tab>
+            <Tab>Platforms</Tab>
+            <Tab>Stats</Tab>
+            <Tab>Posts</Tab>
           </TabList>
           <TabPanel value={0}>
-            <Typography>General information about the community.</Typography>
+            <Typography level='body-xs'>
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati delectus perferendis modi eaque consequuntur accusamus. Maiores architecto sequi natus eaque consectetur neque veritatis ipsa cum hic soluta. Id, temporibus vel? Quisquam, quisquam!
+            </Typography>
           </TabPanel>
           <TabPanel value={1}>
             <Typography>Manage members of the community here.</Typography>
@@ -411,18 +456,24 @@ export function DashboardControlCommunity() {
       </Card>
 
       {/* Community List on the Right */}
-      <Card sx={{ width: 250, 
-        p: 2, 
-        float: 'right' ,
-        width: 250, p: 2
+      <Card sx={{
+        p: 2,
+        width: { xs: '97%', md: '250px' },
+        maxHeight: { xs: '300px', md: 'auto' },
+        overflowY: 'auto'
       }}>
-        <Typography level="title-lg" mb={1}>
-          Your Communities
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
+        <Box sx={{ position: 'sticky', 
+                    top: 0, 
+                    bgcolor: 'background.surface', 
+                    zIndex: 2,
+                    p: 1
+        }}>
+          <Typography level="title-lg" mb={1}>
+            Your Communities
+          </Typography>       
+        </Box>
         <List>
           {communities.map((community) => (
-
             <ListItem key={community.id}>
               <ListItemButton sx={{my: 0.1, borderRadius: 'md', 
                 transition: 'background 0.3s ease'
