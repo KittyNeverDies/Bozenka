@@ -7,6 +7,10 @@ import { Link } from 'react-router-dom';
 import LinearProgress from '@mui/joy/LinearProgress';
 import { Box, Button, Input, Typography, Card } from '@mui/joy';
 import Alert from '@mui/joy/Alert';
+import Step from '@mui/joy/Step';
+import Stepper from '@mui/joy/Stepper';
+import StepIndicator from '@mui/joy/StepIndicator';
+import Grid from '@mui/joy/Grid';
 
 
 // Icons from MUI
@@ -123,7 +127,7 @@ function RegisterPage () {
   ];
 
   return (
-    <Box sx={{ maxWidth: 480, mx: 'auto', p: 4}}>
+    <Box sx={{ maxWidth:1000, mx: 'auto', p: 4}}>
     {alert.open && (
       <Box sx={{ textAlign: 'left', mb: 2 }}>
         <Alert
@@ -168,12 +172,18 @@ function RegisterPage () {
     )}
       
       <Card sx={{ p: 4, backgroundColor: 'background.body', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+
         <Typography variant="h2" level="h4" sx={{ fontWeight: 'bold', color: 'text.primary', fontSize: '1.75rem' }}>
           Registration
         </Typography>
         <Typography level='body-sm' sx={{ mb: 3, color: 'text.primary' }}>
           Create a new account here, to get started with unified community management.
         </Typography>
+        </Grid>
+        
+        <Grid item xs={12} md={6} sx={{py: 3}}>
         <form onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {inputFields.map((field) => (
             <Input
@@ -189,42 +199,24 @@ function RegisterPage () {
               autoComplete={field.autoComplete}
             />
           ))}
+          
+                        <Typography level='body-xs'>Already have an account? <Link to='/login/'>Login</Link></Typography>
           <Button
             variant="solid"
             type="submit"
             sx={{
-              width: '100%',
               mt: 2,
               fontWeight: 'bold',
               p: 1.5,
+              float: 'left',
               transition: 'background-color 0.3s ease',
             }}
           >
             Register
           </Button>
         </form>
-        <Box sx={{ textAlign: 'center', mt: 3 }}>
-          <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-            Already have an account?
-          </Typography>
-          <Button
-            component={Link}
-            to="/login"
-            variant="outlined"
-            sx={{
-              borderColor: '#1976d2',
-              color: '#1976d2',
-              fontWeight: 'bold',
-              p: 1.5,
-              '&:hover': {
-                backgroundColor: '#e3f2fd',
-              },
-              transition: 'background-color 0.3s ease',
-            }}
-          >
-            Go to login page
-          </Button>
-        </Box>
+        </Grid>
+        </Grid>
       </Card>
     </Box>
   );
