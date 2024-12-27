@@ -297,8 +297,10 @@ export function DashboardBuildCommunity() {
         <Typography level='body-md' sx={{textAlign: 'center'}}>
           What you would like to do?
         </Typography>
+        <Box sx={{display: 'flex', flexDirection: 'row'}}>
         <Button variant="plain" size="lg" sx={{
                         p: 1.5,
+                        m: 0.5,
                         transition: 'transform 0.2s ease, background-color 0.2s ease',
                         border: '1px',
                         '&:hover': {
@@ -320,6 +322,7 @@ export function DashboardBuildCommunity() {
         </Button>
         <Button variant="plain" size="lg" sx={{
                         p: 1.5,
+                        m: 0.5,
                         transition: 'transform 0.2s ease, background-color 0.2s ease',
                         border: '1px',
                         '&:hover': {
@@ -340,6 +343,7 @@ export function DashboardBuildCommunity() {
                   
                         I want to create my community
         </Button>
+        </Box>
     </Card>
     </Box>
   </>
@@ -498,4 +502,240 @@ export function DashboardControlCommunity() {
     </Stack>
     </>
   );
+}
+
+export function DashboardControlAccount() {
+  const [selectedTab, setSelectedTab] = React.useState(0);
+  const tabListRef = React.useRef(null);
+
+
+  const data = [
+    {
+      name: "03.09",
+      views: 4000,
+      members: 2400,
+      amt: 2400,
+    },
+    {
+      name: "04.09",
+      views: 3000,
+      members: 1398,
+      amt: 2210,
+    },
+    {
+      name: "05.09",
+      views: 2000,
+      members: 9800,
+      amt: 2290,
+    },
+    {
+      name: "06.09",
+      views: 2780,
+      members: 3908,
+      amt: 2000,
+    },
+    {
+      name: "07.09",
+      views: 1890,
+      members: 4800,
+      amt: 2181,
+    },
+    {
+      name: "08.09",
+      views: 2390,
+      members: 3800,
+      amt: 2500,
+    },
+    {
+      name: "09.09",
+      views: 3490,
+      members: 4300,
+      amt: 2100,
+    },
+  ];
+
+
+  const displayData = {
+    members: {
+      title: "The number of members in the community",
+      shortTitle: "Number of members",
+      description: "Total number of community members.",
+      icon: <PeopleRoundedIcon/>,
+    },
+    views: {
+      title: "Views of the posts at this date.",
+      shortTitle: "Views of the posts",
+      description: "Total growth of number of views on posts at this date.",
+      icon: <VisibilityRoundedIcon/>,
+    }
+  
+  }
+
+  const icons = {
+    members: <PeopleRoundedIcon />,
+    views: <VisibilityRoundedIcon/>,
+  };
+
+
+  const posts = [
+    {
+      title: 'Post 1',
+      author: 'John Doe',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      date: '2022-01-01',
+      category: 'Vk',
+      views: '1'
+    },
+    {
+      title: 'Post 2',
+      author: 'Jane Doe',
+      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      date: '2022-01-02',
+      category: 'Telegram',
+      views: '10'
+    },
+    // Add more posts here...
+    // In other time ...
+    // From backend ..
+  ];
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
+
+  React.useEffect(() => {
+    const updateTabIndicator = () => {
+      if (tabListRef.current) {
+        const tabs = tabListRef.current.querySelectorAll(`.${tabClasses.root}`);
+        const activeTab = tabs[selectedTab];
+        if (activeTab) {
+          const tabListRect = tabListRef.current.getBoundingClientRect();
+          const activeTabRect = activeTab.getBoundingClientRect();
+          
+          const offsetLeft = activeTabRect.left - tabListRect.left;
+          const offsetTop = activeTabRect.top - tabListRect.top;
+
+          tabListRef.current.style.setProperty('--tab-left', `${offsetLeft}px`);
+          tabListRef.current.style.setProperty('--tab-top', `${offsetTop}px`);
+          tabListRef.current.style.setProperty('--tab-width', `${activeTabRect.width}px`);
+          tabListRef.current.style.setProperty('--tab-height', `${activeTabRect.height}px`);
+        }
+      }
+    };
+
+    updateTabIndicator();
+    window.addEventListener('resize', updateTabIndicator);
+    return () => window.removeEventListener('resize', updateTabIndicator);
+  }, [selectedTab]);
+
+  return (
+    <Tabs 
+      aria-label="tabs" 
+      value={selectedTab} 
+      onChange={handleTabChange}
+      orientation='vertical'
+      sx={{
+        bgcolor: 'transparent',
+        width: '100%', // Set width to 100% to make it responsive
+        marginLeft: 2,
+        '@media (max-width: 670px)': { // Mobile responsiveness
+          width: '100%',
+          marginLeft: 0,
+        }
+      }}
+    >
+      <Card sx={{marginTop: 2, paddingBottom: 6, width: '100%', height: '100%'}}>
+        <TabPanel value={0}>
+          </TabPanel>
+          <TabPanel value={1}>
+          </TabPanel>
+          <TabPanel value={2}>
+          </TabPanel>
+          <TabPanel value={3}>
+          </TabPanel>
+      </Card>
+      
+      <TabList
+        ref={tabListRef}
+        disableUnderline
+        sx={{
+          marginTop: 1,
+          p: 0.5,
+          gap: 0.5,
+          borderRadius: 'sm',
+          bgcolor: 'background.surface',
+          position: 'relative',
+          border: '1px solid',
+          borderColor: 'neutral.outlinedBorder',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignSelf: 'center',
+          width: 'auto',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            left: 'var(--tab-left, 4px)',
+            top: 'var(--tab-top, 4px)',
+            width: 'var(--tab-width, 0)',
+            height: 'var(--tab-height, 100%)',
+            bgcolor: 'primary.softBg',
+            borderRadius: 'lg',
+            transition: 'all 0.3s ease',
+          },
+          [`& .${tabClasses.root}`]: {
+            zIndex: 1,
+            transition: 'transform 0.2s ease, background-color 0.2s ease',
+            m: 0.5,
+            borderRadius: 'lg',
+            paddingLeft: 1,
+            paddingRight: 1,
+            textAlign: 'center',
+            '&:hover': {
+              transform: 'scale(1.05)',
+              bgcolor: 'primary.lightBg',
+              borderRadius: 'lg',
+            },
+            '&[aria-selected="true"]': {
+              bgcolor: 'transparent',
+              color: 'primary.plainColor',
+              borderRadius: 'lg'
+            },
+          },
+        }}
+      >
+        <Tab 
+            key='About' 
+            disableIndicator
+          >
+            <Typography level='title-ms'>
+              About
+            </Typography>
+            <Typography level='body-xs'>
+              About me? ;3
+            </Typography>
+          </Tab>
+        <Tab 
+            key='Stats' 
+            disableIndicator
+          >
+
+            Stats
+        </Tab>
+        
+        <Tab 
+            key='Posts' 
+            disableIndicator
+          >
+            Posts
+        </Tab>
+        
+        <Tab 
+            key='KnowledgeLibrary' 
+            disableIndicator
+          >
+            Knowledge Library
+        </Tab>
+      </TabList>
+    </Tabs>
+  )
 }
