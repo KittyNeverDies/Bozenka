@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 // MUI Joy UI controls
-import {FormControl, FormLabel, FormHelperText, List, ListItem} from '@mui/joy';
+import {FormControl, FormLabel, FormHelperText, List, ListItem, ListSubheader} from '@mui/joy';
 import Card from '@mui/joy/Card';
 import Input from '@mui/joy/Input';
 import Box from '@mui/joy/Box';
@@ -23,9 +23,15 @@ import Stepper from '@mui/joy/Stepper';
 import Step from '@mui/joy/Step';
 import StepIndicator from '@mui/joy/StepIndicator';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
+import Chip from '@mui/joy/Chip';
 import ListItemContent from '@mui/joy/ListItemContent';
+import AspectRatio from '@mui/joy/AspectRatio';
+import IconButton from '@mui/joy/IconButton';
+import Sheet from '@mui/joy/Sheet';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
+import { useColorScheme} from '@mui/joy/styles';
+
 
 
 // Our own controls
@@ -46,6 +52,30 @@ import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import LinkIcon from '@mui/icons-material/Link';
+
+
+
+function ColorModeToggle() {
+  const { mode, setMode } = useColorScheme();
+  return (
+    <IconButton
+      variant="soft"
+      onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+      sx={{
+        minWidth: 40,
+        minHeight: 40,
+        borderRadius: '50%',
+      }}
+    >
+      {mode === 'dark' ? <LightModeRoundedIcon /> : <DarkModeRoundedIcon />}
+    </IconButton>
+  );
+}
 
 
 export function DashboardLayout(){
@@ -79,99 +109,145 @@ export function DashboardLayout(){
   return(
     <>
     <Box sx={{ display: 'flex', height: '100vh',
-
       '@media (max-width:1000px)': {
         height: '100%'
-      }
-     }}>
+      }}}>
     {(!isMobile) && (
-      <Box sx={{
-        backgroundColor: 'background.surface', 
-        float: 'left', border: '1px solid', 
-        borderColor: 'background.level2', borderTop: '0px',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: 'Inter',
-        width: '300px',
-        minWidth: '22%',
-        boxSizing: 'border-box',
-      }}>
-        <Stack sx={{ 
-          alignItems: 'left', 
-          display: 'flex',  
-          justifyContent: 'center', p: 2 
-        }}>
-          <Avatar
-            src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
-            size="lg"
-          />
-          <Typography level="h5" mt={1} element="h5" fontWeight='bold'>
-            Welcome, user.
-          </Typography>
-
-          <Typography color='neutral' level="body-xs">
+      <Sheet
+          sx={{
+            width: 300,
+            minWidth: 300,
+            p: 2,
+            borderRight: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2, p: 1}}>
+              <Avatar
+                src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
+                size="lg"
+              />
+              <Box>
+                <Typography level="h5" element="h5" fontWeight='bold'>
+                  Welcome, user.
+                </Typography>
+                <Typography color='neutral' level="body-xs">
             Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
-          </Typography>
-          
-          <Typography level="body-xs">Have a nice day!</Typography>
-        </Stack>
-      
+          </Typography>     
+                <Typography level="body-xs">
+                  Have a nice day!
+                </Typography>
+              </Box>
+        </Box>
         <Box sx={{px: 0.8}}>
+        <List
+              size="sm"
+              sx={{
+                '--ListItem-radius': '8px',
+                '--ListItemDecorator-size': '32px',
+              }}
+            >
           <Link to="">
-            <Button variant='plain' color='neutral'
-                size='sm'
-                startDecorator={<HomeRoundedIcon/>}
-                sx={{
-                  width: '100%',
-                  fontSize: 'xs',
-                  my: 0.2,
-                  justifyContent: 'left',
-                  fontWeight: '500',
-                  transition: '0.2s ease background-color'
-                }}>
-              Home
-            </Button>
+          <ListItem  sx={{
+                                my: 0.4,
+                              }} >
+                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
+                  <ListItemDecorator> 
+                    <HomeRoundedIcon /> 
+                  </ListItemDecorator>
+                  <ListItemContent>
+                      <Typography level='title-xs'>
+                          Home
+                      </Typography>
+                      <Typography level='body-xs'>
+                          Overivew of your Dashboard.
+                     </Typography>
+                   </ListItemContent>
+                  </ListItemButton>
+            </ ListItem>
+
             </Link>
           {Object.keys(buttons).map((button) => (
-            <>
-              <Typography
-              level="body-xs"
-              textTransform="uppercase"
-              sx={{ 
-                letterSpacing: '0.15rem', 
-                paddingLeft: 2, 
-                paddingBottom: 1, 
-                paddingTop: 2}}>
+            <ListItem nested>
+              <ListSubheader>
                   {button}
-              </Typography>
+              </ListSubheader>
+              <List>
               {buttons[button].map( (btn) => (
                             <Link to={btn.destination}>
-                              <Button variant='plain'
-                              color='neutral'
-                              size='sm'
-                              sx={{
-                                width: '100%',
-                                fontSize: 'xs',
-                                my: 0.2,
-                                justifyContent: 'left',
-                                
-                                fontWeight: '500',
-                                transition: '0.3s ease background-color'
-                              }}
-                              startDecorator={btn.icon}
-                            >
-                              {btn.head}
-                            </Button>
+                              <ListItem sx={{
+                                my: 0.4,
+                              }} variant='plain'>
+                                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
+                                  <ListItemDecorator>
+                                    {btn.icon}
+                                  </ListItemDecorator>
+                                  <ListItemContent>
+                                    <Typography level='title-xs'>
+                                    {btn.head}
+                                    </Typography>
+                                    <Typography level='body-xs'>
+                                    {btn.description}
+                                    </Typography>
+                                    </ListItemContent>
+                                </ListItemButton>
+                            </ListItem>
                           </Link>
               ))}
-              </>
+              </List>
+              </ListItem>
           ))}
-        </Box>
-    </Box>
+      </List>
+      <Box sx={{ display: 'flex', gap: 1, mt: 2}}>
+            
+        <IconButton
+          variant="soft"
+          color="primary"
+          sx={{
+            minWidth: 40,
+            minHeight: 40,
+            borderRadius: '50%',
+            position: 'relative',
+          }}
+          >
+            <NotificationsRoundedIcon />
+            <Chip
+              size="sm"
+              variant="solid"
+              color="danger"
+              sx={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                p: 1,
+                py: 0,
+                transform: 'translate(30%, -30%)',
+              }}
+              >
+                3
+              </Chip>
+        </IconButton>
+        <IconButton
+          variant="soft"
+          sx={{
+            minWidth: 40,
+            minHeight: 40,
+            borderRadius: '50%',
+          }}
+        >
+          <LogoutRoundedIcon/>  
+        </IconButton>
+        <ColorModeToggle />
+      </Box>
+      </Box>
+    </Sheet>
     )}
 
     <Box sx={{p: 3,
       width: '70%',
+      height: 'auto',
       '@media (max-width:1000px)': {
         width: '100%'
       }
@@ -185,8 +261,11 @@ export function DashboardLayout(){
 
 
 
-// Define the DashboardHomepage component
 export function DashboardHomepage() {
+  const [loading, setLoading] = React.useState(false);
+  const [selectedPeriod, setSelectedPeriod] = React.useState('week');
+
+
   
   const data = [
     {
@@ -233,6 +312,34 @@ export function DashboardHomepage() {
     },
   ];
 
+  
+  const stats = [
+    {
+      label: 'Total Members',
+      value: '12.5K',
+      change: '+12%',
+      trend: 'up',
+      icon: <PeopleRoundedIcon />,
+      color: 'primary'
+    },
+    {
+      label: 'Active Users',
+      value: '8.2K',
+      change: '+8%',
+      trend: 'up',
+      icon: <VisibilityRoundedIcon />,
+      color: 'success'
+    },
+    {
+      label: 'Engagement Rate',
+      value: '85%',
+      change: '+5%',
+      trend: 'up',
+      icon: <TrendingUpRoundedIcon />,
+      color: 'warning'
+    }
+  ];
+
 
   const displayData = {
     members: {
@@ -257,26 +364,127 @@ export function DashboardHomepage() {
 
   return (
     <>
-        <Breadcrumbs size='sm' 
-          separator={<KeyboardArrowRightIcon/>} >
-          <Link>
-            Dashboard
-          </Link>
-          <Link>
-            Home
-          </Link>
-        </Breadcrumbs>
-        <Typography level='h2' my={2} px={1}>
-            Home
+    <Breadcrumbs 
+          size="sm"
+          separator={ <KeyboardArrowRightIcon/>}>
+          <Typography sx={{mt: 0}}>Dashboard</Typography>
+          <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Home</Typography>
+      </Breadcrumbs>
+    {/* Header Section */}
+    <Box my={2} px={1}>
+    <Typography level="h2" sx={{}}>
+      Dashboard Overview
+    </Typography>
+    <Typography level="body-md" color="neutral">
+      Welcome back! Here's what's happening with your communities.
+    </Typography>
+  </Box>
+    <Box sx={{display: 'flex', flexDirection: 
+      { xs: 'column', md: 'row' }, flexWrap: 'wrap'}}>
+
+
+
+      {/* Stats Cards Grid */}
+      <Box spacing={2} sx={{ mb: 4, flexDirection: 'column', mr: 3}}>
+        {stats.map((stat, index) => (
+          <Box key={index} sx={{m: 1}}>
+            <Card>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Avatar color={stat.color} variant='soft'>
+                  {stat.icon}
+                </Avatar>
+                <Box>
+                  <Typography level="body-sm" color="neutral">
+                    {stat.label}
+                  </Typography>
+                  <Typography level="h3">{stat.value}</Typography>
+                  <Chip
+                    size="sm"
+                    variant="soft"
+                    color={stat.trend === 'up' ? 'success' : 'danger'}
+                    startDecorator={
+                      stat.trend === 'up' ? <TrendingUpRoundedIcon /> : null
+                    }
+                  >
+                    {stat.change}
+                  </Chip>
+                </Box>
+              </Box>
+            </Card>
+          </Box>
+        ))}
+      </Box>
+      {/* Chart Section */}
+      <Card sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Typography level="title-lg">Growth Analytics</Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {['week', 'month', 'year'].map((period) => (
+              <Button
+                key={period}
+                size="sm"
+                variant={selectedPeriod === period ? 'solid' : 'soft'}
+                onClick={() => setSelectedPeriod(period)}
+              >
+                {period.charAt(0).toUpperCase() + period.slice(1)}
+              </Button>
+            ))}
+          </Box>
+        </Box>
+        {loading ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 400,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <AspectRatio ratio="2">
+            <TestChart data={data} displayData={displayData} />
+          </AspectRatio>
+        )}
+      </Card>
+
+      {/* Recent Activity Section */}
+      <Card sx={{ mt: 4, width: '90%'}}>
+        <Typography level="title-lg" sx={{ mb: 2 }}>
+          Recent Activity
         </Typography>
-      <Card sx={{ height: '60vh', mt: 1, width: 'min-content'
-       }}>
-        <TestChart icons={icons} data={data} displayData={displayData}/>
-      </Card>  
+        <List>
+          {[1, 2, 3].map((item) => (
+            <ListItem
+              key={item}
+              endAction={
+                <Typography level="body-sm" color="neutral">
+                  2h ago
+                </Typography>
+              }
+            >
+              <ListItemButton>
+                <ListItemDecorator>
+                  <Avatar size="sm" />
+                </ListItemDecorator>
+                <ListItemContent>
+                  <Typography level="title-sm">
+                    New member joined Community Alpha
+                  </Typography>
+                  <Typography level="body-sm" color="neutral">
+                    John Doe joined your community
+                  </Typography>
+                </ListItemContent>
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Card>
+      </Box>
     </>
   );
 }
-
 
 
 
@@ -504,238 +712,152 @@ export function DashboardControlCommunity() {
   );
 }
 
+
 export function DashboardControlAccount() {
-  const [selectedTab, setSelectedTab] = React.useState(0);
-  const tabListRef = React.useRef(null);
+  const [activeTab, setActiveTab] = React.useState(0);
 
-
-  const data = [
-    {
-      name: "03.09",
-      views: 4000,
-      members: 2400,
-      amt: 2400,
-    },
-    {
-      name: "04.09",
-      views: 3000,
-      members: 1398,
-      amt: 2210,
-    },
-    {
-      name: "05.09",
-      views: 2000,
-      members: 9800,
-      amt: 2290,
-    },
-    {
-      name: "06.09",
-      views: 2780,
-      members: 3908,
-      amt: 2000,
-    },
-    {
-      name: "07.09",
-      views: 1890,
-      members: 4800,
-      amt: 2181,
-    },
-    {
-      name: "08.09",
-      views: 2390,
-      members: 3800,
-      amt: 2500,
-    },
-    {
-      name: "09.09",
-      views: 3490,
-      members: 4300,
-      amt: 2100,
-    },
-  ];
-
-
-  const displayData = {
-    members: {
-      title: "The number of members in the community",
-      shortTitle: "Number of members",
-      description: "Total number of community members.",
-      icon: <PeopleRoundedIcon/>,
-    },
-    views: {
-      title: "Views of the posts at this date.",
-      shortTitle: "Views of the posts",
-      description: "Total growth of number of views on posts at this date.",
-      icon: <VisibilityRoundedIcon/>,
+  const userProfile = {
+    name: "John Doe",
+    email: "john@example.com",
+    avatar: "https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90",
+    role: "Community Manager",
+    joinDate: "September 2023",
+    bio: "Passionate about building and growing online communities",
+    socialLinks: {
+      telegram: "@johndoe",
+      vk: '@johndoe',
     }
-  
-  }
-
-  const icons = {
-    members: <PeopleRoundedIcon />,
-    views: <VisibilityRoundedIcon/>,
   };
-
-
-  const posts = [
-    {
-      title: 'Post 1',
-      author: 'John Doe',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      date: '2022-01-01',
-      category: 'Vk',
-      views: '1'
-    },
-    {
-      title: 'Post 2',
-      author: 'Jane Doe',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      date: '2022-01-02',
-      category: 'Telegram',
-      views: '10'
-    },
-    // Add more posts here...
-    // In other time ...
-    // From backend ..
-  ];
-
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-  };
-
-  React.useEffect(() => {
-    const updateTabIndicator = () => {
-      if (tabListRef.current) {
-        const tabs = tabListRef.current.querySelectorAll(`.${tabClasses.root}`);
-        const activeTab = tabs[selectedTab];
-        if (activeTab) {
-          const tabListRect = tabListRef.current.getBoundingClientRect();
-          const activeTabRect = activeTab.getBoundingClientRect();
-          
-          const offsetLeft = activeTabRect.left - tabListRect.left;
-          const offsetTop = activeTabRect.top - tabListRect.top;
-
-          tabListRef.current.style.setProperty('--tab-left', `${offsetLeft}px`);
-          tabListRef.current.style.setProperty('--tab-top', `${offsetTop}px`);
-          tabListRef.current.style.setProperty('--tab-width', `${activeTabRect.width}px`);
-          tabListRef.current.style.setProperty('--tab-height', `${activeTabRect.height}px`);
-        }
-      }
-    };
-
-    updateTabIndicator();
-    window.addEventListener('resize', updateTabIndicator);
-    return () => window.removeEventListener('resize', updateTabIndicator);
-  }, [selectedTab]);
 
   return (
-    <Tabs 
-      aria-label="tabs" 
-      value={selectedTab} 
-      onChange={handleTabChange}
-      orientation='vertical'
-      sx={{
-        bgcolor: 'transparent',
-        width: '100%', // Set width to 100% to make it responsive
-        marginLeft: 2,
-        '@media (max-width: 670px)': { // Mobile responsiveness
-          width: '100%',
-          marginLeft: 0,
-        }
-      }}
-    >
-      <Card sx={{marginTop: 2, paddingBottom: 6, width: '100%', height: '100%'}}>
-        <TabPanel value={0}>
-          </TabPanel>
-          <TabPanel value={1}>
-          </TabPanel>
-          <TabPanel value={2}>
-          </TabPanel>
-          <TabPanel value={3}>
-          </TabPanel>
-      </Card>
-      
-      <TabList
-        ref={tabListRef}
-        disableUnderline
+    <Box sx={{ py: 2, px: { xs: 2, md: 4 } }}>
+      <Card
         sx={{
-          marginTop: 1,
-          p: 0.5,
-          gap: 0.5,
-          borderRadius: 'sm',
-          bgcolor: 'background.surface',
-          position: 'relative',
-          border: '1px solid',
-          borderColor: 'neutral.outlinedBorder',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          alignSelf: 'center',
-          width: 'auto',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            left: 'var(--tab-left, 4px)',
-            top: 'var(--tab-top, 4px)',
-            width: 'var(--tab-width, 0)',
-            height: 'var(--tab-height, 100%)',
-            bgcolor: 'primary.softBg',
-            borderRadius: 'lg',
-            transition: 'all 0.3s ease',
-          },
-          [`& .${tabClasses.root}`]: {
-            zIndex: 1,
-            transition: 'transform 0.2s ease, background-color 0.2s ease',
-            m: 0.5,
-            borderRadius: 'lg',
-            paddingLeft: 1,
-            paddingRight: 1,
-            textAlign: 'center',
-            '&:hover': {
-              transform: 'scale(1.05)',
-              bgcolor: 'primary.lightBg',
-              borderRadius: 'lg',
-            },
-            '&[aria-selected="true"]': {
-              bgcolor: 'transparent',
-              color: 'primary.plainColor',
-              borderRadius: 'lg'
-            },
-          },
+          p: 4,
+          mb: 3,
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'center', md: 'flex-start' },
+          gap: 3,
         }}
       >
-        <Tab 
-            key='About' 
-            disableIndicator
-          >
-            <Typography level='title-ms'>
-              About
-            </Typography>
-            <Typography level='body-xs'>
-              About me? ;3
-            </Typography>
-          </Tab>
-        <Tab 
-            key='Stats' 
-            disableIndicator
-          >
+        <Avatar
+          src={userProfile.avatar}
+          size="xs"
+          sx={{ width: 120, height: 120 }}
+        />
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            mb: 2,
+          }}>
+            <Box>
+              <Typography level="h3">{userProfile.name}</Typography>
+              <Typography level="body-sm" color="neutral">
+                {userProfile.role}
+              </Typography>
+            </Box>
+            <Button
+              variant="outlined"
+              color="neutral"
+              startDecorator={<SettingsRoundedIcon />}
+            >
+              Edit Profile
+            </Button>
+          </Box>
+          <Typography level="body-md" sx={{ mb: 2 }}>
+            {userProfile.bio}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {Object.entries(userProfile.socialLinks).map(([platform, link]) => (
+              <Chip
+                size="sm"
+                variant="soft"
+                color="primary"
+                startDecorator={<LinkIcon />}
+              >
+                {platform}
+              </Chip>
+            ))}
+          </Box>
+        </Box>
+      </Card>
 
-            Stats
-        </Tab>
-        
-        <Tab 
-            key='Posts' 
-            disableIndicator
-          >
-            Posts
-        </Tab>
-        
-        <Tab 
-            key='KnowledgeLibrary' 
-            disableIndicator
-          >
-            Knowledge Library
-        </Tab>
-      </TabList>
-    </Tabs>
-  )
+      <Tabs
+        value={activeTab}
+        onChange={(event, value) => setActiveTab(value)}
+        sx={{
+          bgcolor: 'background.surface',
+          borderRadius: 'md',
+          boxShadow: 'sm',
+        }}
+      >
+        <TabList
+          sx={{
+            pt: 2,
+            justifyContent: 'center',
+            [`& .${tabClasses.root}`]: {
+              fontWeight: 'lg',
+              flex: 1,
+              maxWidth: 200,
+              p: 2,
+              [`&.${tabClasses.selected}`]: {
+                bgcolor: 'primary.softBg',
+                color: 'primary.solidBg',
+              },
+            },
+          }}
+        >
+          <Tab>Profile</Tab>
+          <Tab>Security</Tab>
+          <Tab>Notifications</Tab>
+          <Tab>Billing</Tab>
+        </TabList>
+        <Divider />
+        <TabPanel value={0}>
+          <Box sx={{ p: 3 }}>
+            <Typography level="title-lg" sx={{ mb: 3 }}>
+              Profile Information
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid xs={12} md={6}>
+                <FormControl>
+                  <FormLabel>Full Name</FormLabel>
+                  <Input defaultValue={userProfile.name} />
+                </FormControl>
+              </Grid>
+              <Grid xs={12} md={6}>
+                <FormControl>
+                  <FormLabel>Email</FormLabel>
+                  <Input defaultValue={userProfile.email} />
+                </FormControl>
+              </Grid>
+              <Grid xs={12}>
+                <FormControl>
+                  <FormLabel>Bio</FormLabel>
+                  <Input
+                    multiline
+                    minRows={3}
+                    defaultValue={userProfile.bio}
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+              <Button size="lg">Save Changes</Button>
+              <Button
+                size="lg"
+                variant="outlined"
+                color="neutral"
+              >
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </TabPanel>
+      </Tabs>
+    </Box>
+  );
 }
