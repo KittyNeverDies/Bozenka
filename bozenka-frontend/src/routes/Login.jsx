@@ -1,8 +1,15 @@
+
+
+// MUI joy UI theme
 import { Box, Button, Input, Typography, Card, Grid } from '@mui/joy';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LinearProgress from '@mui/joy/LinearProgress';
 import Alert from '@mui/joy/Alert';
+import * as React from 'react';
+
+
+// Material UI Icons
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
@@ -179,6 +186,8 @@ const LoginPage = () => {
                   autoComplete={field.autoComplete}
                 />
               ))}
+
+
               <Typography level='body-xs'>Don't have an account? <Link to='/register/'>Register</Link></Typography>
               <Button
                 variant="solid"
