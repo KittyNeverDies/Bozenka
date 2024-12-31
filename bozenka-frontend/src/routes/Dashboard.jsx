@@ -31,6 +31,8 @@ import Sheet from '@mui/joy/Sheet';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import { useColorScheme} from '@mui/joy/styles';
+import Checkbox from '@mui/joy/Checkbox';
+
 
 
 
@@ -108,7 +110,7 @@ export function DashboardLayout(){
 
   return(
     <>
-    <Box sx={{ display: 'flex', height: '100vh',
+    <Box sx={{ display: 'flex', height: '100%',
       '@media (max-width:1000px)': {
         height: '100%'
       }}}>
@@ -246,8 +248,11 @@ export function DashboardLayout(){
     )}
 
     <Box sx={{p: 3,
+                flexGrow: 1,
+                bgcolor: 'background.level1',
+    
       width: '70%',
-      height: 'auto',
+      height: '100vh',
       '@media (max-width:1000px)': {
         width: '100%'
       }
@@ -363,7 +368,7 @@ export function DashboardHomepage() {
   };
 
   return (
-    <>
+    <Box sx={{width: '100%'}}>
     <Breadcrumbs 
           size="sm"
           separator={ <KeyboardArrowRightIcon/>}>
@@ -380,12 +385,13 @@ export function DashboardHomepage() {
     </Typography>
   </Box>
     <Box sx={{display: 'flex', flexDirection: 
-      { xs: 'column', md: 'row' }, flexWrap: 'wrap'}}>
+      { xs: 'column', md: 'row' }}}>
 
 
 
       {/* Stats Cards Grid */}
-      <Box spacing={2} sx={{ mb: 4, flexDirection: 'column', mr: 3}}>
+      <Box sx={{flexDirection: 'column', display: 'flex'}}>
+      <Box spacing={2} sx={{ mb: 1, flexDirection: 'row', display: 'flex', mr: 3}}>
         {stats.map((stat, index) => (
           <Box key={index} sx={{m: 1}}>
             <Card>
@@ -448,9 +454,9 @@ export function DashboardHomepage() {
           </AspectRatio>
         )}
       </Card>
-
+      </Box>
       {/* Recent Activity Section */}
-      <Card sx={{ mt: 4, width: '90%'}}>
+      <Card sx={{mx: 3, width: 300}}>
         <Typography level="title-lg" sx={{ mb: 2 }}>
           Recent Activity
         </Typography>
@@ -482,7 +488,7 @@ export function DashboardHomepage() {
         </List>
       </Card>
       </Box>
-    </>
+    </Box>
   );
 }
 
@@ -579,13 +585,17 @@ export function DashboardControlCommunity() {
           <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Manage Communities</Typography>
       </Breadcrumbs>
     
-      <Typography level='h2' my={2} px={1}>
-            Manage communities
-        </Typography>
+        <Box my={2} px={1}>
+          <Typography level="h2">Manage Communities</Typography>
+          <Typography level="body-md" color="neutral">
+            Oversee and optimize your community spaces
+          </Typography>
+        </Box>
       <Stack  direction={{ xs: 'column-reverse', md: 'row' }}  spacing={1} >
         <Card sx={{ 
           width: {xs: '95%', md: '70%'}, p: 3,
           minWidth: '70%', 
+                  maxHeight: { xs: 'auto', md: '600px' },
           
           }}>
           <Box sx={{
@@ -609,7 +619,6 @@ export function DashboardControlCommunity() {
                     Created on 9th September, 1999
               </Typography>
             </Box>
-            
             <Typography color='neutral' level="body-xs">
               Total growth: <Typography 
                                 color="success" 
@@ -618,7 +627,21 @@ export function DashboardControlCommunity() {
                                 50% from last day 
                 </Typography>
             </Typography>
+
+            <Box>
+            <Chip variant="outlined" 
+                            startDecorator={<CalendarMonthRoundedIcon/>} 
+                            sx={{borderRadius: 'sm', m: 0.5}}>
+                            Tag 1
+                        </Chip>
+                        <Chip variant="outlined" 
+                            startDecorator={<CalendarMonthRoundedIcon/>} 
+                            sx={{borderRadius: 'sm', m: 0.5}}>
+                            Tag 1
+                        </Chip>
+            </Box>
         </Box>
+          
 
         {/* Tab System */}
         <Tabs value={tabIndex}
@@ -653,16 +676,69 @@ export function DashboardControlCommunity() {
             <Tab>Stats</Tab>
             <Tab>Posts</Tab>
           </TabList>
-          <TabPanel value={0}>
+          <TabPanel value={0} sx={{maxHeight: '200px', overflowY: 'auto'}}>
             <Typography level='body-xs'>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati delectus perferendis modi eaque consequuntur accusamus. Maiores architecto sequi natus eaque consectetur neque veritatis ipsa cum hic soluta. Id, temporibus vel? Quisquam, quisquam!
             </Typography>
+                          {/* Quick Stats */}
+                          <Grid container spacing={2} sx={{ my: 2 }}>
+                {[
+                  {
+                    label: 'Members',
+                    value: 100,
+                    icon: <PeopleRoundedIcon />,
+                    color: 'primary'
+                  },
+                  {
+                    label: 'Engagement',
+                    value: '100%',
+                    icon: <TrendingUpRoundedIcon />,
+                    color: 'success'
+                  },
+                  {
+                    label: 'Last Active',
+                    value: '100pm',
+                    icon: <CalendarMonthRoundedIcon />,
+                    color: 'warning'
+                  }
+                ].map((stat) => (
+                  <Grid xs={12} md={3} >
+                    <Card variant='outlined' sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar color={stat.color}>
+                          {stat.icon}
+                        </Avatar>
+                        <Box>
+                          <Typography level="body-xs">{stat.label}</Typography>
+                          <Typography level="h4">{stat.value}</Typography>
+                        </Box>
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+        
           </TabPanel>
           <TabPanel value={1}>
-            <Typography>Manage members of the community here.</Typography>
+            <FormControl sx={{my: 1}}>
+              <Checkbox label="Function 1" size='sm' />
+              <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
+            </FormControl>
+            <FormControl sx={{my: 1}}>
+              <Checkbox label="Function 1" size='sm' />
+              <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
+            </FormControl>
+            <FormControl sx={{my: 1}}>
+              <Checkbox label="Function 1" size='sm' />
+              <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
+            </FormControl>
+            
           </TabPanel>
           <TabPanel value={2}>
-            <Typography>Community settings and configurations.</Typography>
+            <Typography>
+
+
+            </Typography>
           </TabPanel>
         </Tabs>
       </Card>
