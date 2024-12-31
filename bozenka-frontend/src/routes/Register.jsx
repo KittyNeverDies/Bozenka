@@ -10,6 +10,10 @@ import Alert from '@mui/joy/Alert';
 import Step from '@mui/joy/Step';
 import Stepper from '@mui/joy/Stepper';
 import StepIndicator from '@mui/joy/StepIndicator';
+import FormControl from '@mui/joy/FormControl';
+import FormHelperText from '@mui/joy/FormHelperText';
+import Fragment from 'react';
+import Checkbox from '@mui/joy/Checkbox';
 import Grid from '@mui/joy/Grid';
 
 
@@ -199,8 +203,26 @@ function RegisterPage () {
               autoComplete={field.autoComplete}
             />
           ))}
-          
-                        <Typography level='body-xs'>Already have an account? <Link to='/login/'>Login</Link></Typography>
+          <FormControl size="sm" sx={{my: 1 }}>
+                <Checkbox
+                    size='sm'
+                    label={
+                      <React.Fragment>
+                        <Typography level='body-xs'>
+                          I have read and agree to the{' '}
+                          <Typography level='body-xs' sx={{ fontWeight: 'md' }}>
+                            terms and conditions</Typography>.
+                          </Typography>
+                      </React.Fragment>
+                    }
+                />
+                  <FormHelperText>
+                    <Typography level="body-xs">
+                      Read our <Link href="#link">terms and conditions</Link>.
+                    </Typography>
+                  </FormHelperText>
+              </FormControl>
+          <Typography level='body-xs'>Already have an account? <Link to='/login/'>Login</Link></Typography>
           <Button
             variant="solid"
             type="submit"
