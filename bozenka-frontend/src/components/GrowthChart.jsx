@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,
@@ -8,115 +8,301 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
+  ReferenceLine,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
 } from "recharts";
-import { Box, Typography } from "@mui/joy";
+import { Box, Typography, useTheme, IconButton, Button } from "@mui/joy";
 import Avatar from '@mui/joy/Avatar';
-
 import Divider from '@mui/joy/Divider';
 import Card from '@mui/joy/Card';
 import Grid from '@mui/joy/Grid';
+import DownloadIcon from '@mui/icons-material/Download';
+import { CSVLink } from 'react-csv';
 
+export default function TestChart({ data, displayData }) {
+  const theme = useTheme();
+  const [chartType, setChartType] = useState('line');
+  const [hoveredDataPoint, setHoveredDataPoint] = useState(null);
 
+  const colors = {
+    members: theme.palette.primary[500],
+    views: theme.palette.success[500]
+  };
 
+  const averages = {
+    members: data.reduce((acc, curr) => acc + curr.members, 0) / data.length,
+    views: data.reduce((acc, curr) => acc + curr.views, 0) / data.length
+  };
 
+  const exportData = () => {
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + ["Date,Members,Views"]
+        .concat(data.map(row => `${row.name},${row.members},${row.views}`))
+        .join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "chart_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-export default function TestChart({ data, displayData, }) {
-  
   const CustomLegend = (props) => {
     const { payload } = props;
 
     return (
-    <Box sx={{ 
-      display: "flex", 
-      flexDirection: "row", 
-      justifyContent: "space-between", 
-      alignItems: "flex-start",
-      marginTop: 2
-    }}>
-      <Grid container >
-        {payload.map((item, index) => (
-          <Grid>
-          <Box key={index} sx={{ 
-            display: "flex", 
-            flexDirection: "row", 
-            alignItems: "center", marginBottom: 2,
-            marginLeft: 2 
-          }}>
-          
-            {displayData[item.value].icon ? 
-              <Avatar size="md" color="neutral" variant="outlined">
-                {displayData[item.value].icon}
-              </Avatar> 
-              : 
-              <Box sx={{ backgroundColor: item.color, width: 10, height: 10,}} />
-            }
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              alignItems: "flex-start", ml: 2 ,
-            }}>
-              <Typography level="title-xs" sx={{lineHeight: 1.3, fontWeight: 'bold'}}>
-                {displayData[item.value].title ? displayData[item.value].title : item.value}
-              </Typography>
-              {displayData[item.value].description && (
-                <Typography level="body-xs" >
-                  {displayData[item.value].description}
-                </Typography>
-              )}
-          </Box>
+      <Card variant="outlined" sx={{ p: 2, mt: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2
+        }}>
+          <Typography level="title-sm">Chart Legend</Typography>
+          <IconButton 
+            variant="soft"
+            color="neutral"
+            onClick={exportData}
+            title="Export data"
+          >
+            <DownloadIcon />
+          </IconButton>
         </Box>
+        <Grid container spacing={2}>
+          {payload.map((item, index) => (
+            <Grid xs={12} sm={6} key={index}>
+              <Box sx={{ 
+                display: "flex", 
+                alignItems: "center",
+                gap: 2,
+                '&:hover': {
+                  bgcolor: 'background.level1',
+                  borderRadius: 'sm'
+                },
+                p: 1
+              }}>
+                <Avatar 
+                  size="sm" 
+                  color={item.value === 'members' ? 'primary' : 'success'}
+                  variant="soft"
+                >
+                  {displayData[item.value].icon}
+                </Avatar>
+                <Box>
+                  <Typography level="title-sm">
+                    {displayData[item.value].shortTitle}
+                  </Typography>
+                  <Typography level="body-xs" color="neutral">
+                    Avg: {Math.round(averages[item.value])}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
-      ))}
-      </Grid>
-    </Box>
+      </Card>
     );
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-      <Box sx={{ 
-          backgroundColor: "background.surface", 
-          padding: 2, 
-          border: "1px solid",
-          borderColor: 'background.level3', 
-          borderRadius: "lg",
-          boxShadow: 'xs' 
-      }}>
-        <Typography level="title-lg">{label}</Typography>
-        
-        <Divider sx={{ mb: 2, mt: 1 }} />
-        {payload.map((item, index) => (
-          <>
-            <Typography key={index} startDecorator={displayData[item.name].icon ? displayData[item.name].icon : ""} level="body-xs">
-              {displayData[item.name] ? displayData[item.name].shortTitle: item.name}: 
-                <Typography textColor={item.color}>
-                  <b>{item.value}</b>
-                </Typography>
-              </Typography>
-            </>
-          ))}
-        
-        </Box>
+        <Card variant="outlined" sx={{ 
+          p: 2,
+          boxShadow: 'sm',
+          minWidth: 200
+        }}>
+          <Typography level="title-sm" sx={{ mb: 1 }}>
+            {label}
+          </Typography>
+          <Divider />
+          <Box sx={{ mt: 1 }}>
+            {payload.map((item, index) => (
+              <Box 
+                key={index} 
+                sx={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mt: 1,
+                  p: 1,
+                  bgcolor: hoveredDataPoint === item.name ? 'background.level1' : 'transparent',
+                  borderRadius: 'sm'
+                }}
+                onMouseEnter={() => setHoveredDataPoint(item.name)}
+                onMouseLeave={() => setHoveredDataPoint(null)}
+              >
+                {displayData[item.name].icon}
+                <Box>
+                  <Typography level="body-xs">
+                    {displayData[item.name].shortTitle}
+                  </Typography>
+                  <Typography 
+                    level="title-sm"
+                    sx={{ color: colors[item.name] }}
+                  >
+                    {item.value}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Card>
       );
     }
-
     return null;
   };
 
-  return (
-    <Box sx={{ width: 500, height: 300, padding: 2, paddingBottom: 5 }}>
-      <LineChart width={500} height={400} data={data} style={{fontFamily: 'Inter'}}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis style={{fontSize: 12}} dataKey="name" padding={{ left: 30, right: 30 }} marginBottom={1}>
-          <Label value="Dates of knowngrowth" offset={0} position="bottom" fontSize={12} />
-        </XAxis>
-        <YAxis style={{fontSize: 12}} /> 
+  const chartTypes = {
+    line: (
+      <LineChart 
+        data={data}
+        margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
+        onMouseMove={(e) => {
+          if (e && e.activePayload) {
+            setHoveredDataPoint(e.activePayload[0].name);
+          }
+        }}
+        onMouseLeave={() => setHoveredDataPoint(null)}
+      >
+        <CartesianGrid 
+          strokeDasharray="3 3"
+          stroke={theme.palette.divider}
+        />
+        <XAxis 
+          dataKey="name"
+          tick={{ fill: theme.palette.text.primary }}
+          stroke={theme.palette.divider}
+          style={{fontSize: 10}}
+        />
+        <YAxis
+          
+          tick={{ fill: theme.palette.text.primary }}
+          stroke={theme.palette.divider}
+          style={{fontSize: 10}}
+        />
         <Tooltip content={<CustomTooltip />} />
         <Legend content={<CustomLegend />} />
-        <Line type="monotone" dataKey="members" stroke="#8884d8"/>
-        <Line type="monotone" dataKey="views" stroke="#82ca9d" />
+        <ReferenceLine 
+          y={averages.members}
+          stroke={colors.members}
+          strokeDasharray="3 3"
+          label={{ 
+            value: 'Avg Members',
+            fill: colors.members,
+            fontSize: 12
+          }}
+        />
+        <ReferenceLine 
+          y={averages.views}
+          stroke={colors.views}
+          strokeDasharray="3 3"
+          label={{ 
+            value: 'Avg Views',
+            fill: colors.views,
+            fontSize: 12
+          }}
+        />
+        <Line
+          type="monotone"
+          dataKey="members"
+          stroke={colors.members}
+          strokeWidth={2}
+          dot={{ fill: colors.members, r: 4 }}
+          activeDot={{ r: 8 }}
+          animationDuration={1500}
+        />
+        <Line
+          type="monotone"
+          dataKey="views"
+          stroke={colors.views}
+          strokeWidth={2}
+          dot={{ fill: colors.views, r: 4 }}
+          activeDot={{ r: 8 }}
+          animationDuration={1500}
+        />
       </LineChart>
+    ),
+    bar: (
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" 
+        tick={{ fill: theme.palette.text.primary }}
+        stroke={theme.palette.divider} style={{fontSize: 12}} />
+        <YAxis 
+        tick={{ fill: theme.palette.text.primary }}
+        stroke={theme.palette.divider} style={{fontSize: 12}}  />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend content={<CustomLegend />} />
+        <Bar
+          dataKey="views"
+          fill="#8884d8"
+        />
+        <Bar
+          dataKey="members"
+          fill="#82ca9d"
+        />
+      </BarChart>
+    ),
+    area: (
+      <AreaChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis 
+                  tick={{ fill: theme.palette.text.primary }}
+                  stroke={theme.palette.divider} 
+          style={{fontSize: 12}} dataKey="name" />
+        <YAxis 
+                  tick={{ fill: theme.palette.text.primary }}
+                  stroke={theme.palette.divider} 
+          style={{fontSize: 12}} />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend content={<CustomLegend />} />
+        <Area
+          type="monotone"
+          dataKey="views"
+          stackId="1"
+          stroke="#8884d8"
+          fill="#8884d8"
+        />
+        <Area
+          type="monotone"
+          dataKey="members"
+          stackId="1"
+          stroke="#82ca9d"
+          fill="#82ca9d"
+        />
+      </AreaChart>
+    ),
+  };
+
+  return (
+    <Box sx={{ 
+      width: '90%',
+      height: 500,
+      p: 2
+    }}>
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {Object.keys(chartTypes).map((type) => (
+            <Button
+              key={type}
+              variant={chartType === type ? 'solid' : 'soft'}
+              onClick={() => setChartType(type)}
+              aria-label={`Switch to ${type} chart`}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </Button>
+          ))}
+        </Box>
+      </Box>
+      <ResponsiveContainer>
+        {chartTypes[chartType]}
+      </ResponsiveContainer>
     </Box>
   );
 }
