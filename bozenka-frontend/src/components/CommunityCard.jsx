@@ -24,22 +24,26 @@ import CardOverflow from '@mui/joy/CardOverflow';
 import InfoIcon from '@mui/icons-material/Info';
 
 
-
 /**
 * CommunityCard component, used in community search page.
 * Have inside a Card component with Avatar, description, memebers count,
 * date of creation & other responsive community infromation.
+* @param {Object} props - The props object.
+* @param {string} props.avatarSrc - The source URL of the avatar image.
+* @param {Array} props.menuItems - An array of menu items, each item is an object with color, icon, and label properties.
+* @param {string} props.title - The title of the community.
+* @param {string} props.description - The description of the community.
+* @param {Array} props.tags - An array of tags associated with the community.
+* @param {number} props.membersCount - The number of members in the community.
+* @param {string} props.creationDate - The creation date of the community.
 * @returns {JSX.Element} - The rendered community card.
 */
-function CommunityCard() {
+function CommunityCard({ avatarSrc, menuItems, title, description, tags, membersCount, creationDate }) {
     return (
-        <Card sx={{m: 1 }}>
-            <Avatar 
-                src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" 
-            />
+        <Card sx={{m: 1}}>
+            <Avatar src={avatarSrc} />
             <Dropdown>
-                <MenuButton size='sm' variant='plain'
-                sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
+                <MenuButton size='sm' variant='plain' sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
                     <MoreVertIcon />
                 </MenuButton>
                 <Menu size='sm'>
@@ -52,69 +56,36 @@ function CommunityCard() {
                         Report
                     </MenuItem>
                     <Divider />
-                    <MenuItem sx={{
-                        transition: 'background-color 0.3s'
-                    }}>
-                        Discord
-                        <OpenInNewIcon />
-                    </MenuItem>
-                    <MenuItem sx={{
-                        transition: 'background-color 0.3s'
-                    }}>
-                        Telegram
-                        <OpenInNewIcon />
-                    </MenuItem>
-                    <MenuItem sx={{
-                        transition: 'background-color 0.3s'
-                    }}>
-                        Vkontakte
-                        <OpenInNewIcon />
-                    </MenuItem>
+                    {menuItems.map((item, index) => (
+                        <MenuItem key={index} color={item.color} sx={{ transition: 'background-color 0.3s' }}>
+                            <ListItemDecorator sx={{ color: 'inherit' }}>
+                                {item.icon}
+                            </ListItemDecorator>
+                            {item.label}
+                        </MenuItem>
+                    ))}
                 </Menu>
             </Dropdown>
             <CardContent>
-                <Typography level="title-lg">Testing stuff?</Typography>
-                <Typography level="body-sm">Lorem ipsum lorem ipsum. Lorem lorem ipsum ipsum.</Typography>
+                <Typography level="title-lg">{title}</Typography>
+                <Typography level="body-sm">{description}</Typography>
                 <Grid>
-                    <Chip variant="outlined"
-                        startDecorator={<InfoIcon/>}
-                        sx={{
-                            m: 0.5,
-                            borderRadius: 'sm'
-                        }}>
-                        First Tag
-                    </Chip>
-                    <Chip variant="outlined"
-                        startDecorator={<InfoIcon/>}
-                        sx={{
-                            m: 0.5,
-                            borderRadius: 'sm'
-                        }}>
-                        Second Tag
-                    </Chip>
-                    <Chip variant="outlined"
-                        startDecorator={<InfoIcon/>}
-                        sx={{
-                            m: 0.5,
-                            borderRadius: 'sm'
-                        }}>
-                        Third Tag
-                    </Chip>
+                    {tags.map((tag, index) => (
+                        <Chip key={index} variant="outlined" startDecorator={tag.icon} sx={{ m: 0.5, borderRadius: 'sm' }}>
+                            {tag.name}
+                        </Chip>
+                    ))}
                 </Grid>
             </CardContent>
-            
             <CardOverflow>
                 <Divider inset="context" />
                 <CardContent orientation="horizontal">
-                    <Typography
-                        startDecorator={<PersonIconRounded/>} 
-                        level="body-xs" fontWeight="md" textColor="text.secondary">
-                        650 members
+                    <Typography startDecorator={<PersonIconRounded />} level="body-xs" fontWeight="md" textColor="text.secondary">
+                        {membersCount} members
                     </Typography>
                     <Divider orientation="vertical" />
-                    <Typography 
-                        startDecorator={<CalendarMonthRoundedIcon/>} level="body-xs" fontWeight="md"  textColor="text.secondary">
-                        created on 9th September, 1999
+                    <Typography startDecorator={<CalendarMonthRoundedIcon />} level="body-xs" fontWeight="md" textColor="text.secondary">
+                        created on {creationDate}
                     </Typography>
                 </CardContent>
             </CardOverflow>
