@@ -33,9 +33,6 @@ import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import { useColorScheme} from '@mui/joy/styles';
 import Checkbox from '@mui/joy/Checkbox';
 
-
-
-
 // Our own controls
 import TestChart from '../components/GrowthChart';
 
@@ -59,7 +56,74 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import LinkIcon from '@mui/icons-material/Link';
+import SecurityIcon from '@mui/icons-material/SecurityRounded';
 
+
+
+
+  
+const data = [
+  {
+    name: "03.09",
+    views: 4000,
+    members: 2400,
+    amt: 2400,
+  },
+  {
+    name: "04.09",
+    views: 3000,
+    members: 1398,
+    amt: 2210,
+  },
+  {
+    name: "05.09",
+    views: 2000,
+    members: 9800,
+    amt: 2290,
+  },
+  {
+    name: "06.09",
+    views: 2780,
+    members: 3908,
+    amt: 2000,
+  },
+  {
+    name: "07.09",
+    views: 1890,
+    members: 4800,
+    amt: 2181,
+  },
+  {
+    name: "08.09",
+    views: 2390,
+    members: 3800,
+    amt: 2500,
+  },
+  {
+    name: "09.09",
+    views: 3490,
+    members: 4300,
+    amt: 2100,
+  },
+];
+
+
+
+const displayData = {
+  members: {
+    title: "Total members of communities",
+    shortTitle: "Number of members",
+    description: "Total number of communities members.",
+    icon: <PeopleRoundedIcon/>,
+  },
+  views: {
+    title: "Views of the posts from all communities at this date.",
+    shortTitle: "Views of the posts",
+    description: "Total growth of number of views on posts at this date.",
+    icon: <VisibilityRoundedIcon/>,
+  }
+
+}
 
 
 function ColorModeToggle() {
@@ -362,10 +426,7 @@ export function DashboardHomepage() {
   
   }
 
-  const icons = {
-    members: <PeopleRoundedIcon />,
-    views: <VisibilityRoundedIcon/>,
-  };
+
 
   return (
     <Box sx={{width: '100%'}}>
@@ -421,7 +482,7 @@ export function DashboardHomepage() {
         ))}
       </Box>
       {/* Chart Section */}
-      <Card sx={{ p: 2 }}>
+      <Card sx={{ p: 2, height: 'auto' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
           <Typography level="title-lg">Growth Analytics</Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -449,9 +510,9 @@ export function DashboardHomepage() {
             <CircularProgress />
           </Box>
         ) : (
-          <AspectRatio ratio="2">
-            <TestChart data={data} displayData={displayData} />
-          </AspectRatio>
+          <Box sx={{overflowY: 'auto', height: '40vh'}}>
+            <TestChart sx={{height: 10}} data={data} displayData={displayData} />
+            </Box>
         )}
       </Card>
       </Box>
@@ -719,7 +780,7 @@ export function DashboardControlCommunity() {
               </Grid>
         
           </TabPanel>
-          <TabPanel value={1}>
+          <TabPanel value={1}  sx={{maxHeight: '200px', overflowY: 'auto'}}>
             <FormControl sx={{my: 1}}>
               <Checkbox label="Function 1" size='sm' />
               <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
@@ -740,6 +801,11 @@ export function DashboardControlCommunity() {
 
             </Typography>
           </TabPanel>
+          <TabPanel value={3}  sx={{maxHeight: '200px', overflowY: 'auto'}}>
+          <TestChart sx={{height: 10}} data={data} displayData={displayData} />
+          </TabPanel>
+          <TabPanel value={4}>
+            </TabPanel>
         </Tabs>
       </Card>
 
@@ -835,13 +901,6 @@ export function DashboardControlAccount() {
                 {userProfile.role}
               </Typography>
             </Box>
-            <Button
-              variant="outlined"
-              color="neutral"
-              startDecorator={<SettingsRoundedIcon />}
-            >
-              Edit Profile
-            </Button>
           </Box>
           <Typography level="body-md" sx={{ mb: 2 }}>
             {userProfile.bio}
@@ -865,9 +924,27 @@ export function DashboardControlAccount() {
         value={activeTab}
         onChange={(event, value) => setActiveTab(value)}
         sx={{
-          bgcolor: 'background.surface',
           borderRadius: 'md',
-          boxShadow: 'sm',
+          [`& .${tabClasses.root}`]: {
+            zIndex: 1,
+            transition: 'transform 0.2s ease, background-color 0.2s ease',
+            mx: 0.5,
+            paddingLeft: 1,
+            paddingRight: 1,
+            
+            borderTopLeftRadius: '5px',
+            borderTopRightRadius: '5px',
+            '&:hover': {
+              transform: 'scale(1.05)',
+              
+            },
+            '&[aria-selected="true"]': {
+              bgcolor: 'primary.softBgColor',
+              color: 'primary.softColor',
+              transition: 'all 0.5 ease'
+
+            },
+          },
         }}
       >
         <TabList
@@ -886,10 +963,18 @@ export function DashboardControlAccount() {
             },
           }}
         >
-          <Tab>Profile</Tab>
-          <Tab>Security</Tab>
-          <Tab>Notifications</Tab>
-          <Tab>Billing</Tab>
+          <Tab>
+            <PersonIcon/>
+            Profile
+          </Tab>
+          <Tab>
+            <SecurityIcon/>
+            Security
+          </Tab>
+          <Tab>
+            <NotificationsRoundedIcon/>
+            Notifications
+          </Tab>
         </TabList>
         <Divider />
         <TabPanel value={0}>
