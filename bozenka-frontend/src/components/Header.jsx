@@ -14,10 +14,13 @@ import IconButton from '@mui/joy/IconButton';
 import Drawer from '@mui/joy/Drawer';
 import Stack from '@mui/joy/Stack';
 import Button from '@mui/joy/Button';
+import Sheet from '@mui/joy/Sheet';
 import Divider from '@mui/joy/Divider';
 import ListItem from '@mui/joy/ListItem';
+import Chip from '@mui/joy/Chip';
 import ListItemButton from '@mui/joy/ListItemButton';
 import ListItemContent from "@mui/joy/ListItemContent"
+import ListSubheader from '@mui/joy/ListSubheader';
 import Avatar from '@mui/joy/Avatar';
 import ListItemDecorator from "@mui/joy/ListItemDecorator";
 import List from '@mui/joy/List';
@@ -38,6 +41,12 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import SettingsRoundedIcon from'@mui/icons-material/SettingsRounded';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+
+
+// Our elements
+import ColorModeToggle from './ColorModeToggle';
 
 /**
  * @description A functional component that renders header for all pages.
@@ -63,7 +72,7 @@ export default function JoyHeader() {
 
   
   // Dashboard navigation buttons (moved from Dashboard.jsx)
-  const dashboardButtons = {
+  const buttons = {
     'Communities': [
       {
         head: 'Manage communities',
@@ -250,86 +259,133 @@ export default function JoyHeader() {
     
     <Drawer open={openDrawer} onClose={toggleDrawer(false)}>
 
-      <Box sx={{
-        backgroundColor: 'background.surface', 
-        borderColor: 'background.level2', borderTop: '0px',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: 'Inter',
-        boxSizing: 'border-box',
-      }}>
-        <Stack sx={{ 
-          alignItems: 'left', 
-          display: 'flex',  
-          justifyContent: 'center', p: 2 
-        }}>
-          <Avatar
-            src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
-            size="lg"
-          />
-          <Typography level="h5" mt={1} element="h5" fontWeight='bold'>
-            Welcome, user.
-          </Typography>
-
-          <Typography color='neutral' level="body-xs">
+     
+    <Sheet
+          sx={{
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2, p: 1}}>
+              <Avatar
+                src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
+                size="lg"
+              />
+              <Box>
+                <Typography level="h5" element="h5" fontWeight='bold'>
+                  Welcome, user.
+                </Typography>
+                <Typography color='neutral' level="body-xs">
             Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
-          </Typography>
-          
-          <Typography level="body-xs">Have a nice day!</Typography>
-        </Stack>
-      
+          </Typography>     
+                <Typography level="body-xs">
+                  Have a nice day!
+                </Typography>
+              </Box>
+        </Box>
         <Box sx={{px: 0.8}}>
-          <Link to="/dashboard/">
-            <Button variant='plain' color='neutral'
-                size='sm'
-                startDecorator={<HomeRoundedIcon/>}
-                sx={{
-                  width: '100%',
-                  fontSize: 'xs',
-                  my: 0.2,
-                  justifyContent: 'left',
-                  fontWeight: '500',
-                  transition: '0.2s ease background-color'
-                }}>
-              Home
-            </Button>
+        <List
+              size="sm"
+              sx={{
+                '--ListItem-radius': '8px',
+                '--ListItemDecorator-size': '32px',
+              }}
+            >
+          <Link to="">
+          <ListItem  sx={{
+                                my: 0.4,
+                              }} >
+                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
+                  <ListItemDecorator> 
+                    <HomeRoundedIcon /> 
+                  </ListItemDecorator>
+                  <ListItemContent>
+                      <Typography level='title-xs'>
+                          Home
+                      </Typography>
+                      <Typography level='body-xs'>
+                          Overivew of your Dashboard.
+                     </Typography>
+                   </ListItemContent>
+                  </ListItemButton>
+            </ ListItem>
+
             </Link>
-          {Object.keys(dashboardButtons).map((button) => (
-            <>
-              <Typography
-              level="body-xs"
-              textTransform="uppercase"
-              sx={{ 
-                letterSpacing: '0.15rem', 
-                paddingLeft: 2, 
-                paddingBottom: 1, 
-                paddingTop: 2}}>
+          {Object.keys(buttons).map((button) => (
+            <ListItem nested>
+              <ListSubheader>
                   {button}
-              </Typography>
-              {dashboardButtons[button].map( (btn) => (
+              </ListSubheader>
+              <List>
+              {buttons[button].map( (btn) => (
                             <Link to={btn.destination}>
-                              <Button variant='plain'
-                              color='neutral'
-                              size='sm'
-                              sx={{
-                                width: '100%',
-                                fontSize: 'xs',
-                                my: 0.2,
-                                justifyContent: 'left',
-                                
-                                fontWeight: '500',
-                                transition: '0.3s ease background-color'
-                              }}
-                              startDecorator={btn.icon}
-                            >
-                              {btn.head}
-                            </Button>
+                              <ListItem sx={{
+                                my: 0.4,
+                              }} variant='plain'>
+                                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
+                                  <ListItemDecorator>
+                                    {btn.icon}
+                                  </ListItemDecorator>
+                                  <ListItemContent>
+                                    <Typography level='title-xs'>
+                                    {btn.head}
+                                    </Typography>
+                                    <Typography level='body-xs'>
+                                    {btn.description}
+                                    </Typography>
+                                    </ListItemContent>
+                                </ListItemButton>
+                            </ListItem>
                           </Link>
               ))}
-              </>
+              </List>
+              </ListItem>
           ))}
-        </Box>
-    </Box>
+      </List>
+      <Box sx={{ display: 'flex', gap: 1, mt: 2}}>
+            
+        <IconButton
+          variant="soft"
+          color="primary"
+          sx={{
+            minWidth: 40,
+            minHeight: 40,
+            borderRadius: '50%',
+            position: 'relative',
+          }}
+          >
+            <NotificationsRoundedIcon />
+            <Chip
+              size="sm"
+              variant="solid"
+              color="danger"
+              sx={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                p: 1,
+                py: 0,
+                transform: 'translate(30%, -30%)',
+              }}
+              >
+                3
+              </Chip>
+        </IconButton>
+        <IconButton
+          variant="soft"
+          sx={{
+            minWidth: 40,
+            minHeight: 40,
+            borderRadius: '50%',
+          }}
+        >
+          <LogoutRoundedIcon/>  
+        </IconButton>
+        <ColorModeToggle />
+      </Box>
+      </Box>
+    </Sheet>
     </Drawer>
   </>
   );
