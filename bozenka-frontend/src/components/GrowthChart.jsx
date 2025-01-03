@@ -61,9 +61,11 @@ export default function TestChart({ data, displayData }) {
           display: 'flex', 
           justifyContent: 'space-between',
           alignItems: 'center',
-          mb: 2
         }}>
-          <Typography level="title-sm">Chart Legend</Typography>
+          <Typography level="title-sm" 
+          sx={{fontWeight: 'bold'}}>
+            Chart Legend
+          </Typography>
           <IconButton 
             variant="soft"
             color="neutral"
@@ -80,6 +82,7 @@ export default function TestChart({ data, displayData }) {
                 display: "flex", 
                 alignItems: "center",
                 gap: 2,
+                transition: 'all 0.2s ease',
                 '&:hover': {
                   bgcolor: 'background.level1',
                   borderRadius: 'sm'
@@ -87,7 +90,7 @@ export default function TestChart({ data, displayData }) {
                 p: 1
               }}>
                 <Avatar 
-                  size="sm" 
+                  size="md" 
                   color={item.value === 'members' ? 'primary' : 'success'}
                   variant="soft"
                 >
@@ -112,15 +115,13 @@ export default function TestChart({ data, displayData }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <Card variant="outlined" sx={{ 
-          p: 2,
+        <Card variant="outlined" size='xs' sx={{ 
+        
           boxShadow: 'sm',
-          minWidth: 200
         }}>
-          <Typography level="title-sm" sx={{ mb: 1 }}>
+          <Typography level="title-sm" sx={{ mb: 1, fontWeight: 'bold' }}>
             {label}
           </Typography>
-          <Divider />
           <Box sx={{ mt: 1 }}>
             {payload.map((item, index) => (
               <Box 
@@ -130,12 +131,8 @@ export default function TestChart({ data, displayData }) {
                   alignItems: 'center',
                   gap: 1,
                   mt: 1,
-                  p: 1,
-                  bgcolor: hoveredDataPoint === item.name ? 'background.level1' : 'transparent',
                   borderRadius: 'sm'
                 }}
-                onMouseEnter={() => setHoveredDataPoint(item.name)}
-                onMouseLeave={() => setHoveredDataPoint(null)}
               >
                 {displayData[item.name].icon}
                 <Box>
