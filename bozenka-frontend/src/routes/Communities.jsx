@@ -37,8 +37,7 @@ const massive = [
     avatarSrc: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?auto=format&fit=crop&w=90",
     menuItems: [
       { icon: <OpenInNewIcon />, label: 'Discord' },
-      { icon: <OpenInNewIcon />, label: 'Twitter' },
-      { icon: <OpenInNewIcon />, label: 'Website' },
+      { icon: <OpenInNewIcon />, label: 'Telegram' },
     ],
     title: "React Developers Hub",
     description: "A vibrant community for developers passionate about React.js and its ecosystem. Share projects, ask questions, and collaborate!",
@@ -50,7 +49,7 @@ const massive = [
     avatarSrc: "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=90",
     menuItems: [
       { icon: <OpenInNewIcon />, label: 'Telegram' },
-      { icon: <OpenInNewIcon />, label: 'Reddit' },
+      { icon: <OpenInNewIcon />, label: 'Discord' },
     ],
     title: "Indie Game Devs Unite",
     description: "Connect with fellow independent game developers. Discuss game design, programming, art, and marketing strategies.",
@@ -62,7 +61,7 @@ const massive = [
     avatarSrc: "https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?auto=format&fit=crop&w=90",
     menuItems: [
       { icon: <OpenInNewIcon />, label: 'Discord' },
-      { icon: <OpenInNewIcon />, label: 'Instagram' },
+      { icon: <OpenInNewIcon />, label: 'Telegram' },
     ],
     title: "Digital Artists Collective",
     description: "A space for digital artists of all levels to share their work, get feedback, and find inspiration. From illustration to 3D modeling!",
@@ -73,8 +72,8 @@ const massive = [
   {
     avatarSrc: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=90",
     menuItems: [
-      { icon: <OpenInNewIcon />, label: 'Website' },
-      { icon: <OpenInNewIcon />, label: 'YouTube' },
+      { icon: <OpenInNewIcon />, label: 'Discord' },
+      { icon: <OpenInNewIcon />, label: 'Vkontakte' },
     ],
     title: "Urban Photography Explorers",
     description: "For photographers who love capturing the beauty and grit of urban environments. Share your shots, tips, and favorite locations.",
@@ -86,7 +85,7 @@ const massive = [
     avatarSrc: "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?auto=format&fit=crop&w=90",
     menuItems: [
       { icon: <OpenInNewIcon />, label: 'Telegram' },
-      { icon: <OpenInNewIcon />, label: 'Github' }
+      { icon: <OpenInNewIcon />, label: 'Discord' }
     ],
     title: "Python Programming Enthusiasts",
     description: "Discuss all things Python! From beginner questions to advanced topics, data science, web development with Django/Flask, and more.",
@@ -109,8 +108,8 @@ const massive = [
     {
     avatarSrc: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=90",
     menuItems: [
-      { icon: <OpenInNewIcon />, label: 'Website' },
-      { icon: <OpenInNewIcon />, label: 'Instagram' },
+      { icon: <OpenInNewIcon />, label: 'Telegram' },
+      { icon: <OpenInNewIcon />, label: 'Discord' },
     ],
     title: "Fitness & Wellness Journey",
     description: "Motivate and support each other on our fitness and wellness journeys. Share workout routines, healthy recipes, and progress updates.",
