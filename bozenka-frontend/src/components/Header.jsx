@@ -261,6 +261,9 @@ export default function JoyHeader() {
 
      
     <Sheet
+              role="presentation"
+              onClick={toggleDrawer(false)}
+              onKeyDown={toggleDrawer(false)}
           sx={{
             p: 2,
             display: 'flex',
