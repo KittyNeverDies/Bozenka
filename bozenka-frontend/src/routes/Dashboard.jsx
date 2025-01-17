@@ -1,8 +1,11 @@
 // React related components
 import * as React from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
+// Some React Router magic
+import { Outlet, Link, useLocation } from 'react-router-dom';
+
+// Some MUI magic
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // MUI Joy UI controls
 import {FormControl, FormLabel, FormHelperText, List, ListItem, ListSubheader} from '@mui/joy';
@@ -22,6 +25,10 @@ import TabPanel from '@mui/joy/TabPanel';
 import Stepper from '@mui/joy/Stepper';
 import Step from '@mui/joy/Step';
 import StepIndicator from '@mui/joy/StepIndicator';
+import Accordion, { accordionClasses } from '@mui/joy/Accordion';
+import AccordionDetails from '@mui/joy/AccordionDetails';
+import AccordionGroup from '@mui/joy/AccordionGroup'; 
+import AccordionSummary from '@mui/joy/AccordionSummary';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import Chip from '@mui/joy/Chip';
 import ListItemContent from '@mui/joy/ListItemContent';
@@ -32,9 +39,12 @@ import ListItemButton from '@mui/joy/ListItemButton';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import { useColorScheme} from '@mui/joy/styles';
 import Checkbox from '@mui/joy/Checkbox';
+import TextArea from '@mui/joy/TextArea'; 
+
 
 // Our own controls
 import TestChart from '../components/GrowthChart';
+import ColorModeToggle from '../components/ColorModeToggle';
 
 
 // MUI material theme icons
@@ -49,16 +59,19 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import LinkIcon from '@mui/icons-material/Link';
+import AlternateEmailRoundedIcon from '@mui/icons-material/AlternateEmailRounded';
 import SecurityIcon from '@mui/icons-material/SecurityRounded';
-
-
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
+import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
+import MailRoundedIcon from '@mui/icons-material/MailRounded';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRounded';
 
 
   
@@ -126,25 +139,17 @@ const displayData = {
 }
 
 
-function ColorModeToggle() {
-  const { mode, setMode } = useColorScheme();
-  return (
-    <IconButton
-      variant="soft"
-      onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
-      sx={{
-        minWidth: 40,
-        minHeight: 40,
-        borderRadius: '50%',
-      }}
-    >
-      {mode === 'dark' ? <LightModeRoundedIcon /> : <DarkModeRoundedIcon />}
-    </IconButton>
-  );
-}
 
-
+/**
+* React component for the dashboard layout.
+* @returns {JSX.Element} - The rendered component.
+*/
 export function DashboardLayout(){
+
+  const location = useLocation();
+
+  // Buttons for the dashboard, made to speed up the editing buttons list &
+  // localization in future.
   const buttons = {
     'Communities': [
         {
@@ -170,7 +175,35 @@ export function DashboardLayout(){
       ]
   };
 
-  const isMobile = useMediaQuery('@media (max-width:1000px)'); // Use MUI's useMediaQuery
+
+    // Get current route path
+    const currentPath = location.pathname.split('/').pop();
+
+    // Active item styles
+    const activeItemStyles = {
+      borderLeft: '2px solid',
+      '&:hover': {
+        backgroundColor: 'primary.softHoverBg',
+      },
+      '& .MuiListItemDecorator-root': {
+        color: 'primary.main',
+      },
+      '& .MuiTypography-root': {
+        color: 'primary.main',
+        fontWeight: 600,
+      }
+    };
+  
+    // Common button styles
+    const buttonStyles = {
+      transition: 'all 0.2s ease',
+      my: 0.4,
+      '&.Mui-selected': activeItemStyles
+    };
+
+
+  // Using MUI's useMediaQuery to check, if screen is mobile.
+  const isMobile = useMediaQuery('@media (max-width:1000px)'); 
 
   return(
     <>
@@ -214,57 +247,52 @@ export function DashboardLayout(){
                 '--ListItem-radius': '8px',
                 '--ListItemDecorator-size': '32px',
               }}
-            >
-          <Link to="">
-          <ListItem  sx={{
-                                my: 0.4,
-                              }} >
-                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
-                  <ListItemDecorator> 
-                    <HomeRoundedIcon /> 
-                  </ListItemDecorator>
-                  <ListItemContent>
-                      <Typography level='title-xs'>
-                          Home
-                      </Typography>
-                      <Typography level='body-xs'>
-                          Overivew of your Dashboard.
-                     </Typography>
-                   </ListItemContent>
-                  </ListItemButton>
-            </ ListItem>
+            >            <Link to="" style={{ textDecoration: 'none' }}>
+            <ListItem>
+              <ListItemButton 
+                selected={currentPath === '' || currentPath === 'dashboard'}
+                sx={buttonStyles}
+              >
+                <ListItemDecorator>
+                  <HomeRoundedIcon />
+                </ListItemDecorator>
+                <ListItemContent>
+                  <Typography level='title-xs'>Home</Typography>
+                  <Typography level='body-xs'>Overview of your Dashboard</Typography>
+                </ListItemContent>
+              </ListItemButton>
+            </ListItem>
+          </Link>
 
-            </Link>
-          {Object.keys(buttons).map((button) => (
-            <ListItem nested>
-              <ListSubheader>
-                  {button}
-              </ListSubheader>
-              <List>
-              {buttons[button].map( (btn) => (
-                            <Link to={btn.destination}>
-                              <ListItem sx={{
-                                my: 0.4,
-                              }} variant='plain'>
-                                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
-                                  <ListItemDecorator>
-                                    {btn.icon}
-                                  </ListItemDecorator>
-                                  <ListItemContent>
-                                    <Typography level='title-xs'>
-                                    {btn.head}
-                                    </Typography>
-                                    <Typography level='body-xs'>
-                                    {btn.description}
-                                    </Typography>
-                                    </ListItemContent>
-                                </ListItemButton>
-                            </ListItem>
-                          </Link>
-              ))}
-              </List>
+
+          {Object.entries(buttons).map(([section, items]) => (
+              <ListItem nested key={section}>
+                <ListSubheader>{section}</ListSubheader>
+                <List>
+                  {items.map((item) => (
+                    <Link 
+                      key={item.destination}
+                      to={item.destination}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <ListItem>
+                        <ListItemButton
+                          selected={currentPath === item.destination}
+                          sx={buttonStyles}
+                        >
+                          <ListItemDecorator>{item.icon}</ListItemDecorator>
+                          <ListItemContent>
+                            <Typography level='title-xs'>{item.head}</Typography>
+                            <Typography level='body-xs'>{item.description}</Typography>
+                          </ListItemContent>
+                        </ListItemButton>
+                      </ListItem>
+                    </Link>
+                  ))}
+                </List>
               </ListItem>
-          ))}
+            ))}
+
       </List>
       <Box sx={{ display: 'flex', gap: 1, mt: 2}}>
             
@@ -316,9 +344,7 @@ export function DashboardLayout(){
                 bgcolor: 'background.level1',
     
       width: '70%',
-      height: '100vh',
       '@media (max-width:1000px)': {
-        width: '100%'
       }
     }}>
       <Outlet/>
@@ -329,7 +355,11 @@ export function DashboardLayout(){
 }
 
 
-
+/**
+* React component (page) for the dashboard homepage.
+* Shows the quick overview of the current situation of communities for user.
+* @returns {JSX.Element} - The rendered component.
+*/
 export function DashboardHomepage() {
   const [loading, setLoading] = React.useState(false);
   const [selectedPeriod, setSelectedPeriod] = React.useState('week');
@@ -510,7 +540,7 @@ export function DashboardHomepage() {
             <CircularProgress />
           </Box>
         ) : (
-          <Box sx={{overflowY: 'auto', height: '40vh'}}>
+          <Box sx={{}}>
             <TestChart sx={{height: 10}} data={data} displayData={displayData} />
             </Box>
         )}
@@ -531,7 +561,10 @@ export function DashboardHomepage() {
                 </Typography>
               }
             >
-              <ListItemButton>
+              <ListItemButton sx={{
+                borderRadius: 'lg',
+                transition: 'background-color 0.2s ease'
+              }}>
                 <ListItemDecorator>
                   <Avatar size="sm" />
                 </ListItemDecorator>
@@ -554,7 +587,10 @@ export function DashboardHomepage() {
 }
 
 
-
+/**
+* React component for building a community dashboard.
+* @returns {JSX.Element} - The rendered component.
+*/
 export function DashboardBuildCommunity() {
   return <>
         <Breadcrumbs 
@@ -625,6 +661,11 @@ export function DashboardBuildCommunity() {
 }
 
 
+/**
+* React component for controlling the communities of user in
+* dashboard.
+* @returns {JSX.Element} - The rendered component.
+*/
 export function DashboardControlCommunity() {
   const [tabIndex, setTabIndex] = React.useState(0);
 
@@ -656,54 +697,62 @@ export function DashboardControlCommunity() {
         <Card sx={{ 
           width: {xs: '95%', md: '70%'}, p: 3,
           minWidth: '70%', 
-                  maxHeight: { xs: 'auto', md: '600px' },
+                  maxHeight: 'auto'
           
           }}>
+
           <Box sx={{
             display: 'flex', 
-            flexDirection: 'column', my: 1,
-            overflow: 'auto' 
+            flexDirection: 'row',
+            
           }}> 
             
-            <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
-            <Typography level="title-lg"
-                sx={{marginBottom: 0}}>
-                  Community
-            </Typography>
-            <Box sx={{display: 'flex', flexDirection: 'row'}}>
-              <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
-                 100 Members
+            <Avatar size="lg" src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
+            <Box ml={1}>
+              <Typography level="title-lg"
+                  sx={{marginBottom: 0}}>
+                    Community
               </Typography>
-              <Typography 
+              <Box sx={{display: 'flex', flexDirection: 'row'}}>
+                <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
+                  100 Members
+                </Typography>
+                <Typography 
                   startDecorator={<CalendarMonthRoundedIcon/>}
                   level="body-xs">
                     Created on 9th September, 1999
-              </Typography>
-            </Box>
-            <Typography color='neutral' level="body-xs">
-              Total growth: <Typography 
+                </Typography>
+              </Box>
+              <Typography color='neutral' level="body-xs">
+                Total growth: <Typography 
                                 color="success" 
                                 level="body-xs" 
                                 startDecorator={<TrendingUpRoundedIcon/>}> 
                                 50% from last day 
-                </Typography>
-            </Typography>
+                  </Typography>
+              </Typography>
 
-            <Box>
-            <Chip variant="outlined" 
-                            startDecorator={<CalendarMonthRoundedIcon/>} 
-                            sx={{borderRadius: 'sm', m: 0.5}}>
+              <Box>
+                {/* There should be tags of community */}
+                <Chip 
+                  variant="soft"
+                  color='primary' 
+                  size='sm' 
+                  startDecorator={<CalendarMonthRoundedIcon/>} 
+                  sx={{borderRadius: 'sm', m: 0.5}}>
                             Tag 1
-                        </Chip>
-                        <Chip variant="outlined" 
-                            startDecorator={<CalendarMonthRoundedIcon/>} 
-                            sx={{borderRadius: 'sm', m: 0.5}}>
-                            Tag 1
-                        </Chip>
+                </Chip>
+                <Chip
+                 variant="soft"
+                 color='primary' 
+                 size='sm' 
+                 startDecorator={<CalendarMonthRoundedIcon/>} 
+                 sx={{borderRadius: 'sm', m: 0.5}}>
+                            Tag 2
+                </Chip>
             </Box>
+          </Box>
         </Box>
-          
-
         {/* Tab System */}
         <Tabs value={tabIndex}
               onChange={(event, value) => setTabIndex(value)}
@@ -715,7 +764,7 @@ export function DashboardControlCommunity() {
                             mx: 0.5,
                             paddingLeft: 1,
                             paddingRight: 1,
-                            
+                            height: 0.1,
                             borderTopLeftRadius: '5px',
                             borderTopRightRadius: '5px',
                             '&:hover': {
@@ -731,11 +780,36 @@ export function DashboardControlCommunity() {
                           },
               }}>
           <TabList>
-            <Tab>General</Tab>
-            <Tab>Settings</Tab>
-            <Tab>Platforms</Tab>
-            <Tab>Stats</Tab>
-            <Tab>Posts</Tab>
+            <Tab>
+              <HomeRoundedIcon sx={{fontSize: 20}} />
+              <Typography level='title-sm'>
+                General
+              </Typography>
+            </Tab>
+            <Tab>
+              <SettingsRoundedIcon sx={{fontSize: 20}} />
+              <Typography level='title-sm'>
+                Settings
+              </Typography>
+            </Tab>
+            <Tab>
+              <DnsRoundedIcon sx={{fontSize: 20}} />
+              <Typography level='title-sm'>
+                Platforms
+              </Typography>
+            </Tab>
+            <Tab>
+              <QueryStatsRoundedIcon sx={{fontSize: 20}} />
+              <Typography level='title-sm'>
+                Stats
+              </Typography>
+            </Tab>
+            <Tab>
+              <MailRoundedIcon sx={{fontSize: 20}} />
+              <Typography level='title-sm'>
+                Posts
+              </Typography>
+            </Tab>
           </TabList>
           <TabPanel value={0} sx={{maxHeight: '200px', overflowY: 'auto'}}>
             <Typography level='body-xs'>
@@ -780,28 +854,152 @@ export function DashboardControlCommunity() {
               </Grid>
         
           </TabPanel>
-          <TabPanel value={1}  sx={{maxHeight: '200px', overflowY: 'auto'}}>
-            <FormControl sx={{my: 1}}>
-              <Checkbox label="Function 1" size='sm' />
-              <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
-            </FormControl>
-            <FormControl sx={{my: 1}}>
-              <Checkbox label="Function 1" size='sm' />
-              <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
-            </FormControl>
-            <FormControl sx={{my: 1}}>
-              <Checkbox label="Function 1" size='sm' />
-              <FormHelperText>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis sint enim nihil soluta sapiente voluptas iure. Vero cumque voluptas hic, ipsum, cupiditate sint enim architecto, velit voluptate est aut voluptates?</FormHelperText>
+          <TabPanel value={1} >
+          <FormControl sx={{my: 1}}>
+            <AccordionGroup
+                  color="neutral"
+                  size="sm"
+                
+                sx={{
+                    borderRadius: 'md',
+                    
+        [`& .${accordionClasses.root}`]: {
+            marginTop: '0.5rem',
+            transition: '0.2s ease, background-color 0.4 ease, transform 0.2 ease',
+            '& button:not([aria-expanded="true"])': {
+              transition: '0.2s ease',
+              paddingBottom: '0.625rem',
+            },
+            '& button:hover': {
+              background: 'transparent'
+            },
+            
+            '& button:active': {
+                backgroundColor: 'background.level1',
+                borderRadius: 'md'
+            }
+          }
+                }}
+                variant="plain"
+                transition="0.2s">
+                {/* Filters for communtites */}
+
+                <Accordion>
+                    <AccordionSummary>
+                        <Avatar color="primary">
+                          <PeopleRoundedIcon sx={{fontSize: 24}} />
+                        </Avatar>
+                        <ListItemContent>
+                            <Typography level="title-md">Features for Members</Typography>
+                            <Typography level="body-sm">Change experience for Members of your community </Typography>
+                        </ListItemContent>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                     <List sx={{my: 1}}>
+                      <ListItem>
+                        <ListItemContent>
+                        <Checkbox label="Allow to chat with Neural GPT models" size='sm' my={0} p={0} />
+                        <FormHelperText>Members of your community will use command /conversations to chat with Neural GPT models and ask questions using Bozenka.</FormHelperText>
+                        </ListItemContent>
+                      </ListItem>
+                      <ListItem>
+                        <ListItemContent>
+                          <Checkbox label="Allow to generate images using Bozenka" size='sm' />
+                          <FormHelperText>Members of your community will use command /imagine to start generation of images using diffusion neural models</FormHelperText>
+                        </ListItemContent>
+                      </ListItem>
+                      <ListItem>
+                        <ListItemContent>
+                          <Checkbox label="Enable custom welcome messages from Bozenka" size='sm' />
+                          <FormHelperText>Bozenka will met new joined members with own custom message :)</FormHelperText>
+                        </ListItemContent>
+                      </ListItem>
+                      <ListItem>
+                        <ListItemContent>
+                          <Checkbox label="Enable bridges from different social platforms." size='sm' />
+                          <FormHelperText>Bozenka will duplicate some messages of your community from one social platform in other channels of other social platform</FormHelperText>
+                        </ListItemContent>
+                      </ListItem>
+                      </List>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion>
+                    <AccordionSummary>
+                        <Avatar color="primary">
+                          <AccessibilityNewRoundedIcon sx={{fontSize: 24}}/>
+                        </Avatar>
+                        <ListItemContent>
+                            <Typography level="title-md">Features for Administration</Typography>
+                            <Typography level="body-sm">Improve your commmunity administration experience by this features.</Typography>
+                        </ListItemContent>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <List sx={{my: 1}}>
+                        <ListItem>
+                          <ListItemContent>
+                            <Checkbox label="Enable statistics" size='sm' />
+                            <FormHelperText>Bozenka will collect statistics to show it on your dashboard and community control page</FormHelperText>
+                          </ListItemContent>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemContent>
+                            <Checkbox label="Enable Knowledge Library" size='sm' />
+                            <FormHelperText>Bozenka will give abillity to create Knowledge Library, where you can publish your tutorials and rules of your community.</FormHelperText>
+                          </ListItemContent>
+                        </ListItem>
+                        <ListItem>
+                         <ListItemContent>
+                            <Checkbox label="Enable Moderation" size='sm' />
+                            <FormHelperText>Bozenka will be able to ban, mute and kick users by your decision and decision of your administration</FormHelperText>
+                          </ListItemContent>
+                        </ListItem>
+                      </List>
+                    </AccordionDetails>
+                </Accordion>
+            </AccordionGroup>
             </FormControl>
             
           </TabPanel>
           <TabPanel value={2}>
-            <Typography>
-
-
-            </Typography>
+                <List>
+                  <ListItem sx={{
+                    borderRadius: 'lg', 
+                    p: 1, my: 1}} 
+                  variant='outlined'>
+                    <ListItemDecorator sx={{m: 1}}>
+                      <LinkIcon sx={{fontSize: 40}}/>
+                    </ListItemDecorator>
+                    <ListItemContent>
+                      <Typography level="title-md">
+                        Telegram
+                      </Typography>
+                      <Box sx={{display: 'flex', flexDirection: 'row'}}>
+                        <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
+                          100 Members
+                        </Typography>
+                        <Typography 
+                          startDecorator={<CalendarMonthRoundedIcon/>}
+                          mr={1}
+                          level="body-xs">
+                          Created on 9th September, 1999
+                        </Typography>
+                      </Box>
+                      <Typography 
+                          level="body-xs"
+                          startDecorator={<AlternateEmailRoundedIcon mr={0}/>}
+                        >
+                          testingname
+                      </Typography>
+                    </ListItemContent>
+                    <IconButton sx={{mr: 2, transition: 'all 0.3s ease'}}>
+                      <DeleteRoundedIcon/>
+                    </IconButton>
+                  </ListItem>
+                
+                  
+                </List>
           </TabPanel>
-          <TabPanel value={3}  sx={{maxHeight: '200px', overflowY: 'auto'}}>
+          <TabPanel value={3} >
           <TestChart sx={{height: 10}} data={data} displayData={displayData} />
           </TabPanel>
           <TabPanel value={4}>
@@ -824,8 +1022,15 @@ export function DashboardControlCommunity() {
         }}>
           <Typography level="title-lg" mb={1}>
             Your Communities
-          </Typography>       
+          </Typography>    
+          <Input
+              size="sm"
+              placeholder="Search communities..."
+              startDecorator={<SearchIcon />}
+              sx={{ mb: 2 }}
+            />   
         </Box>
+
         <List>
           {communities.map((community) => (
             <ListItem key={community.id}>
@@ -855,9 +1060,16 @@ export function DashboardControlCommunity() {
 }
 
 
+/**
+* React component (Page) for controlling the account in dashboard.
+* @returns {JSX.Element} - The rendered component.
+*/
 export function DashboardControlAccount() {
+
+  // Current active tab ???
   const [activeTab, setActiveTab] = React.useState(0);
 
+  // Mock user profile data, being replaced in future
   const userProfile = {
     name: "John Doe",
     email: "john@example.com",
@@ -870,6 +1082,42 @@ export function DashboardControlAccount() {
       vk: '@johndoe',
     }
   };
+
+  // Styles for inputs.
+  const inputStyles = {
+    width: '100%',
+    '--Input-focusedThickness': '1px',
+    bgcolor: 'background.level0',
+    borderRadius: 'lg',
+    '&:hover': {
+      borderColor: 'primary.300',
+    },
+    '&:focus-within': {
+      borderColor: 'background.level2',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+    mb: 2,
+    py: 1,
+    px: 2,
+    fontSize: 'sm',
+    fontWeight: 'md',
+    border: '1px solid',
+    borderColor: 'neutral.300',
+    transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
+    '&::placeholder': {
+      color: 'neutral.500',
+      fontStyle: 'italic',
+    },
+    '&:disabled': {
+      bgcolor: 'neutral.100',
+      color: 'neutral.400',
+      cursor: 'not-allowed',
+    },
+  };
+
+
 
   return (
     <Box sx={{ py: 2, px: { xs: 2, md: 4 } }}>
@@ -891,11 +1139,14 @@ export function DashboardControlAccount() {
         <Box sx={{ flex: 1 }}>
           <Box sx={{ 
             display: 'flex', 
-            justifyContent: 'space-between',
+            justifyContent: {md: 'space-between', xs: 'center'},
             alignItems: 'flex-start',
+            
+            textAlign: {xs: 'center', md: 'left'},
             mb: 2,
           }}>
-            <Box>
+            <Box sx={{
+            }}>
               <Typography level="h3">{userProfile.name}</Typography>
               <Typography level="body-sm" color="neutral">
                 {userProfile.role}
@@ -905,18 +1156,6 @@ export function DashboardControlAccount() {
           <Typography level="body-md" sx={{ mb: 2 }}>
             {userProfile.bio}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {Object.entries(userProfile.socialLinks).map(([platform, link]) => (
-              <Chip
-                size="sm"
-                variant="soft"
-                color="primary"
-                startDecorator={<LinkIcon />}
-              >
-                {platform}
-              </Chip>
-            ))}
-          </Box>
         </Box>
       </Card>
 
@@ -986,23 +1225,26 @@ export function DashboardControlAccount() {
               <Grid xs={12} md={6}>
                 <FormControl>
                   <FormLabel>Full Name</FormLabel>
-                  <Input defaultValue={userProfile.name} />
+                  <Input sx={inputStyles} 
+                          startDecorator={<PersonIcon/>}
+                          placeholder="Enter your name (can be not real)"
+                          defaultValue={userProfile.name} />
                 </FormControl>
               </Grid>
               <Grid xs={12} md={6}>
                 <FormControl>
                   <FormLabel>Email</FormLabel>
-                  <Input defaultValue={userProfile.email} />
+                  <Input
+                    startDecorator={<MailRoundedIcon/>}
+                    placeholder="Enter your email"
+                    sx={inputStyles}
+                    defaultValue={userProfile.email} />
                 </FormControl>
               </Grid>
               <Grid xs={12}>
                 <FormControl>
                   <FormLabel>Bio</FormLabel>
-                  <Input
-                    multiline
-                    minRows={3}
-                    defaultValue={userProfile.bio}
-                  />
+                  <TextArea sx={inputStyles} defaultValue={userProfile.bio} />
                 </FormControl>
               </Grid>
             </Grid>
