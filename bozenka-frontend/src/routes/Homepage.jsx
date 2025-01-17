@@ -8,7 +8,6 @@ import Typography from '@mui/joy/Typography';
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
 import Card from '@mui/joy/Card';
-import Chip from '@mui/joy/Chip';
 
 
 // MUI icons
@@ -18,9 +17,6 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import CodeIcon from "@mui/icons-material/Code";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import KeyboardDoubleArrowDownRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowDownRounded';
-import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Avatar } from '@mui/joy';
 
 
 /**
@@ -98,8 +94,6 @@ function HomePage(){
 
     return (
         <>
-        
-            {/* Main introduction page */}
             <Box sx={{
                 paddingTop: 2,
                 paddingBottom: 3,
@@ -121,44 +115,46 @@ function HomePage(){
                 }}>
                     Manage Your Community Across Platforms
                 </Typography>
-            
                 <Typography level='body-md' sx={{
                     textAlign: "left",
                     my: 0,
                     paddingTop: 0,
                     fontWeight: 'regular',
                     px: 2
-                }}>Streamline your community management on Discord, Telegram, and VK with Bozenka project.
+                }}>
+                    Streamline your community management on Discord, Telegram, and VK with Bozenka project.
                 </Typography>
                 <Box sx={{textAlign: 'right'}}>
-                    <Button variant="soft" size="lg" sx={{
-                        justifyContent: "right",
-                        p: 1.5,
-                        transition: 'transform 0.2s ease, background-color 0.2s ease',
-                        border: '1px',
-                        '&:hover': {
-                            transform: 'scale(1.05)',
-                            bgcolor: 'primary.lightBg',
-                            borderRadius: '',
-                        },
-                        '&:active': {
-                            transform: 'scale(1.20)'
-                        }
-                    }} endDecorator={<KeyboardDoubleArrowDownRoundedIcon/>}
-                    >
-                        Get started
-                    </Button>
+                    <Link to='/communities/'>
+                        <Button variant="soft" size="lg" sx={{
+                            justifyContent: "right",
+                            p: 1.5,
+                            transition: 'transform 0.2s ease, background-color 0.2s ease',
+                            border: '1px',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                                bgcolor: 'primary.lightBg',
+                                borderRadius: '',
+                            },
+                            '&:active': {
+                                transform: 'scale(1.20)'
+                            }
+                            }} 
+                            endDecorator={<KeyboardDoubleArrowDownRoundedIcon/>}>
+                            Get started
+                        </Button>
+                    </Link>
                 </Box>
                 </Card>
                 <Box sx={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: 4, 
-                m: 2
-            }}>
-                {features.map((feature, index) => (
-                <FeatureCard key={index} feature={feature} />
-                ))}
+                    display: 'flex', 
+                    flexWrap: 'wrap', 
+                    gap: 4, 
+                    m: 2
+                }}>
+                    {features.map((feature, index) => (
+                        <FeatureCard key={index} feature={feature} />
+                    ))}
             </Box>
             </Box>
         </>
