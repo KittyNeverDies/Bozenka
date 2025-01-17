@@ -295,7 +295,7 @@ export default function JoyHeader() {
                 '--ListItemDecorator-size': '32px',
               }}
             >
-          <Link to="">
+          <Link to="/dashboard/">
           <ListItem  sx={{
                                 my: 0.4,
                               }} >
