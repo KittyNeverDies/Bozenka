@@ -36,7 +36,7 @@ function SelectableTags({ Tag }) {
                  */
                 {
                     m: 0.4,
-                    borderRadius: 'sm'
+                    borderRadius: 'sm',
                 }
             }
             variant='soft'

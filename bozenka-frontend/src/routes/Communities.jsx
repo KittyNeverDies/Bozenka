@@ -31,7 +31,7 @@ import CommunityCard from '../components/CommunityCard';
 
 
 
-
+// Mock data of communites list
 const massive = [
   {
     avatarSrc: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?auto=format&fit=crop&w=90",
@@ -228,16 +228,14 @@ function CommunitiesSearch() {
                             </Box>
                         </Card>
                     )}
-    <div 
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-        gap: '16px',
-        padding: '16px',
-        width: '95%',
-        justifyContent: 'center'
-      }}
-    >
+                <div 
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gap: '16px',
+                    padding: '16px',
+                    width: '95%',
+                    justifyContent: 'center'}}>
                         {/* Community cards go here */}
                         {
                             massive.map((community, index) => (
