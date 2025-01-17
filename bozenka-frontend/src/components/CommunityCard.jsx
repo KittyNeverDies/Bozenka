@@ -1,4 +1,7 @@
 
+import {Link} from 'react-router-dom';
+
+
 // MUI Joy UI elements
 import Card from '@mui/joy/Card';
 import Avatar from '@mui/joy/Avatar';
@@ -40,7 +43,15 @@ import InfoIcon from '@mui/icons-material/Info';
 */
 function CommunityCard({ avatarSrc, menuItems, title, description, tags, membersCount, creationDate }) {
     return (
-        <Card sx={{m: 1}}>
+    <Link to='/community/'>
+        <Card sx={{m: 1,
+
+            transition: 'transform 0.3s, box-shadow 0.3s',
+            '&:hover': { 
+                transform: 'scale(1.05)', 
+                boxShadow: 'md',
+            }
+        }}>
             <Avatar src={avatarSrc} />
             <Dropdown>
                 <MenuButton size='sm' variant='plain' sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
@@ -90,6 +101,7 @@ function CommunityCard({ avatarSrc, menuItems, title, description, tags, members
                 </CardContent>
             </CardOverflow>
         </Card>
+    </Link>
     );
 }
 
