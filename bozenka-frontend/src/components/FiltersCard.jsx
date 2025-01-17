@@ -1,4 +1,6 @@
 
+import {Link} from 'react-router-dom';
+
 // Joy UI components
 import Button from '@mui/joy/Button';
 import Card from '@mui/joy/Card';
@@ -79,7 +81,7 @@ function FiltersCard() {
     
     <Stack sx={{
                 flexDirection: 'column',
-                '@media (max-width: 670px)': { // Mobile responsiveness
+                '@media (max-width: 720px)': { // Mobile responsiveness
                   width: '120%',
                   position: 'relative',
                   left: 'unset',    
@@ -88,7 +90,10 @@ function FiltersCard() {
                     <Breadcrumbs 
                         size="sm"
                         separator={ <KeyboardArrowRightIcon sy/>}>
-                      <Typography sx={{mt: 0}}>Home</Typography>
+                      
+                      <Link to='/'>
+                        <Typography sx={{mt: 0}}>Home</Typography>
+                      </Link>
                       <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Communities</Typography>
                     </Breadcrumbs>
        
@@ -101,7 +106,7 @@ function FiltersCard() {
                 maxHeight: 'calc(100vh - 32px)', // Adjust as needed
                 overflowY: 'auto',
                 marginBottom: '25px',
-                '@media (max-width: 670px)': { // Mobile responsiveness
+                '@media (max-width: 720px)': { // Mobile responsiveness
                     width: '95%',
                     position: 'relative',
                     left: 'unset',
