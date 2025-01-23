@@ -54,7 +54,7 @@ function CommunityCard({ avatarSrc, menuItems, title, description, tags, members
         }}>
             <Avatar src={avatarSrc} />
             <Dropdown>
-                <MenuButton size='sm' variant='plain' sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}>
+                <MenuButton size='sm' variant='plain' sx={{ position: 'absolute', top: '0.875rem', right: '0.5rem' }}onClick={(event) => event.preventDefault() }>
                     <MoreVertIcon />
                 </MenuButton>
                 <Menu size='sm'>

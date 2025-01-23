@@ -28,7 +28,7 @@ import '@fontsource/inter';
 * @returns {JSX.Element} - The rendered application.
 */
 function App() {
- return (
+  return (
    <div>
      <JoyHeader />
      <Routes>
