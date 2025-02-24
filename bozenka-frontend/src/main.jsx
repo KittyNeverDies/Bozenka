@@ -1,12 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { StyledEngineProvider } from '@mui/joy/styles';
-import { CssVarsProvider } from '@mui/joy/styles';
-import softTheme from './theme';
+import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
 
 import App from './App.jsx'
 import './index.css'
 import { BrowserRouter } from 'react-router-dom';
+import softTheme from './theme.js';
 
 
 createRoot(document.getElementById('root')).render(

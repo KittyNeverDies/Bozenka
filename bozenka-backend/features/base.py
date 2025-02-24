@@ -19,19 +19,21 @@ class BasicFeature:
             },
             'handlers': {
                 #  Format is [Handler, [Filters]]
-                'callback': {},
-                'message': {},
+                'callback_query': [],  # Handlers for callback queries
+                'message': [],         # Handlers for messages
+                'channel_post': [],    # Handlers for channel posts
+                'edited_channel_post': [], # Handlers for edited channel posts
+                'poll': [],           # Handlers for polls
+                'chat_join_request': [],      # Handlers for chat joins request
+                'chat_boost': [],     # Handlers for chat boosts
             }
         },
         "discord": {
-            'commands_hints': {
-                # In development right now
-            },
             'handlers': {
-                #  Format is [Handler, [Filters]]
+                #  Format is [Handler, {'name': 'example', 'description': 'It is an example'}]
             }
         },
-        "vk": {
+        "vkontakte": {
             # In development right now
             'handlers': {
                 #  Format is [Handler, [Filters]]

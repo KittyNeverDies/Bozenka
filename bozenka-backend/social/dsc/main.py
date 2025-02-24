@@ -30,15 +30,15 @@ def static_to_coroutine(func):
 
 async def launch_discord_bot_instance(features: dict[str: list]) -> None:
     """
-    Launches discord bot instance for bozenka platform
+    Launches dsc bot instance for bozenka platform
     :param features: List of features, that instance should have to register
     :return: Nothing
     """
 
-    # Initializing discord bot
+    # Initializing dsc bot
     bot = discord.Bot()
 
-    # Initializing all slash commands, written for discord
+    # Initializing all slash commands, written for dsc
     # in features of platform
     for list_of_features in features.values():
         for feature in list_of_features:

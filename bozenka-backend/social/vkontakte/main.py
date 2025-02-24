@@ -1,4 +1,4 @@
-# social/vkontakte.bot/main.py
+# social/vkontakte/main.py
 import asyncio
 import logging
 import os
@@ -8,7 +8,7 @@ from vkbottle.user import Message
 
 async def launch_vk_bot_instance(features: dict[str: list]) -> None:
     """
-    Launches vkontakte.bot bot instance
+    Launches vkontakte bot instance
     for bozenka platform
     :return: Nothing
     """
@@ -30,12 +30,12 @@ async def launch_vk_bot_instance(features: dict[str: list]) -> None:
     for feature_list in features.values():
         for feature in feature_list:
             # Skip if telegram platform not available
-            if 'vkontakte.bot' not in feature.platforms_available:
+            if 'vkontakte' not in feature.platforms_available:
                 continue
 
 
             # Get telegram handlers
-            vk_handlers = feature.platforms_available['vkontakte.bot']['handlers']
+            vk_handlers = feature.platforms_available['vkontakte']['handlers']
 
             # Register each handler type
             for event_type, handlers in vk_handlers.items():
