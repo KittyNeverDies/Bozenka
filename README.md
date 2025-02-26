@@ -38,7 +38,7 @@ For a better understanding of our workflow, please refer to the following overvi
 </figure>
 
 ### Current State of Development
-- Frontend:
+- [Frontend](bozenka-frontend/):
     - [x] Home (Needs improvements) \
         I think its requires some redesign with visualisation of bozenka works with 3d elements. Current redesign is nice, but still requires imnprovements
     - [x] Communities search (Need improvements) \
@@ -56,7 +56,7 @@ For a better understanding of our workflow, please refer to the following overvi
         - [x] Manage account \
             Manage account (change password, email and etc)
         - [ ] Connection with Backend (Started)
-- Backend:
+- [Backend](bozenka-backend/):
     - [x] Database Models (Refactors in future) \
         Has been writen first after creation of new bozenka project
     - [x] Basic sturcture
