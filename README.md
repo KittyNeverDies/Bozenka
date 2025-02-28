@@ -76,7 +76,7 @@ For a better understanding of our workflow, please refer to the following overvi
             Probably using OAuth or something other.
         - [ ] Give infromation about communities & search \
             By requests from frontend to us
-        - [ ] ASGI with paralel part of Backend \
+        - [x] ASGI with paralel part of Backend \
             Using ASGI to work in paralel with bots instances on platforms
         - [ ] Connection with Frontend \
             To complete project
