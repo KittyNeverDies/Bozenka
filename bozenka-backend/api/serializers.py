@@ -1,0 +1,129 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth.base_user import AbstractBaseUser
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
+from .models import User, Community, Tag, CommunityGrowth, CommunityER, Post, CommunityManager, LatestPostView, \
+    SocialLink
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer for registering a new user.
+    """
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')
+
+    def create(self, validated_data) -> User:
+        """
+        Creates a new user.
+        :param validated_data: A valid date for creating a user.
+        :return:
+        """
+        user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
+        return user
+
+class LoginSerializer(serializers.ModelSerializer):
+    """
+    Serializer for logging in.
+    """
+    class Meta:
+        model = User
+        fields = ('username', 'password')
+
+
+    def validate(self, data) -> AbstractBaseUser | ValidationError:
+        user = authenticate(username=data['username'], password=data['password'])
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Incorrect Credentials")
+
+
+class CommunitySerializer(serializers.ModelSerializer):
+    """
+    Serializer for communities.
+    """
+    class Meta:
+        model = Community
+        fields = ('name',
+                  'description',
+                  'short_description',
+                  'creation_date',
+                  'tags', 'icon', 'members_count', 'id')
+
+    def create(self, validated_data) -> Community:
+        """
+        Creates a new community.
+        :param validated_data: A valid date for creating a community.
+        :return: Community object
+        """
+        pass
+
+    def update(self, instance, validated_data) -> Community:
+        """
+        Updates a community
+        :param instance: The community to be updated.
+        :param validated_data: The new data for the community.
+        :return: Community object.
+        """
+        pass
+
+class TagSerializer(serializers.ModelSerializer):
+    """
+    Serializer for tags.
+    """
+    class Meta:
+        model = Tag
+        fields = ('name', 'icon')
+
+
+class CommunityGrowthSerializer(serializers.ModelSerializer):
+    """
+    Serializer for community growth.
+    """
+    class Meta:
+        model = CommunityGrowth
+        fields = (
+            'community',
+            'members_count',
+            'growth',
+            'date'
+        )
+
+
+class CommunityERSerializer(serializers.ModelSerializer):
+    """
+    Serializer for community growth.
+    """
+    class Meta:
+        model = CommunityER
+        fields = (
+            'community',
+            'er',
+            'date'
+        )
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ('text', 'source', 'created_at', 'views')
+
+
+class CommunityManagerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunityManager
+        fields = ('status', 'contact_link', 'avatar')
+
+
+class LatestPostViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LatestPostView
+        fields = ('recording_date', 'views')
+
+
+class SocialLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SocialLink
+        fields = ('platform', 'link')

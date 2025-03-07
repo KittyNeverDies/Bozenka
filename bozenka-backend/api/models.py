@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 
 from django.db import models
@@ -34,7 +36,13 @@ class Community(models.Model):
     """
     A community with its description, creation date, tags, icon, and member count
     """
-
+    id = models.UUIDField(
+        verbose_name=_("ID"),
+        primary_key=True,
+        unique=True,
+        editable=False,
+        default=uuid.uuid4().int,
+    )
     name = models.TextField(
         verbose_name=_("Name of Community")
     )
@@ -173,7 +181,7 @@ class CommunityManager(models.Model):
     )
     avatar = models.ImageField(
         upload_to='images\\manager_avatars',
-        verbose_name=_("Avatar")
+        verbose_name=_("Avatar"),
     )
 
     class Meta:
