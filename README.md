@@ -72,9 +72,15 @@ For a better understanding of our workflow, please refer to the following overvi
       - [x] Vk bot \
           Worst development expirence, but it's also works well by some not good techincs.
     - [ ] Rest API from Django
-        - [ ] Registration & Authorization \
-            Probably using OAuth or something other.
-        - [ ] Give infromation about communities & search \
+        - [ ] Registration & Authorization (Beta) \
+            <strike>Probably using OAuth or something other.</strike> Using JWT to register Users and support authorization, right now only in beta test, for understanding it work.
+          - [x] Basic authorization
+            Using JWT to get authorization token and refresh token.
+          - [ ] Mail verification. \
+            Probably just an integrated SMTP server with ability to verifycation.
+          - [ ] Social networks & Messengers integration by Oauth? \ 
+            I don't fully understand, how to do that.
+        - [x] Give infromation about communities\
             By requests from frontend to us
         - [x] ASGI with paralel part of Backend \
             Using ASGI to work in paralel with bots instances on platforms
