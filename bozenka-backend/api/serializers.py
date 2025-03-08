@@ -11,6 +11,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for registering a new user.
     """
+    def __init__(self, data, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_data = data
+
     class Meta:
         model = User
         fields = ('username', 'email', 'password')
@@ -24,50 +28,42 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
         return user
 
-class LoginSerializer(serializers.ModelSerializer):
+class LoginSerializer(serializers.Serializer):
     """
-    Serializer for logging in.
+    Serializer for logging in a user.
     """
-    class Meta:
-        model = User
-        fields = ('username', 'password')
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data) -> AbstractBaseUser:
+        """
+        Validates the login data.
+        :param data: The login data.
+        :return: The validated data.
+        """
+
+        user = authenticate(email=data['email'], password=data['password'])
+        if not user:
+            raise ValidationError('Invalid username or password.')
+        return user
 
 
-    def validate(self, data) -> AbstractBaseUser | ValidationError:
-        user = authenticate(username=data['username'], password=data['password'])
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Incorrect Credentials")
-
-
-class CommunitySerializer(serializers.ModelSerializer):
+class PublicCommunitySerializer(serializers.ModelSerializer):
     """
-    Serializer for communities.
+    Serializer for public information about communities.
     """
     class Meta:
         model = Community
-        fields = ('name',
+        fields = ('id', 'name',
                   'description',
                   'short_description',
                   'creation_date',
-                  'tags', 'icon', 'members_count', 'id')
+                  'tags', 'icon', 'members_count')
 
-    def create(self, validated_data) -> Community:
-        """
-        Creates a new community.
-        :param validated_data: A valid date for creating a community.
-        :return: Community object
-        """
-        pass
 
-    def update(self, instance, validated_data) -> Community:
-        """
-        Updates a community
-        :param instance: The community to be updated.
-        :param validated_data: The new data for the community.
-        :return: Community object.
-        """
-        pass
+class PrivateCommunitySerializer(serializers.ModelSerializer):
+    pass
+
 
 class TagSerializer(serializers.ModelSerializer):
     """

@@ -57,7 +57,8 @@ class Community(models.Model):
     )
     creation_date = models.DateTimeField(
         verbose_name=_("Creation date"),
-        auto_now_add=True
+        auto_now_add=True,
+        editable=False,
     )
     tags = models.ManyToManyField(
         Tag,
@@ -66,7 +67,8 @@ class Community(models.Model):
 
     icon = models.ImageField(
         upload_to='images/community_icons',
-        verbose_name=_("Icon")
+        verbose_name=_("Icon"),
+        blank=True
     )
 
     members_count = models.IntegerField(

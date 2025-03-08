@@ -17,19 +17,29 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.views import CommunityViews, TagViews
+from rest_framework_simplejwt.views import TokenRefreshView
 
+from api.views import PublicCommunityViews, TagViews, AuthViews, PrivateCommunityViews
 
 urlpatterns = [
+    # Administration
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('communities/', CommunityViews.as_view({'get': 'list'}), name='communities'),
-    path('communities/<str:community_id>/', CommunityViews.as_view({'get': 'retrieve'}), name='community-detail'),
-    path('tags/', TagViews.as_view({'get': 'list'}), name='tags'),
 
+    # Get public information about communities and tags
+    path('communities/', PublicCommunityViews.as_view({'get': 'list'}), name='communities'),
+    path('communities/<str:community_id>/', PublicCommunityViews.as_view({'get': 'retrieve'}), name='community_detail'),
+    path('tags/', TagViews.as_view({'get': 'list'}), name='tags'),
+    path('private/communities/', PrivateCommunityViews.as_view({'get': 'communities'}), name='private_communities'),
+    path('private/communities/<str:community_id>/update/base', PrivateCommunityViews.as_view({'post': 'update_community_base_information'}),
+         name='private_community_update'),
+    path('private/communities/<str:community_id>/delete/',
+         PrivateCommunityViews.as_view({'post': 'delete_community'}), name='private_community_delete'),
+
+    # Authentication
+    path('auth/register', AuthViews.as_view({'post': 'register'}), name='auth_register'),
+    path('auth/login', AuthViews.as_view({'post': 'login'}), name='auth_login'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 ]
 admin.autodiscover()
