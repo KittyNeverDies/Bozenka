@@ -49,8 +49,6 @@ class CommunityApiClient {
            }
 
            const data = await response.json();
-           this.authToken = data.access_token;
-           this.refreshToken = data.refresh_token;
 
            return {
                success: true,
@@ -108,10 +106,9 @@ class CommunityApiClient {
    /**
     * Refresh the authentication token.
     */
-   async refreshAuthToken() {
+   async refreshAuthToken(refreshToken) {
        if (this.useMockData) {
-           this.authToken = 'mock-auth-token-refreshed';
-           return;
+           return {};
        }
 
        try {
@@ -121,7 +118,7 @@ class CommunityApiClient {
                    'Content-Type': 'application/json',
                },
                body: JSON.stringify({
-                   refresh: this.refreshToken
+                   refresh: refreshToken
                })
            });
 
@@ -130,7 +127,6 @@ class CommunityApiClient {
            }
 
            const data = await response.json();
-           this.authToken = data.access;
            return data;
        } catch (error) {
            console.error('Token refresh failed:', error);
@@ -162,7 +158,7 @@ class CommunityApiClient {
     * @param {number} [retryCount=3] - The number of times to retry the request.
     * @returns {Promise<Object>} - A promise that resolves to the response data.
     */
-   async makeRequest(endpoint, options = {}, retryCount = 3) {
+   async makeRequest(endpoint,  authToken = None, options = {}, retryCount = 3) {
        if (this.useMockData) {
            return this.getMockResponse(endpoint);
        }
@@ -173,7 +169,7 @@ class CommunityApiClient {
            // Add authorization header if token exists
            const headers = {
                'Content-Type': 'application/json',
-               ...(this.authToken && { 'Authorization': `Bearer ${this.authToken}` }),
+               ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
                ...options.headers
            };
 
@@ -231,10 +227,11 @@ class CommunityApiClient {
 
    /**
     * Get a list of private communities.
+    * @param {string} authToken - Token for authorization
     * @returns {Promise<Object>} - A promise that resolves to the response data.
     */
-   async getPrivateCommunities() {
-       return this.makeRequest('/private/communities/', {
+   async getPrivateCommunities(authToken) {
+       return this.makeRequest('/private/communities/', authToken, {
            method: 'GET'
        });
    }
@@ -243,10 +240,11 @@ class CommunityApiClient {
     * Update the base information of a community.
     * @param {number} communityId - The ID of the community.
     * @param {Object} updatedData - The updated data.
+    * @param {string} authToken - Token for authorization
     * @returns {Promise<Object>} - A promise that resolves to the response data.
     */
-   async updateCommunityBaseInformation(communityId, updatedData) {
-       return this.makeRequest(`/private/communities/${communityId}/update_community_base_information/`, {
+   async updateCommunityBaseInformation(communityId, updatedData, authToken) {
+       return this.makeRequest(`/private/communities/${communityId}/update_community_base_information/`, authToken, {
            method: 'POST',
            body: JSON.stringify({ updated_data: updatedData })
        });
@@ -255,16 +253,15 @@ class CommunityApiClient {
    /**
     * Delete a community.
     * @param {number} communityId - The ID of the community.
+    * @param {string} authToken - Token for authorization
     * @returns {Promise<Object>} - A promise that resolves to the response data.
     */
-   async deleteCommunity(communityId) {
-       return this.makeRequest(`/private/communities/${communityId}/delete_community/`, {
+   async deleteCommunity(communityId, authToken) {
+       return this.makeRequest(`/private/communities/${communityId}/delete_community/`, authToken, {
            method: 'GET'
        });
    }
 }
 
-// Export for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CommunityApiClient;
-}
+export default CommunityApiClient;
+
