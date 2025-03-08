@@ -15,7 +15,10 @@ import {
   DashboardBuildCommunity,
   DashboardControlCommunity,
   DashboardLayout, 
-  DashboardControlAccount} from './routes/Dashboard.jsx';
+  DashboardControlAccount,
+  DashboardCreateCommunity,
+  DashboardImportCommunity
+} from './routes/Dashboard.jsx';
 
 // Other imports
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -42,6 +45,8 @@ function App() {
       <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardHomepage />} />
           <Route path='build' element={<DashboardBuildCommunity />} />
+          <Route path='build/create' element={<DashboardCreateCommunity/>}/>
+          <Route path='build/import' element={<DashboardImportCommunity/>}/>
           <Route path='communities' element={<DashboardControlCommunity />} />
           <Route path='account' element={<DashboardControlAccount/>}/>
           <Route path="*" element={<Page404 />}/>

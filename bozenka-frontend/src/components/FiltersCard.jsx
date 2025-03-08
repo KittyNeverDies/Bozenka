@@ -91,7 +91,7 @@ function FiltersCard() {
                         size="sm"
                         separator={ <KeyboardArrowRightIcon sy/>}>
                       
-                      <Link to='/'>
+                      <Link to='/' style={{color: 'var(--joy-palette-text-tertiary)'}}>
                         <Typography sx={{mt: 0}}>Home</Typography>
                       </Link>
                       <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Communities</Typography>

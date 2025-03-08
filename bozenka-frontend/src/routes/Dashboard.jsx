@@ -1,5 +1,6 @@
 // React related components
 import * as React from 'react';
+import { useState } from 'react';
 
 // Some React Router magic
 import { Outlet, Link, useLocation } from 'react-router-dom';
@@ -37,7 +38,9 @@ import IconButton from '@mui/joy/IconButton';
 import Sheet from '@mui/joy/Sheet';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
-import { useColorScheme} from '@mui/joy/styles';
+import RadioGroup from '@mui/joy/RadioGroup';
+import Radio from '@mui/joy/Radio';
+import { FormControlLabel } from '@mui/material';
 import Checkbox from '@mui/joy/Checkbox';
 import TextArea from '@mui/joy/TextArea'; 
 
@@ -71,7 +74,9 @@ import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRounded';
+
 
 
   
@@ -596,7 +601,11 @@ export function DashboardBuildCommunity() {
         <Breadcrumbs 
           size="sm"
           separator={ <KeyboardArrowRightIcon/>}>
-          <Typography sx={{mt: 0}}>Dashboard</Typography>
+        <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}} >
+          <Typography sx={{}}>
+            Dashboard
+          </Typography>
+        </Link>
           <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Community building</Typography>
       </Breadcrumbs>
     
@@ -609,56 +618,308 @@ export function DashboardBuildCommunity() {
           What you would like to do?
         </Typography>
         <Box sx={{display: 'flex', flexDirection: 'row'}}>
-        <Button variant="plain" size="lg" sx={{
-                        p: 1.5,
-                        m: 0.5,
-                        transition: 'transform 0.2s ease, background-color 0.2s ease',
-                        border: '1px',
-                        '&:hover': {
-                            transform: 'scale(1.05)',
-                            bgcolor: 'primary.lightBg',
-                            borderRadius: '',
-                        },
-                        '&:active': {
-                            transform: 'scale(1.20)'
-                        },
-                        display: 'flex',
-                        flexDirection: 'column', 
-                        alignItems: 'center', 
-                    }}
-                    startDecorator={<AutoAwesomeIcon sx={{ marginBottom: 1, fontSize: '50px'}}/>}
-                    >
-                  
-                        I want to import my community
-        </Button>
-        <Button variant="plain" size="lg" sx={{
-                        p: 1.5,
-                        m: 0.5,
-                        transition: 'transform 0.2s ease, background-color 0.2s ease',
-                        border: '1px',
-                        '&:hover': {
-                            transform: 'scale(1.05)',
-                            bgcolor: 'primary.lightBg',
-                            borderRadius: '',
-                        },
-                        '&:active': {
-                            transform: 'scale(1.20)'
-                        },
-                        display: 'flex',
-                        flexDirection: 'column', 
-                        alignItems: 'center', 
-                    }} 
+        <Link to='import'>
+          <Button variant="plain" size="lg" sx={{
+                          p: 1.5,
+                          m: 0.5,
+                          transition: 'transform 0.2s ease, background-color 0.2s ease',
+                          border: '1px',
+                          '&:hover': {
+                              transform: 'scale(1.05)',
+                              bgcolor: 'primary.lightBg',
+                              borderRadius: '',
+                          },
+                          '&:active': {
+                              transform: 'scale(1.20)'
+                          },
+                          display: 'flex',
+                          flexDirection: 'column', 
+                          alignItems: 'center', 
+                      }}
+                      startDecorator={<AutoAwesomeIcon sx={{ marginBottom: 1, fontSize: '50px'}}/>}
+                      >
                     
-                    startDecorator={<AddCircleIcon sx={{ marginBottom: 1, fontSize: '50px'}}/>}
-                    >
-                  
-                        I want to create my community
-        </Button>
+                          I want to import my community
+          </Button>
+        </Link>
+        <Link to='create'>
+          <Button variant="plain" size="lg" sx={{
+                          p: 1.5,
+                          m: 0.5,
+                          transition: 'transform 0.2s ease, background-color 0.2s ease',
+                          border: '1px',
+                          '&:hover': {
+                              transform: 'scale(1.05)',
+                              bgcolor: 'primary.lightBg',
+                              borderRadius: '',
+                          },
+                          '&:active': {
+                              transform: 'scale(1.20)'
+                          },
+                          display: 'flex',
+                          flexDirection: 'column', 
+                          alignItems: 'center', 
+                      }} 
+                      
+                      startDecorator={<AddCircleIcon sx={{ marginBottom: 1, fontSize: '50px'}}/>}
+                      >
+                    
+                          I want to create my community
+          </Button>
+        </Link>
         </Box>
     </Card>
     </Box>
   </>
 }
+
+
+
+/**
+ * React component for creating a new community.
+ * @returns {JSX.Element} - The rendered component.
+ */
+export function DashboardCreateCommunity() {
+  const [communityData, setCommunityData] = useState({
+    name: '',
+    description: '',
+    logo: null,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCommunityData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    setCommunityData(prev => ({
+      ...prev,
+      logo: file
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission logic here
+    console.log('Community Data:', communityData);
+  };
+
+  return (
+    <>
+      <Breadcrumbs 
+        size="sm"
+        separator={<KeyboardArrowRightIcon/>}
+      >
+        <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}} >
+          <Typography sx={{}}>
+            Dashboard
+          </Typography>
+        </Link>
+       <Link to='/dashboard/build/' style={{color: 'var(--joy-palette-text-tertiary)'}}>
+        <Typography>
+          Community building
+          </Typography>
+        </Link>
+        <Typography color="primary">Create Community</Typography>
+      </Breadcrumbs>
+
+      <Typography level='h2' my={2} px={1} sx={{textAlign: 'center'}}>
+            Create new community
+        </Typography>
+
+      <Card sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={3}>
+            <FormControl>
+              <FormLabel>Community Name</FormLabel>
+              <Input
+                name="name"
+                value={communityData.name}
+                onChange={handleInputChange}
+                required
+                fullWidth
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Description</FormLabel>
+              <TextArea
+                name="description"
+                value={communityData.description}
+                onChange={handleInputChange}
+                minRows={3}
+                required
+                fullWidth
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Community Logo</FormLabel>
+              <Button
+                component="label"
+                variant="outlined"
+                startIcon={<CloudUploadIcon />}
+                sx={{ mt: 1 }}
+              >
+                Upload Logo
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+              </Button>
+              {communityData.logo && (
+                <Typography variant="body2" mt={1}>
+                  Selected file: {communityData.logo.name}
+                </Typography>
+              )}
+            </FormControl>
+
+            <Button type="submit" variant="contained" size="large">
+              Create Community
+            </Button>
+          </Stack>
+        </form>
+      </Card>
+    </>
+  );
+}
+
+/**
+ * React component for importing an existing community.
+ * @returns {JSX.Element} - The rendered component.
+ */
+export function DashboardImportCommunity() {
+  const [importData, setImportData] = useState({
+    platform: '',
+    communityUrl: '',
+    configFile: null,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setImportData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    setImportData(prev => ({
+      ...prev,
+      configFile: file
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission logic here
+    console.log('Import Data:', importData);
+  };
+
+  return (
+    <>
+      <Breadcrumbs 
+        size="sm"
+        separator={<KeyboardArrowRightIcon/>}
+      >
+        <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}} >
+          <Typography sx={{}}>
+            Dashboard
+          </Typography>
+        </Link>
+       <Link to='/dashboard/build/' style={{color: 'var(--joy-palette-text-tertiary)'}}>
+        <Typography>
+          Community building
+          </Typography>
+        </Link>
+        <Typography color="primary">Import Community</Typography>
+      </Breadcrumbs>
+
+      <Typography level='h2' my={2} px={1} sx={{textAlign: 'center'}}>
+            Import existing community from platform
+        </Typography>
+
+      <Card sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={3}>
+            <FormControl>
+              <FormLabel>Select Platform</FormLabel>
+              <RadioGroup
+                name="platform"
+                value={importData.platform}
+                onChange={handleInputChange}
+                row
+              >
+                <FormControlLabel 
+                  value="discord" 
+                  control={<Radio />} 
+                  label="Discord" 
+                />
+                <FormControlLabel 
+                  value="vk" 
+                  control={<Radio />} 
+                  label="Vkontakte" 
+                />
+                <FormControlLabel 
+                  value="telegram" 
+                  control={<Radio />} 
+                  label="Telegram" 
+                />
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Community URL</FormLabel>
+              <Input
+                name="communityUrl"
+                value={importData.communityUrl}
+                onChange={handleInputChange}
+                placeholder="https://"
+                required
+                fullWidth
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>Configuration File (Optional)</FormLabel>
+              <Button
+                component="label"
+                variant="outlined"
+                startIcon={<CloudUploadIcon />}
+                sx={{ mt: 1 }}
+              >
+                Upload Config
+                <input
+                  type="file"
+                  hidden
+                  accept=".json,.yaml,.yml"
+                  onChange={handleFileUpload}
+                />
+              </Button>
+              {importData.configFile && (
+                <Typography variant="body2" mt={1}>
+                  Selected file: {importData.configFile.name}
+                </Typography>
+              )}
+            </FormControl>
+
+            <Button type="submit" variant="contained" size="large">
+              Import Community
+            </Button>
+          </Stack>
+        </form>
+      </Card>
+    </>
+  );
+}
+
 
 
 /**
@@ -683,7 +944,11 @@ export function DashboardControlCommunity() {
     <Breadcrumbs 
           size="sm"
           separator={ <KeyboardArrowRightIcon/>}>
-          <Typography sx={{mt: 0}}>Dashboard</Typography>
+        <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}} >
+          <Typography sx={{}}>
+            Dashboard
+          </Typography>
+        </Link>
           <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Manage Communities</Typography>
       </Breadcrumbs>
     

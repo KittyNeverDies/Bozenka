@@ -111,10 +111,8 @@ function LoginPage () {
       borderRadius: 'lg',
       '&:hover': {
         bgcolor: 'background.level1',
-        borderColor: 'primary.300',
       },
       '&:focus-within': {
-        borderColor: 'background.level2',
         bgcolor: 'background.level1',
       },
       '&:focus': {
@@ -125,8 +123,6 @@ function LoginPage () {
       px: 2,
       fontSize: 'sm',
       fontWeight: 'md',
-      border: '1px solid',
-      borderColor: 'neutral.300',
       transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
       '&::placeholder': {
         color: 'neutral.500',
@@ -157,7 +153,7 @@ function LoginPage () {
     ];
 
     return (
-      <Box sx={{ maxWidth:1000, mx: 'auto', p: 4 }}>
+      <Box sx={{ maxWidth:1000, mx: 'auto', p: 4, py: 9 }}>
         {alert.open && (
           <Box sx={{ textAlign: 'left', mb: 2 }}>
             <Alert
@@ -230,7 +226,8 @@ function LoginPage () {
                   />
                 ))}
 
-                <Typography level='body-xs'>Don't have an account? <Link to='/register/'>Register</Link></Typography>
+                <Typography level='body-xs'>Don't have an account? <Link 
+                style={{color: 'var(--joy-palette-primary-plainColor)'}} to='/register/'>Register</Link></Typography>
                 <Button
                   variant="solid"
                   type="submit"

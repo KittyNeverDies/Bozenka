@@ -160,10 +160,8 @@ function CommunitiesSearch() {
                             borderRadius: 'lg',
                             '&:hover': {
                               bgcolor: 'background.level1',
-                              borderColor: 'primary.300',
                             },
                             '&:focus-within': {
-                              borderColor: 'background.level2',
                               bgcolor: 'background.level1',
                             },
                             '&:focus': {
@@ -175,8 +173,6 @@ function CommunitiesSearch() {
                             px: 2,
                             fontSize: 'sm',
                             fontWeight: 'md',
-                            border: '1px solid',
-                            borderColor: 'neutral.300',
                             transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
                             '&::placeholder': {
                               color: 'neutral.500',

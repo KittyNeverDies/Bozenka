@@ -258,7 +258,7 @@ function CommunitySegmentedInfo() {
             Knowledge Library
         </Tab>
       </TabList>
-      <Card sx={{marginTop: 2, paddingBottom: 6}}>
+      <Card sx={{marginTop: 2, paddingBottom: 6, height: '100%'}}>
         <TabPanel value={0}>
           {/* Description of community */}
           <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum suscipit repellat, architecto at dolore odio neque eos dolorum hic aliquam velit sapiente dignissimos molestiae pariatur ducimus! Soluta voluptate ad tenetur!</p>

@@ -135,10 +135,8 @@ function RegisterPage () {
       borderRadius: 'lg',
       '&:hover': {
         bgcolor: 'background.level1',
-        borderColor: 'primary.300',
       },
       '&:focus-within': {
-        borderColor: 'background.level2',
         bgcolor: 'background.level1',
       },
       '&:focus': {
@@ -149,8 +147,6 @@ function RegisterPage () {
       px: 2,
       fontSize: 'sm',
       fontWeight: 'md',
-      border: '1px solid',
-      borderColor: 'neutral.300',
       transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
       '&::placeholder': {
         color: 'neutral.500',
@@ -261,11 +257,11 @@ function RegisterPage () {
                   />
                     <FormHelperText>
                       <Typography level="body-xs">
-                        Read our <Link href="#link">terms and conditions</Link>.
+                        Read our <Link style={{color: 'var(--joy-palette-primary-plainColor)'}} href="#link">terms and conditions</Link>.
                       </Typography>
                     </FormHelperText>
                 </FormControl>
-            <Typography level='body-xs'>Already have an account? <Link to='/login/'>Login</Link></Typography>
+            <Typography level='body-xs'>Already have an account? <Link to='/login/' style={{color: 'var(--joy-palette-primary-plainColor)'}}>Login</Link></Typography>
             <Button
               variant="solid"
               type="submit"

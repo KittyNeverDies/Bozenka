@@ -4,7 +4,8 @@ import {Box, Container, Typography, Link, Grid } from '@mui/joy';
 
 // MUI material icons.
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-
+import GitHubIcon from '@mui/icons-material/GitHub';
+import TelegramIcon from '@mui/icons-material/Telegram';
 
 
 /**
@@ -68,11 +69,11 @@ const Footer = () => {
             &copy; 2024-2025 kittyneverdies. All rights reserved.
           </Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Link href="https://github.com/communitytool/communitytool" underline="none" sx={{ color: 'text.primary' }}>
-              <i className="fa-brands fa-github" />
+            <Link href="https://github.com/kittyneverdies/bozenka" underline="none" sx={{ color: 'text.primary' }}>
+              <GitHubIcon/>
             </Link>
-            <Link href="https://twitter.com/communitytool" underline="none" sx={{ color: 'text.primary' }}>
-              <i className="fa-brands fa-twitter" />
+            <Link href="https://t.me/bozodevelopment" underline="none" sx={{ color: 'text.primary' }}>
+              <TelegramIcon/>
             </Link>
           </Box>
         </Box>
