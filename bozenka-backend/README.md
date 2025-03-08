@@ -49,7 +49,6 @@ bozenka-backend/
 │   │   ├── __init__.py
 │   │   └── main.py
 │   └── run.py
-├── db.sqlite3
 ├── manage.py
 ├── README.md
 └── requirements.txt

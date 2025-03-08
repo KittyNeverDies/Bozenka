@@ -13,6 +13,7 @@
 
 [Telegram Channel](https://t.me/bozodevelopment/) | [Website](https://kittyneverdies.github.io/Bozenka/) (UI  is outdated)
 
+Current state - 79% of basic realisation
 
 </div>
 
@@ -33,7 +34,7 @@ Our objective is to develop an API that can be utilized to build a native client
 For a better understanding of our workflow, please refer to the following overview, which was taken from our Telegram channel.
 
 <figure>
-    <img src="assets/workflow.jpg" alt="Taken from bozodevelopment telegram channel">
+    <img src="assets/workflow.png" alt="Current workflow">
     <figcaption>Workflow of new bozenka project in Russian language. Taken from telegram channel.</figcaption>
 </figure>
 
@@ -56,6 +57,12 @@ For a better understanding of our workflow, please refer to the following overvi
         - [x] Manage account \
             Manage account (change password, email and etc)
         - [ ] Connection with Backend (Started)
+            - [ ] Cookies
+                After authorization of user, we should store all information about him in cookie
+            - [ ] Api Calls
+                Basic implementation of calls to api, to get true information, not place holders.
+            - [ ] Caching
+                Use Redis storage for caching information, what wee get.
 - [Backend](bozenka-backend/):
     - [x] Database Models (Refactors in future) \
         Has been writen first after creation of new bozenka project
@@ -77,21 +84,21 @@ For a better understanding of our workflow, please refer to the following overvi
           - [x] Basic authorization
             Using JWT to get authorization token and refresh token.
           - [ ] Mail verification. \
-            Probably just an integrated SMTP server with ability to verifycation.
-          - [ ] Social networks & Messengers integration by Oauth? \ 
-            I don't fully understand, how to do that.
+            Probably just an integrated SMTP server with ability to verification. Already in work
+          - [ ] Social networks & Messengers integration by Oauth? \
+            I don't fully understand, how to do that. (Release in future.)
         - [x] Give infromation about communities\
             By requests from frontend to us
+        - [x] Ability to update basic information \
+            We can do it right now
         - [x] ASGI with paralel part of Backend \
             Using ASGI to work in paralel with bots instances on platforms
-        - [ ] Connection with Frontend \
-            To complete project
     - [ ] Write features for Bozenka
         - [ ] Work on Statistics workflow
         - [ ] Work on Frontend and Backend connection with information about features.
   
 - Guidelines (Documentation)
-    - [ ] How does bozenka's structure work?
+    - [x] How does bozenka's structure work?
     - [ ] Bozenka design phylosophy (P.S if it exists)
     - [ ] How to write your own feature?
     - [ ] How to help in development?
