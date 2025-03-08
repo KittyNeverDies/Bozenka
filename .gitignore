@@ -155,3 +155,8 @@ dmypy.json
 # Default ignored files
 /shelf/
 /workspace.xml
+
+# Django migrations
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
