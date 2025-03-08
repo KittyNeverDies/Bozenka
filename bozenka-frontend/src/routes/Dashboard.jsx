@@ -47,6 +47,7 @@ import TextArea from '@mui/joy/TextArea';
 
 // Our own controls
 import TestChart from '../components/GrowthChart';
+import NotificationCenter from '../components/NotificationCenter';
 import ColorModeToggle from '../components/ColorModeToggle';
 
 
@@ -1524,6 +1525,9 @@ export function DashboardControlAccount() {
               </Button>
             </Box>
           </Box>
+        </TabPanel>
+        <TabPanel value={2}>    
+          <NotificationCenter/>
         </TabPanel>
       </Tabs>
     </Box>
