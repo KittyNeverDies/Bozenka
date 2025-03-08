@@ -137,10 +137,10 @@ function LoginPage () {
 
     const inputFields = [
       {
-        name: 'email',
-        type: 'email',
-        placeholder: 'Write your email',
-        autoComplete: 'email',
+        name: 'username',
+        type: 'username',
+        placeholder: 'Write your username',
+        autoComplete: 'username',
         icon: <MailRoundedIcon />,
       },
       {

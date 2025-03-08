@@ -552,7 +552,7 @@ export function DashboardHomepage() {
       </Card>
       </Box>
       {/* Recent Activity Section */}
-      <Card sx={{mx: 3, width: 300}}>
+      <Card sx={{mx: 3, width: 'auto', height: {'xs': 200, md: 'auto'}}}>
         <Typography level="title-lg" sx={{ mb: 2 }}>
           Recent Activity
         </Typography>
