@@ -1,221 +1,270 @@
-
-
+/**
+* Class representing a Community API client.
+*/
 class CommunityApiClient {
-    constructor(baseUrl = 'http://localhost:8000/api', useMockData = false) {
+   /**
+    * Create a CommunityApiClient.
+    * @param {string} [baseUrl='http://localhost:8000'] - The base URL for the API.
+    * @param {boolean} [useMockData=false] - Whether to use mock data for testing.
+    */
+   constructor(baseUrl = 'http://localhost:8000', useMockData = false) {
+       // Basic data
+       this.baseUrl = baseUrl;
+       this.useMockData = useMockData;
+       this.authToken = null;
+       this.refreshToken = null;
+       this.requestQueue = [];
+       this.isRefreshing = false;
+       
+       // Rate limiting
+       this.requestCount = 0;
+       this.requestLimit = 100;
+       this.requestResetTime = Date.now() + 60000; // 1 minute window
+   }
 
-        // Basic data, going to be used in future
-        this.baseUrl = baseUrl;
-        this.useMockData = useMockData;
-        this.authToken = null;
-        this.refreshToken = null;
-        this.requestQueue = [];
-        this.isRefreshing = false;
-        
-        // Rate limiting
-        this.requestCount = 0;
-        this.requestLimit = 100;
-        this.requestResetTime = Date.now() + 60000; // 1 minute window
-        
-        // Mock data for testing
-        this.mockData = {
-            communities: [
-                {
-                    id: 1,
-                    name: 'Tech Enthusiasts',
-                    description: 'A community for technology lovers',
-                    created_at: '2024-01-01T10:00:00Z',
-                    member_count: 1250,
-                    owner: {
-                        id: 1,
-                        username: 'techmaster',
-                        email: 'tech@example.com'
-                    },
-                    administrators: [
-                        {
-                            id: 1,
-                            username: 'techmaster',
-                            email: 'tech@example.com'
-                        },
-                        {
-                            id: 2,
-                            username: 'adminuser',
-                            email: 'admin@example.com'
-                        }
-                    ],
-                    tags: ['technology', 'programming', 'innovation'],
-                    statistics: {
-                        total_views: 50000,
-                        monthly_active_users: 750,
-                        growth_rate: '15%'
-                    },
-                    posts: [
-                        {
-                            id: 1,
-                            text: 'Check out this new tech breakthrough!',
-                            views: 1200,
-                            created_at: '2024-01-01T12:00:00Z',
-                            social_platforms: ['telegram', ''],
-                            administrator: {
-                                id: 1,
-                                username: 'techmaster'
-                            }
-                        }
-                    ]
-                }
-            ]
-        };
-    }
+   /**
+    * Log in to the API.
+    * @param {string} username - The username.
+    * @param {string} password - The password.
+    * @returns {Promise<Object>} - A promise that resolves to an object with a success property.
+    */
+   async login(username, password) {
+       if (this.useMockData) {
+           this.authToken = 'mock-auth-token';
+           this.refreshToken = 'mock-refresh-token';
+           return { success: true };
+       }
 
-    // Authentication methods
-    async login(username, password) {
-        if (this.useMockData) {
-            this.authToken = 'mock-auth-token';
-            this.refreshToken = 'mock-refresh-token';
-            return { success: true };
-        }
+       try {
+           const response = await fetch(`${this.baseUrl}/auth/login`, {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({ username, password })
+           });
 
-        try {
-            return { success: true };
-        } 
-        
-        catch (error) {
-            console.error('Login failed:', error);
-            throw error;
-        }
-    }
-    
+           if (!response.ok) {
+               throw new Error('Login failed');
+           }
 
-    /**
-     * Refresh the authentication token.
-     */
-    async refreshAuthToken() {
-        if (this.useMockData) {
-            this.authToken = 'mock-auth-token-refreshed';
-            return;
-        }
+           const data = await response.json();
+           this.authToken = data.access_token;
+           this.refreshToken = data.refresh_token;
 
-        try {
-            return;
-        } 
-        catch (error) {
-            console.error('Token refresh failed:', error);
-            throw error;
-        }
-    }
+           return {
+               success: true,
+               message: data.message,
+               access_token: data.access_token,
+               refresh_token: data.refresh_token
+           };
+       } catch (error) {
+           console.error('Login failed:', error);
+           throw error;
+       }
+   }
 
+   /**
+    * Register a new user.
+    * @param {string} username - The username.
+    * @param {string} email - The email.
+    * @param {string} password - The password.
+    * @returns {Promise<Object>} - A promise that resolves to an object with a success property.
+    */
+   async register(username, email, password) {
+       if (this.useMockData) {
+           return { success: true };
+       }
 
-    /**
-     * Check if the rate limit has been exceeded.
-     */
-    checkRateLimit() {
-        const now = Date.now();
-        if (now > this.requestResetTime) {
-            this.requestCount = 0;
-            this.requestResetTime = now + 60000;
-        }
+       try {
+           const response = await fetch(`${this.baseUrl}/auth/register`, {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({ username, email, password })
+           });
 
-        if (this.requestCount >= this.requestLimit) {
-            throw new Error('Rate limit exceeded');
-        }
+           if (!response.ok) {
+               throw new Error('Registration failed');
+           }
 
-        this.requestCount++;
-    }
+           const data = await response.json();
+           this.authToken = data.access_token;
+           this.refreshToken = data.refresh_token;
 
-    /**
-     * Validate an ID.
-     * @param {number} id - The ID to validate.
-     */
-    validateId(id) {
-        if (!Number.isInteger(id) || id <= 0) {
-            throw new Error('Invalid ID provided');
-        }
-    }
+           return {
+               success: true,
+               message: data.message,
+               access_token: data.access_token,
+               refresh_token: data.refresh_token
+           };
+       } catch (error) {
+           console.error('Registration failed:', error);
+           throw error;
+       }
+   }
 
-    
-    /**
-     * Validate a tag.
-     * @param {string} tag - The tag to validate.
-     */
-    validateTag(tag) {
-        if (typeof tag !== 'string' || tag.trim().length === 0) {
-            throw new Error('Invalid tag provided');
-        }
-    }
+   /**
+    * Refresh the authentication token.
+    */
+   async refreshAuthToken() {
+       if (this.useMockData) {
+           this.authToken = 'mock-auth-token-refreshed';
+           return;
+       }
 
-    /**
-     * Make a request to the API.
-     * @param {string} endpoint - The API endpoint.
-     * @param {Object} [options={}] - The request options.
-     * @param {number} [retryCount=3] - The number of times to retry the request.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async makeRequest(endpoint, options = {}, retryCount = 3) {
-        if (this.useMockData) {
-            return this.getMockResponse(endpoint);
-        }
+       try {
+           const response = await fetch(`${this.baseUrl}/api/token/refresh/`, {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json',
+               },
+               body: JSON.stringify({
+                   refresh: this.refreshToken
+               })
+           });
 
-        this.checkRateLimit();
-        
+           if (!response.ok) {
+               throw new Error('Token refresh failed');
+           }
 
-        // Implement requests soon.
-    }
+           const data = await response.json();
+           this.authToken = data.access;
+           return data;
+       } catch (error) {
+           console.error('Token refresh failed:', error);
+           throw error;
+       }
+   }
 
-    /**
-     * Get a list of communities.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async getCommunities() {
-        return this.makeRequest('/communities');
-    }
+   /**
+    * Check if the rate limit has been exceeded.
+    */
+   checkRateLimit() {
+       const now = Date.now();
+       if (now > this.requestResetTime) {
+           this.requestCount = 0;
+           this.requestResetTime = now + 60000;
+       }
 
-    /**
-     * Get a community by ID.
-     * @param {number} id - The ID of the community.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async getCommunity(id) {
-        this.validateId(id);
-        return this.makeRequest(`/communities/${id}`);
-    }
+       if (this.requestCount >= this.requestLimit) {
+           throw new Error('Rate limit exceeded');
+       }
 
-    /**
-     * Get communities by tag.
-     * @param {string} tag - The tag to search for.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async getCommunitiesByTag(tag) {
-        this.validateTag(tag);
-        return this.makeRequest(`/communities/by-tag/${encodeURIComponent(tag)}`);
-    }
+       this.requestCount++;
+   }
 
-    /**
-     * Get community statistics by ID.
-     * @param {number} id - The ID of the community.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async getCommunityStatistics(id) {
-        this.validateId(id);
-        return this.makeRequest(`/communities/${id}/statistics`);
-    }
+   /**
+    * Make a request to the API.
+    * @param {string} endpoint - The API endpoint.
+    * @param {Object} [options={}] - The request options.
+    * @param {number} [retryCount=3] - The number of times to retry the request.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async makeRequest(endpoint, options = {}, retryCount = 3) {
+       if (this.useMockData) {
+           return this.getMockResponse(endpoint);
+       }
 
-    /**
-     * Get community posts by ID.
-     * @param {number} id - The ID of the community.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async getCommunityPosts(id) {
-        this.validateId(id);
-        return this.makeRequest(`/communities/${id}/posts`);
-    }
+       this.checkRateLimit();
 
+       try {
+           // Add authorization header if token exists
+           const headers = {
+               'Content-Type': 'application/json',
+               ...(this.authToken && { 'Authorization': `Bearer ${this.authToken}` }),
+               ...options.headers
+           };
 
-    /**
-     * Get community administrators by ID.
-     * @param {number} id - The ID of the community.
-     * @returns {Promise<Object>} - A promise that resolves to the response data.
-     */
-    async getCommunityAdministrators(id) {
-        this.validateId(id);
-        return this.makeRequest(`/communities/${id}/administrators`);
-    }
+           const response = await fetch(`${this.baseUrl}${endpoint}`, {
+               ...options,
+               headers
+           });
+
+           // Handle 401 Unauthorized - Token expired
+           if (response.status === 401 && retryCount > 0) {
+               await this.refreshAuthToken();
+               return this.makeRequest(endpoint, options, retryCount - 1);
+           }
+
+           if (!response.ok) {
+               throw new Error(`Request failed with status ${response.status}`);
+           }
+
+           return await response.json();
+       } catch (error) {
+           if (retryCount > 0) {
+               return this.makeRequest(endpoint, options, retryCount - 1);
+           }
+           throw error;
+       }
+   }
+
+   /**
+    * Get a list of communities.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async getCommunities() {
+       return this.makeRequest('/communities/');
+   }
+
+   /**
+    * Get a community by ID.
+    * @param {number} communityId - The ID of the community.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async getCommunity(communityId) {
+       if (!communityId) {
+           throw new Error('Community ID is required');
+       }
+       return this.makeRequest(`/communities/${communityId}/`);
+   }
+
+   /**
+    * Get a list of tags.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async getTags() {
+       return this.makeRequest('/tags/');
+   }
+
+   /**
+    * Get a list of private communities.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async getPrivateCommunities() {
+       return this.makeRequest('/private/communities/', {
+           method: 'GET'
+       });
+   }
+
+   /**
+    * Update the base information of a community.
+    * @param {number} communityId - The ID of the community.
+    * @param {Object} updatedData - The updated data.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async updateCommunityBaseInformation(communityId, updatedData) {
+       return this.makeRequest(`/private/communities/${communityId}/update_community_base_information/`, {
+           method: 'POST',
+           body: JSON.stringify({ updated_data: updatedData })
+       });
+   }
+
+   /**
+    * Delete a community.
+    * @param {number} communityId - The ID of the community.
+    * @returns {Promise<Object>} - A promise that resolves to the response data.
+    */
+   async deleteCommunity(communityId) {
+       return this.makeRequest(`/private/communities/${communityId}/delete_community/`, {
+           method: 'GET'
+       });
+   }
+}
+
+// Export for use in other files
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CommunityApiClient;
 }
