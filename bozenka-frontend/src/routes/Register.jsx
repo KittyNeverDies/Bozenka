@@ -111,7 +111,9 @@ function RegisterPage () {
             localStorage.setItem('accessToken', response.access_token);
             localStorage.setItem('refreshToken', response.refresh_token);
 
-
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 2000);
           }
         } catch (error) {
           // Handle login error
