@@ -15,7 +15,11 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
-const LoginPage = () => {
+/**
+* React component for the login page.
+* @returns {JSX.Element} - The rendered component.
+*/
+function LoginPage () {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
