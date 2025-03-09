@@ -296,7 +296,7 @@ export default function JoyHeader() {
               }}
             >
           <Link to="/dashboard/">
-          <ListItem  sx={{
+          <ListItem key='home' sx={{
                                 my: 0.4,
                               }} >
                 <ListItemButton sx={{transition: '0.2s ease background-color'}}>
@@ -323,7 +323,7 @@ export default function JoyHeader() {
               <List>
               {buttons[button].map( (btn) => (
                             <Link to={btn.destination}>
-                              <ListItem sx={{
+                              <ListItem key={btn.head} sx={{
                                 my: 0.4,
                               }} variant='plain'>
                                 <ListItemButton sx={{transition: '0.2s ease background-color'}}>

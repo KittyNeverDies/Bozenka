@@ -165,7 +165,6 @@ class PrivateCommunityViews(viewsets.ViewSet):
         :param community_id: Community id
         :return: Response object
         """
-
         user = request.user
 
         if community_id is None or is_valid_uuid(community_id):

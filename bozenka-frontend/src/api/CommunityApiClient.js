@@ -158,7 +158,7 @@ class CommunityApiClient {
     * @param {number} [retryCount=3] - The number of times to retry the request.
     * @returns {Promise<Object>} - A promise that resolves to the response data.
     */
-   async makeRequest(endpoint,  authToken = None, options = {}, retryCount = 3) {
+   async makeRequest(endpoint,  authToken = null, options = {}, retryCount = 3) {
        if (this.useMockData) {
            return this.getMockResponse(endpoint);
        }
