@@ -72,11 +72,6 @@ class PublicCommunitySerializer(serializers.ModelSerializer):
                   'tags', 'icon', 'members_count')
 
 
-    def get_icon(self, obj):
-        if obj.icon:
-            return obj.icon.url
-        return None
-
 
 class PrivateCommunitySerializer(serializers.ModelSerializer):
     pass
