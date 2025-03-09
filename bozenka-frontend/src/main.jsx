@@ -2,6 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { StyledEngineProvider } from '@mui/joy/styles';
 import { CssVarsProvider, extendTheme } from '@mui/joy/styles';
+import {AuthProvider} from './context/AuthContext.jsx'
+
 
 import App from './App.jsx'
 import './index.css'
@@ -14,7 +16,9 @@ createRoot(document.getElementById('root')).render(
   <CssVarsProvider defaultMode="system" theme={softTheme}>  
     <StrictMode>
         <StyledEngineProvider injectFirst>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </StyledEngineProvider>
     </StrictMode>
   </CssVarsProvider>

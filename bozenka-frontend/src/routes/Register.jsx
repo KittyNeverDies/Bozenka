@@ -16,8 +16,9 @@ import Fragment from 'react';
 import Checkbox from '@mui/joy/Checkbox';
 import Grid from '@mui/joy/Grid';
 
-// Community API client
-import CommunityApiClient from '../api/CommunityApiClient';
+
+// AuthForm hook for simplifing 
+import { useAuthForm } from '../hooks/useAuthForm';
 
 
 // Icons from MUI
@@ -35,98 +36,15 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 */
 function RegisterPage () {
 
+  const {
+    formData,
+    alert,
+    handleChange,
+    handleSubmit,
+    handleCloseAlert
+} = useAuthForm('register');
 
-    // Initialize API client
-    const apiClient = useMemo(() => new CommunityApiClient(), []);
-    
-    const [formData, setFormData] = useState({
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    });
 
-    const [alert, setAlert] = useState({
-      header: null,
-      message: null,
-      type: 'danger',
-      useWaitAnimation: null,
-      open: false,
-    });
-
-    const handleChange = (event) => {
-      const { name, value } = event.target;
-      setFormData((prevData) => ({ ...prevData, [name]: value }));
-    };
-
-    
-    const handleCloseAlert = () => {
-      setAlert((prevAlert) => ({ ...prevAlert, open: false }));
-    };
-
-    const handleSubmit = async(event) => {
-      event.preventDefault();
-      setAlert({ message: null, type: 'danger' });
-
-      const { username, email, password, confirmPassword } = formData;
-
-      if (!username || !email || !password || !confirmPassword) {
-        setAlert({ 
-          message: 'Please fill in all fields of form to register', 
-          type: 'danger',
-          useWaitAnimation: false,
-          open: true,
-        });
-      } else if (password !== confirmPassword) {
-        setAlert({ 
-          message: 'Passwords do not match', 
-          type: 'danger',
-          useWaitAnimation: false,
-          open: true,
-        });
-      } else {
-        
-        try {
-          // Show loading state
-          setAlert({
-            message: 'Logging in...',
-            type: 'neutral',
-            useWaitAnimation: true,
-            open: true,
-          });
-
-          // Attempt login
-          const response = await apiClient.register(username, email, password);
-
-          if (response.success) {
-            // Show success message
-            setAlert({
-              message: 'Registration successful! Redirecting to dashboard...',
-              type: 'success',
-              useWaitAnimation: true,
-              open: true,
-            });
-
-            // Store tokens in localStorage
-            localStorage.setItem('accessToken', response.access_token);
-            localStorage.setItem('refreshToken', response.refresh_token);
-
-            setTimeout(() => {
-              window.location.href = '/dashboard';
-            }, 2000);
-          }
-        } catch (error) {
-          // Handle login error
-          setAlert({
-            message: 'Registration is failed. Something is failed.',
-            type: 'danger',
-            useWaitAnimation: false,
-            open: true,
-          });
-          console.error('Login error:', error);
-        }
-      }
-    };
 
     const inputStyles = {
       width: '100%',
@@ -244,6 +162,9 @@ function RegisterPage () {
             ))}
             <FormControl size="sm" sx={{my: 1 }}>
                   <Checkbox
+                      name="acceptTerms"
+                      checked={formData.acceptTerms}
+                      onChange={handleChange}
                       size='sm'
                       label={
                         <React.Fragment>

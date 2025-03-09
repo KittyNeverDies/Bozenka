@@ -1,7 +1,9 @@
-// Standart elements for any page
+// Standard elements for any page
 import JoyHeader from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 
+// Hooks of Bozenka
+import { useAuth } from './context/AuthContext.jsx'
 
 // Pages for routing
 import HomePage from "./routes/Homepage.jsx"; 
@@ -21,9 +23,28 @@ import {
 } from './routes/Dashboard.jsx';
 
 // Other imports
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import '@fontsource/inter';
 
+const AuthorizedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: window.location.pathname }} replace />;
+  }
+
+  return children;
+}
+
+const UnauthorizedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" state={{ from: window.location.pathname }} replace />;
+  }
+
+  return children;
+}
 
 /**
 * App component
@@ -37,26 +58,40 @@ function App() {
      <Routes>
        <Route path="/" element={<HomePage />} />
        <Route path="/communities" element={<CommunitiesSearch />} />
-       <Route path='/community/<>' element={<Community />} />
-       <Route path='/login' element={<LoginPage />} />
-       <Route path='/register' element={<RegisterPage />} />
+       <Route path='/community/:id' element={<Community />} />
        
-      {/* Dashboard routes */}
-      <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<DashboardHomepage />} />
-          <Route path='build' element={<DashboardBuildCommunity />} />
-          <Route path='build/create' element={<DashboardCreateCommunity/>}/>
-          <Route path='build/import' element={<DashboardImportCommunity/>}/>
-          <Route path='communities' element={<DashboardControlCommunity />} />
-          <Route path='account' element={<DashboardControlAccount/>}/>
-          <Route path="*" element={<Page404 />}/>
-      </Route>
-      <Route path="*" element={<Page404/>}/>
+       {/* Protected unauthorized routes */}
+       <Route path='/login' element={
+         <UnauthorizedRoute>
+           <LoginPage />
+         </UnauthorizedRoute>
+       } />
+       <Route path='/register' element={
+         <UnauthorizedRoute>
+           <RegisterPage />
+         </UnauthorizedRoute>
+       } />
+       
+       {/* Protected authorized routes */}
+       <Route path="/dashboard" element={
+         <AuthorizedRoute>
+           <DashboardLayout />
+         </AuthorizedRoute>
+       }>
+           <Route index element={<DashboardHomepage />}/>
+           <Route path='build' element={<DashboardBuildCommunity />} />
+           <Route path='build/create' element={<DashboardCreateCommunity/>}/>
+           <Route path='build/import' element={<DashboardImportCommunity/>}/>
+           <Route path='communities' element={<DashboardControlCommunity />} />
+           <Route path='account' element={<DashboardControlAccount/>}/>
+           <Route path="*" element={<Page404 />}/>
+       </Route>
+       
+       <Route path="*" element={<Page404/>}/>
      </Routes>
      <Footer/>
    </div>
  );
 }
-
 
 export default App;

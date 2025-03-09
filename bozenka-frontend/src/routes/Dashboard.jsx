@@ -78,6 +78,9 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRounded';
 
+// Authorization
+import { useAuth } from '../context/AuthContext';
+import { useApi } from '../hooks/useApi';
 
 
   
@@ -184,6 +187,9 @@ export function DashboardLayout(){
 
     // Get current route path
     const currentPath = location.pathname.split('/').pop();
+
+    // Authorization
+    const {logout} = useAuth();
 
     // Active item styles
     const activeItemStyles = {
@@ -330,6 +336,7 @@ export function DashboardLayout(){
               </Chip>
         </IconButton>
         <IconButton
+          onClick={() => logout()}
           variant="soft"
           sx={{
             minWidth: 40,

@@ -1,108 +1,44 @@
 
-
-// MUI joy UI theme
-import { Box, Button, Input, Typography, Card, Grid } from '@mui/joy';
-import { useState, useMemo } from 'react';
+// src/pages/LoginPage.js
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Box, Button, Input, Typography, Card, Grid } from '@mui/joy';
 import LinearProgress from '@mui/joy/LinearProgress';
 import Alert from '@mui/joy/Alert';
-import * as React from 'react';
+import { useAuthForm } from '../hooks/useAuthForm';
 
-import CommunityApiClient from '../api/CommunityApiClient';
-
-
-// Material UI Icons
+// Icons
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
-import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
+function LoginPage() {
+    const {
+        formData,
+        alert,
+        handleChange,
+        handleSubmit,
+        handleCloseAlert
+    } = useAuthForm('login');
 
-/**
-* React component for the login page.
-* @returns {JSX.Element} - The rendered component.
-*/
-function LoginPage () {
-    const [formData, setFormData] = useState({
-      email: '',
-      password: '',
-    });
-    const [alert, setAlert] = useState({
-      header: null,
-      message: null,
-      type: 'danger',
-      useWaitAnimation: null,
-      open: false,
-    });
+    const inputFields = [
+        {
+            name: 'username',
+            type: 'text',
+            placeholder: 'Write your username',
+            autoComplete: 'username',
+            icon: <MailRoundedIcon />,
+        },
+        {
+            name: 'password',
+            type: 'password',
+            placeholder: 'Write your password',
+            autoComplete: 'current-password',
+            icon: <LockRoundedIcon />,
+        },
+    ];
 
-    // Initialize API client
-    const apiClient = useMemo(() => new CommunityApiClient(), []);
-
-    const handleChange = (event) => {
-      const { name, value } = event.target;
-      setFormData((prevData) => ({ ...prevData, [name]: value }));
-    };
-
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-      setAlert({ message: null, type: 'danger', open: false });
-
-      const { email, password } = formData;
-
-      if (!email || !password) {
-        setAlert({
-          message: 'Please fill in all fields of form to login',
-          type: 'danger',
-          useWaitAnimation: false,
-          open: true,
-        });
-      } else {
-        try {
-          // Show loading state
-          setAlert({
-            message: 'Logging in...',
-            type: 'neutral',
-            useWaitAnimation: true,
-            open: true,
-          });
-
-          // Attempt login
-          const response = await apiClient.login(email, password);
-
-          if (response.success) {
-            // Show success message
-            setAlert({
-              message: 'Login successful! Redirecting to dashboard...',
-              type: 'success',
-              useWaitAnimation: true,
-              open: true,
-            });
-
-            // Store tokens in localStorage
-            localStorage.setItem('accessToken', response.access_token);
-            localStorage.setItem('refreshToken', response.refresh_token);
-
-            setTimeout(() => {
-              window.location.href = '/dashboard';
-            }, 2000);
-
-          }
-        } catch (error) {
-          // Handle login error
-          setAlert({
-            message: 'Login failed. Please check your credentials and try again.',
-            type: 'danger',
-            useWaitAnimation: false,
-            open: true,
-          });
-          console.error('Login error:', error);
-        }
-      }
-    };
-
-    const handleCloseAlert = () => {
-      setAlert((prevAlert) => ({ ...prevAlert, open: false }));
-    };
+    
 
     const inputStyles = {
       width: '100%',
@@ -135,22 +71,6 @@ function LoginPage () {
       },
     };
 
-    const inputFields = [
-      {
-        name: 'username',
-        type: 'username',
-        placeholder: 'Write your username',
-        autoComplete: 'username',
-        icon: <MailRoundedIcon />,
-      },
-      {
-        name: 'password',
-        type: 'password',
-        placeholder: 'Write your password',
-        autoComplete: 'password',
-        icon: <LockRoundedIcon />,
-      },
-    ];
 
     return (
       <Box sx={{ maxWidth:1000, mx: 'auto', p: 4, py: 9 }}>
@@ -247,7 +167,6 @@ function LoginPage () {
         </Card>
       </Box>
     );
-};
-
+};  
 export default LoginPage;
 
