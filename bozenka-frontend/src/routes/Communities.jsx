@@ -251,6 +251,7 @@ function CommunitiesSearch() {
                                 filteredCommunities.map((community) => (
                                     <CommunityCard
                                         key={community.id}
+                                        id={community.id}
                                         avatarSrc={`http://localhost:8000${community.icon}`}
                                         menuItems={[
                                             { icon: <OpenInNewIcon />, label: 'Discord' },
