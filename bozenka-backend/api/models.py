@@ -10,6 +10,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, null=False, blank=False)
     username = models.CharField(max_length=30, unique=True)
     password = models.CharField(max_length=128, null=False)
+    image = models.ImageField(upload_to="avatars/", null=True, blank=True)
 
 
 class Tag(models.Model):
@@ -66,7 +67,7 @@ class Community(models.Model):
     )
 
     icon = models.ImageField(
-        upload_to='images/community_icons',
+        upload_to='community_icons/',
         verbose_name=_("Icon"),
         blank=True
     )
