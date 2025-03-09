@@ -7,6 +7,7 @@ from .models import User, Community, Tag, CommunityGrowth, CommunityER, Post, Co
     SocialLink
 
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for registering a new user.
@@ -48,10 +49,20 @@ class LoginSerializer(serializers.Serializer):
         return user
 
 
+class TagSerializer(serializers.ModelSerializer):
+    """
+    Serializer for tags.
+    """
+    class Meta:
+        model = Tag
+        fields = ('id', 'name', 'icon')
+
+
 class PublicCommunitySerializer(serializers.ModelSerializer):
     """
     Serializer for public information about communities.
     """
+    tags = TagSerializer(many=True)
     class Meta:
         model = Community
         fields = ('id', 'name',
@@ -61,17 +72,17 @@ class PublicCommunitySerializer(serializers.ModelSerializer):
                   'tags', 'icon', 'members_count')
 
 
+    def get_icon(self, obj):
+        if obj.icon:
+            return obj.icon.url
+        return None
+
+
 class PrivateCommunitySerializer(serializers.ModelSerializer):
     pass
 
 
-class TagSerializer(serializers.ModelSerializer):
-    """
-    Serializer for tags.
-    """
-    class Meta:
-        model = Tag
-        fields = ('name', 'icon')
+
 
 
 class CommunityGrowthSerializer(serializers.ModelSerializer):
