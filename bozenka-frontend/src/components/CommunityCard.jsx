@@ -82,7 +82,16 @@ function CommunityCard({ avatarSrc, menuItems, title, description, tags, members
                 <Typography level="body-sm">{description}</Typography>
                 <Grid>
                     {tags.map((tag, index) => (
-                        <Chip key={index} variant="outlined" startDecorator={tag.icon} sx={{ m: 0.5, borderRadius: 'sm' }}>
+                        <Chip key={index} variant="outlined" startDecorator={        
+                        <Typography
+                            component="span"
+                            sx={{ 
+                              fontFamily: 'Material Icons', 
+                              fontSize: '18px', 
+                            }}
+                          >
+                            {tag.icon}
+                          </Typography>} sx={{ m: 0.5, borderRadius: 'sm' }}>
                             {tag.name}
                         </Chip>
                     ))}

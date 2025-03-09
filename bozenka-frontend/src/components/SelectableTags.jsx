@@ -1,52 +1,54 @@
 import Chip from '@mui/joy/Chip';
-import { useState } from 'react';
+import Typography from '@mui/joy/Typography';
 
 /**
  * @function SelectableTags
- * @description This function renders chip tags that can be selected and deselected. Mostly used for tags of communities.
- * @param {Object} props - The props object passed to the component.
- * @param {Object} props.Tag - The tag object containing the icon and name of the tag.
- * @param {Object} props.Tag.icon - The icon of the tag.
- * @param {Object} props.Tag.name - The name of the tag.
- * @returns {JSX.Element} - The JSX element representing the selectable tags.
+ * @description This function renders chip tags that can be selected and deselected
+ * @param {Object} props - The props object
+ * @param {Object} props.Tag - The tag object containing icon and name
+ * @param {boolean} props.isSelected - Whether the tag is selected
+ * @param {Function} props.onSelect - Callback when tag is clicked
+ * @returns {JSX.Element}
  */
-function SelectableTags({ Tag }) {
-    /**
-     * @description The tag object containing the icon and name of the tag.
-     * @type {Object}
-     */
-    const {icon, name} = Tag
+function SelectableTags({ Tag, isSelected, onSelect }) {
+    const { icon, name } = Tag;
 
-    /**
-     * @description A boolean state variable that indicates whether the tag is selected or not.
-     * @type {boolean}
-     */
-    const [isSelected, SetSelected] = useState(false);
-
-    /**
-     * @description The JSX element representing the selectable tags.
-     * @type {JSX.Element}
-     */
     return (
         <Chip
-            sx={
-                /**
-                 * @description The styling object for the Chip component.
-                 * @type {Object}
-                 */
-                {
-                    m: 0.4,
-                    borderRadius: 'sm',
-                }
+            sx={{
+                m: 0.4,
+                borderRadius: 'sm',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                    backgroundColor: "background.level2",
+                    transform: 'translateY(-1px)',
+                },
+                '&:active': {
+                    transform: 'translateY(0)',
+                },
+                cursor: 'pointer',
+            }}
+            variant={isSelected ? 'solid' : 'soft'}
+            onClick={onSelect}
+            color={isSelected ? 'primary' : 'neutral'}
+            startDecorator={
+                <Typography
+                    component="span"
+                    sx={{ 
+                        fontFamily: 'Material Icons',
+                        fontSize: '14px',
+                        color: 'inherit',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                >
+                    {icon}
+                </Typography>
             }
-            variant='soft'
-            onClick={() => SetSelected(!isSelected)}
-            color={isSelected == true ? 'primary' : 'neutral'}
-            startDecorator={icon} // Add some spacing between tags
         >
             {name}
         </Chip>
-    )
+    );
 }
 
 export default SelectableTags;
