@@ -39,11 +39,12 @@ import InfoIcon from '@mui/icons-material/Info';
 * @param {Array} props.tags - An array of tags associated with the community.
 * @param {number} props.membersCount - The number of members in the community.
 * @param {string} props.creationDate - The creation date of the community.
+* @param {string} props.id - Id of community
 * @returns {JSX.Element} - The rendered community card.
 */
-function CommunityCard({ avatarSrc, menuItems, title, description, tags, membersCount, creationDate }) {
+function CommunityCard({ avatarSrc, menuItems, title, description, tags, membersCount, creationDate, id }) {
     return (
-    <Link to='/community/'>
+    <Link to={`/community/${id}`}>
         <Card sx={{m: 1,
 
             transition: 'transform 0.3s, box-shadow 0.3s',

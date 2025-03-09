@@ -28,6 +28,10 @@ import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
 // Our componenets
 import CommunitySegmentedInfo from '../components/CommunitySegmentedInfo';
+import CommunityApiClient from '../api/CommunityApiClient';
+
+// React Router
+import { useParams } from 'react-router-dom';
 
 
 /**
@@ -36,6 +40,57 @@ import CommunitySegmentedInfo from '../components/CommunitySegmentedInfo';
 * @returns {JSX.Element} - The rendered community page.
 */
 function Community() {
+    const [community, setCommunityInfo] = React.useState({}) // Initialize as object
+    const params = useParams();
+    const [loading, setLoading] = React.useState(true);
+
+    if (!params.id) {
+        return <Typography>
+            Please, don't try to break me by not passing community.
+        </Typography>
+    }
+    
+
+    // Fetch tags and communities on mount
+    React.useEffect(() => {
+        const fetchData = async () => {
+            const api = new CommunityApiClient();
+            try {
+                // Fetch both tags and communities in parallel
+                const communityInfo = await api.getCommunity(params.id)
+                setCommunityInfo(communityInfo)
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Function to render icon component based on tag icon
+    const renderIcon = (icon) => {
+        return (
+            <Typography
+                component="span"
+                sx={{ 
+                    fontFamily: 'Material Icons',
+                    fontSize: '14px',
+                    color: 'inherit',
+                    display: 'flex',
+                    alignItems: 'center',
+                }}
+            >
+                {icon}
+            </Typography>
+        );
+    };
+
+    if (loading) {
+        return <Typography>Loading...</Typography>;
+    }
+
     return (
         <Box sx={{
                 m: 2,
@@ -43,7 +98,7 @@ function Community() {
                 flexDirection: 'row',
                 '@media (max-width: 670px)': { // Mobile responsiveness
                   flexDirection: 'column',
-                }}}>
+                }}} >
             <Stack sx={{
                     flexDirection: 'column',
                     width: 300,
@@ -64,29 +119,32 @@ function Community() {
                     >
                       <Typography  sx={{mt: 0}}>Home</Typography>
                       <Typography  sx={{mt: 0}}>Communities</Typography>
-                      <Typography  sx={{pt: 0, color: 'primary.plainColor'}}>Community Name</Typography>
+                      <Typography  sx={{pt: 0, color: 'primary.plainColor'}}>{community.community_info?.name}</Typography>
                     </Breadcrumbs>
                   </Box>
                 <Card>
-                    <Avatar src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
-                    <Box> 
+                    <Avatar 
+                        src={`http://127.0.0.1:8000${community.community_info?.icon}`} // Using optional chaining
+                        variant='outlined'
+                    />
+                    <Box>
                         <Typography level="title-lg"
-                            sx={
-                                {
-                                    marginBottom: 0
-                                }
-                            }>Community</Typography>
+                            sx={{
+                                marginBottom: 0
+                            }}>
+                            {community.community_info?.name}
+                        </Typography>
                         <Typography
                         startDecorator={<PersonIcon/>}
                         level="body-xs">
-                            100 Members
+                            {community.community_info?.members_count} Members
                         </Typography>
                         <Typography 
                             startDecorator={<CalendarMonthRoundedIcon/>}
                             level="body-xs">
-                            Created on 9th September, 1999
+                            Created on {new Date(community.community_info?.creation_date).toLocaleDateString()}
                         </Typography>
-                        <Typography level="body-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste fugiat illum laudantium modi doloribus magni totam enim ducimus.</Typography>
+                        <Typography level="body-sm">{community.community_info?.description || 'No description provided'}</Typography>
                     </Box>
                 </Card>
                 <Card sx={{marginTop: 2}}>
@@ -95,96 +153,76 @@ function Community() {
                         Tags
                     </Typography>
                     
-                    <Grid>
-                        <Chip variant="soft" color="primary" 
-                            startDecorator={<CalendarMonthRoundedIcon/>} 
-                            sx={{borderRadius: 'sm', m: 0.5}}>
-                            Tag 1
-                        </Chip>
-                        <Chip variant="soft" color="primary" 
-                            startDecorator={<CalendarMonthRoundedIcon/>} 
-                            sx={{borderRadius: 'sm', m: 0.5}}>
-                            Tag 2
-                        </Chip>
+                    <Grid sx={{flexWrap: 'wrap'}}>
+                        {community.community_info?.tags.map((tag) => (
+                            <Chip 
+                                key={tag.id} 
+                                variant="soft" 
+                                color="primary" 
+                                startDecorator={renderIcon(tag.icon)} 
+                                sx={{borderRadius: 'sm', m: 0.5}}>
+                                {tag.name}
+                            </Chip>
+                        ))}
                     </Grid>
                 </Card>
-                
-                <Card sx={{marginTop: 2}} size='sm'>
+                {community.social_links && (<Card sx={{marginTop: 2}} size='sm'>
                     <Typography level='title-lg' sx={{paddingLeft: 2, paddingTop: 2}}
                       startDecorator={<GroupRoundedIcon/>}
                     >
                         Links
                     </Typography>
                     <List>
-                        <ListItem sx={{margin: 0.2}}>
+                        {community.social_links.map((connection) =>
+                        (
+                        <Link to={connection.link}>
+                            <ListItem sx={{margin: 0.2}}>
                             <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
                                 <ListItemDecorator>
                                 <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>Vkontakte</ListItemContent>
+                                <ListItemContent>connection.platform</ListItemContent>
                                 <KeyboardArrowRight />
                             </ListItemButton>
-                        </ListItem>
+                            </ListItem>
+                            </Link>
+                        ))}
+
                         
-                        <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                                <ListItemDecorator>
-                                <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>Discord</ListItemContent>
-                                <KeyboardArrowRight />
-                            </ListItemButton>
-                        </ListItem>
-                        
-                        <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                                <ListItemDecorator>
-                                <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>Telegram</ListItemContent>
-                                <KeyboardArrowRight />
-                            </ListItemButton>
-                        </ListItem>
+                        {/* Add your social links here based on community.social_links */}
                     </List>
-                </Card>
-                
-                <Card sx={{marginTop: 2}} size='sm'>
+                </Card>)}
+                { community.managers && (<Card sx={{marginTop: 2}} size='sm'>
                     <Typography level='title-lg' startDecorator={<MultipleStopRoundedIcon/>} sx={{paddingLeft: 2, paddingTop: 2}}>
                         Contacts
                     </Typography>
                     
                     <List>
-                      <ListItem sx={{margin: 0.2}}>
+                        {/* String(val).charAt(0).toUpperCase() + String(val).slice(1) */}
+                        {community.managers.map((manager) => (<ListItem sx={{margin: 0.2}}>
                         <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
                             <ListItemDecorator>
-                              <Avatar size="md" variant='outlined' />
+                              <Avatar size="md" src={`http://localhost:8000${manager.avatar}`} variant='outlined' />
                             </ListItemDecorator>
                             <ListItemContent sx={{ml: 1.5}}>
-                                <Typography level="title-sm">User1</Typography>
-                                <Typography level="body-sm">Owner</Typography>
+                                <Typography level="title-sm">{manager.user.display_name ? manager.user.display_name : manager.user.username}</Typography>
+                                <Typography level="body-sm">{String(manager.status).charAt(0).toUpperCase() + String(manager.status).slice(1)} </Typography>
                             </ListItemContent>
                             <KeyboardArrowRight />
                           </ListItemButton>
-                      </ListItem>
-                      
-                      <ListItem sx={{margin: 0.2}}>
-                        <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                            <ListItemDecorator>
-                              <Avatar size="md" variant='outlined' />
-                            </ListItemDecorator>
-                            <ListItemContent sx={{ml: 1.5}}>
-                                <Typography level="title-sm">User2</Typography>
-                                <Typography level="body-sm">Administration</Typography>
-                            </ListItemContent>
-                            <KeyboardArrowRight />
-                          </ListItemButton>
-                      </ListItem>
+                      </ListItem>))}
+                        {/* Add your contacts list here based on community.managers */}
                     </List>
-                </Card>
+                </Card>)}
+                {/* Rest of the component remains the same */}
             </Stack>
-            
-            <CommunitySegmentedInfo sx={{flex: 1}}/>
-            
+            <CommunitySegmentedInfo 
+                community_description={community.description}
+                growth_stats={community.growth_stats}
+                er_stats={community.er_stats}
+                sx={{flex: 1}} 
+            />
         </Box>
     )
 }
-
 
 export default Community;

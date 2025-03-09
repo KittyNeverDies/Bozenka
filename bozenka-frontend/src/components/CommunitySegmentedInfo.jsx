@@ -16,8 +16,12 @@ import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab, { tabClasses } from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
+
+
 import TestChart from './GrowthChart';
 
+
+import {useTheme} from '@mui/joy';
 
 // Material UI icons for Tabs
 import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
@@ -35,100 +39,43 @@ import PersonIcon from '@mui/icons-material/Person';
 
 
 
-function CommunitySegmentedInfo() {
+function CommunitySegmentedInfo({community_description, growth_stats, er_stats, posts }) {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
 
+  // Data for stats visualization (mapped from growth_stats and er_stats)
+  const data = growth_stats.map((stat, index) => ({
+    name: stat.date,
+    views: stat.views || 0, // If views are in growth_stats
+    members: stat.members_count || 0,
+    amt: stat.members_count || 0,
+    er: er_stats?.[index]?.er || 0, // Match ER with corresponding date
+  }));
 
-  const data = [
-    {
-      name: "03.09",
-      views: 4000,
-      members: 2400,
-      amt: 2400,
-    },
-    {
-      name: "04.09",
-      views: 3000,
-      members: 1398,
-      amt: 2210,
-    },
-    {
-      name: "05.09",
-      views: 2000,
-      members: 9800,
-      amt: 2290,
-    },
-    {
-      name: "06.09",
-      views: 2780,
-      members: 3908,
-      amt: 2000,
-    },
-    {
-      name: "07.09",
-      views: 1890,
-      members: 4800,
-      amt: 2181,
-    },
-    {
-      name: "08.09",
-      views: 2390,
-      members: 3800,
-      amt: 2500,
-    },
-    {
-      name: "09.09",
-      views: 3490,
-      members: 4300,
-      amt: 2100,
-    },
-  ];
-
-
+  // Display data configuration (mapped from server data)
   const displayData = {
     members: {
-      title: "The number of members in the community",
+      title: "The number of community members",
       shortTitle: "Number of members",
       description: "Total number of community members.",
-      icon: <PeopleRoundedIcon/>,
+      icon: <PeopleRoundedIcon />,
     },
     views: {
-      title: "Views of the posts at this date.",
+      title: "Views of the posts",
       shortTitle: "Views of the posts",
-      description: "Total growth of number of views on posts at this date.",
-      icon: <VisibilityRoundedIcon/>,
+      description: "Total growth of number of views on posts.",
+      icon: <VisibilityRoundedIcon />,
     }
-  
-  }
-
-  const icons = {
-    members: <PeopleRoundedIcon />,
-    views: <VisibilityRoundedIcon/>,
   };
 
+  // Icons configuration (mapped from server data)
+  const icons = {
+    members: <PeopleRoundedIcon />,
+    views: <VisibilityRoundedIcon />,
+  };
 
-  const posts = [
-    {
-      title: 'Post 1',
-      author: 'John Doe',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      date: '2022-01-01',
-      category: 'Vk',
-      views: '1'
-    },
-    {
-      title: 'Post 2',
-      author: 'Jane Doe',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      date: '2022-01-02',
-      category: 'Telegram',
-      views: '10'
-    },
-    // Add more posts here...
-    // In other time ...
-    // From backend ..
-  ];
+  // Posts data (mapped from server)
+  const postsData = posts || [];
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -166,9 +113,9 @@ function CommunitySegmentedInfo() {
       onChange={handleTabChange}
       sx={{
         bgcolor: 'transparent',
-        width: '100%', // Set width to 100% to make it responsive
+        width: '100%',
         marginLeft: 2,
-        '@media (max-width: 670px)': { // Mobile responsiveness
+        '@media (max-width: 670px)': {
           width: '100%',
           marginLeft: 0,
         }
@@ -225,7 +172,7 @@ function CommunitySegmentedInfo() {
             key='About' 
             disableIndicator
           >
-            <InfoRoundedIcon/>
+            <InfoRoundedIcon />
             About
           </Tab>
         <Tab 
@@ -233,7 +180,7 @@ function CommunitySegmentedInfo() {
             disableIndicator
           >
             <ListItemDecorator>
-              <BarChartRoundedIcon/>
+              <BarChartRoundedIcon />
             </ListItemDecorator>
             Stats
         </Tab>
@@ -243,7 +190,7 @@ function CommunitySegmentedInfo() {
             disableIndicator
           >
             <ListItemDecorator>
-              <MailRoundedIcon/>
+              <MailRoundedIcon />
             </ListItemDecorator>
             Posts
         </Tab>
@@ -253,106 +200,98 @@ function CommunitySegmentedInfo() {
             disableIndicator
           >
             <ListItemDecorator>
-              <QuizRoundedIcon/>
+              <QuizRoundedIcon />
             </ListItemDecorator>
             Knowledge Library
         </Tab>
       </TabList>
       <Card sx={{marginTop: 2, paddingBottom: 6, height: '100%'}}>
         <TabPanel value={0}>
-          {/* Description of community */}
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum suscipit repellat, architecto at dolore odio neque eos dolorum hic aliquam velit sapiente dignissimos molestiae pariatur ducimus! Soluta voluptate ad tenetur!</p>
-
-          
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum suscipit repellat, architecto at dolore odio neque eos dolorum hic aliquam velit sapiente dignissimos molestiae pariatur ducimus! Soluta voluptate ad tenetur!</p>
-          
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum suscipit repellat, architecto at dolore odio neque eos dolorum hic aliquam velit sapiente dignissimos molestiae pariatur ducimus! Soluta voluptate ad tenetur!
-          
-          </TabPanel>
-          <TabPanel value={1}>
-            <Typography level='h2' sx={{mb: 2}}>
-              Stats
-            </Typography>
-              <TestChart icons={icons} data={data} displayData={displayData} />
-          </TabPanel>
-          <TabPanel value={2}>
-            <Typography level='h2' sx={{mb: 2}}>
-              Posts
-            </Typography>
-            <Grid container spacing={1}>
-              {posts.map((post, index) => (
-                <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                  <Box my={0.5}>
-                  <Card sx={{ height: '100%'}}>
-            
-                    <Typography level="title-lg" sx={{marginBottom: -1}}>
-                      {post.title}
-                    </Typography>
-                    <Typography startDecorator={<PersonIcon/>} level="body-xs">
-                      by {post.author}
-                    </Typography>
-                    <Typography level="body-sm">
-                      {post.content}
-                    </Typography>
-                    
-                    <Box>
-                      <Typography startDecorator={<CalendarMonthRoundedIcon/>} sx={{m: 0.2}} level="body-xs">
-                        Posted at {post.date}
-                      </Typography>
-                      <Chip variant="soft" startDecorator={<OpenInNewIcon/>} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
-                        {post.category}
-                      </Chip>
-  
-                      <Chip variant="soft" startDecorator={<VisibilityRoundedIcon/>} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
-                        {post.views} views
-                      </Chip>
-                    </Box>
-                  </Card>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </TabPanel>
-          <TabPanel value={3}>
-          
+          {community_description}
+        </TabPanel>
+        <TabPanel value={1}>
           <Typography level='h2' sx={{mb: 2}}>
-              Knowledge Library
+            Stats
           </Typography>
-          <AccordionGroup
-                color="neutral"
-                size="sm"
+            <TestChart icons={icons} data={data} displayData={displayData} />
+        </TabPanel>
+        <TabPanel value={2}>
+          <Typography level='h2' sx={{mb: 2}}>
+            Posts
+          </Typography>
+          <Grid container spacing={1}>
+            {postsData.map((post, index) => (
+              <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                <Box my={0.5}>
+                <Card sx={{ height: '100%' }}>
                 
-                sx={{
-                    borderRadius: 'md',
-                    
-                    [`& .${accordionClasses.root}`]: {
-                      marginTop: '0.5rem',
+                  <Typography level="title-lg" sx={{marginBottom: -1}}>
+                    {post.text}
+                  </Typography>
+                  <Typography level="body-sm">
+                    {post.text}
+                  </Typography>
+                  
+                  <Box>
+                    <Typography startDecorator={<CalendarMonthRoundedIcon />} sx={{m: 0.2}} level="body-xs">
+                      Posted at {post.created_at}
+                    </Typography>
+                    <Chip variant="soft" startDecorator={<OpenInNewIcon />} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
+                      {post.source}
+                    </Chip>
+
+                    <Chip variant="soft" startDecorator={<VisibilityRoundedIcon />} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
+                      {post.views} views
+                    </Chip>
+                  </Box>
+                </Card>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </TabPanel>
+        <TabPanel value={3}>
+        
+        <Typography level='h2' sx={{mb: 2}}>
+            Knowledge Library
+        </Typography>
+        <AccordionGroup
+              color="neutral"
+              size="sm"
+              
+              sx={{
+                  borderRadius: 'md',
+                  
+                  [`& .${accordionClasses.root}`]: {
+                    marginTop: '0.5rem',
+                    transition: '0.2s ease',
+                    '& button:not([aria-expanded="true"])': {
                       transition: '0.2s ease',
-                      '& button:not([aria-expanded="true"])': {
-                        transition: '0.2s ease',
-                        paddingBottom: '0.625rem',
-                      },
-                      '& button:hover': {
-                        background: 'transparent',
-                      },
-                    }
-                }}
-                variant="plain"
-                transition="0.2s">
-                  <Accordion>
-                    <AccordionSummary>
-                        <Avatar color="primary">
-                            <InfoRoundedIcon/>
-                        </Avatar>
-                        <ListItemContent>
-                            <Typography level="title-md">Your lorem ipsum</Typography>
-                            <Typography level="body-sm">Lorem Ipsum tutorial</Typography>
-                        </ListItemContent>
-                    </AccordionSummary>
-                    <AccordionDetails>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus perspiciatis cupiditate nam accusantium corporis obcaecati labore, dolores placeat aliquid doloremque impedit, sapiente aspernatur sit vero qui incidunt ipsa aliquam molestias.</AccordionDetails>
-                  </Accordion>
-          </AccordionGroup>
-          </TabPanel>
+                      paddingBottom: '0.625rem',
+                    },
+                    '& button:hover': {
+                      background: 'transparent',
+                    },
+                  }
+              }}
+              variant="plain"
+              transition="0.2">
+                <Accordion>
+                  <AccordionSummary>
+                      <Avatar color="primary">
+                          <InfoRoundedIcon />
+                      </Avatar>
+                      <ListItemContent>
+                          <Typography level="title-md">Community Guidelines</Typography>
+                          <Typography level="body-sm">Learn how to behave in our community</Typography>
+                      </ListItemContent>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {displayData.members.description}
+                  </AccordionDetails>
+                </Accordion>
+        </AccordionGroup>
+        </TabPanel>
       </Card>
     </Tabs>
   );
