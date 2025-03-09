@@ -8,6 +8,7 @@ from .models import User, Community, Tag, CommunityGrowth, CommunityER, Post, Co
 
 
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for registering a new user.
@@ -43,10 +44,16 @@ class LoginSerializer(serializers.Serializer):
         :return: The validated data.
         """
 
-        user = authenticate(email=data['email'], password=data['password'])
+        user = authenticate(username=data['username'], password=data['password'])
         if not user:
             raise ValidationError('Invalid username or password.')
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'display_name', 'image')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -114,9 +121,10 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class CommunityManagerSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     class Meta:
         model = CommunityManager
-        fields = ('status', 'contact_link', 'avatar')
+        fields = ('status', 'contact_link', 'avatar', 'user')
 
 
 class LatestPostViewSerializer(serializers.ModelSerializer):

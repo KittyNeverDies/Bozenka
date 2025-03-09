@@ -7,8 +7,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
+    """
+    A user with their username, preview name, email, password, and image (avatar).
+    """
     email = models.EmailField(unique=True, null=False, blank=False)
     username = models.CharField(max_length=30, unique=True)
+    display_name = models.CharField(max_length=30, null=True, blank=True, unique=False)
     password = models.CharField(max_length=128, null=False)
     image = models.ImageField(upload_to="avatars/", null=True, blank=True)
 

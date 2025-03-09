@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Community, Tag, CommunityGrowth, CommunityER, CommunityManager, SocialLink, Post, LatestPostView
 from .serializers import RegisterSerializer, LoginSerializer, PublicCommunitySerializer, TagSerializer, \
     CommunityGrowthSerializer, CommunityERSerializer, CommunityManagerSerializer, PostSerializer, SocialLinkSerializer, \
-    LatestPostViewSerializer
+    LatestPostViewSerializer, UserSerializer
 
 
 class AuthViews(viewsets.ViewSet):
@@ -57,6 +57,7 @@ class AuthViews(viewsets.ViewSet):
         :param request: Request object
         :return: Response object
         """
+
         username = request.data.get('username')
         password = request.data.get('password')
         serializer = LoginSerializer(data={'username': username, 'password': password})
@@ -73,6 +74,68 @@ class AuthViews(viewsets.ViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class AccountViews(viewsets.ModelViewSet):
+    """
+    ViewsSet for accessing user account information of bozenka platform.
+    Gives ability to get information about user with authentication.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=False, methods=['get'])
+    def account(self, request) -> Response:
+        """
+        View for getting user information
+        :param request: Request object
+        :return: Response object
+        """
+        user = request.user
+
+        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def update_account(self, request):
+        """
+        View for updating user information
+        :param request: Request object
+        :return: Response object
+        """
+        user = request.user
+
+        try:
+            updated_data = request.data
+
+            if 'id' in updated_data.keys():
+                return Response("You can't change your id.", status=status.HTTP_400_BAD_REQUEST)
+
+            UserSerializer(user, data=updated_data, partial=True).is_valid(raise_exception=True)
+            UserSerializer(user, data=updated_data, partial=True).save()
+
+            return Response({'message': 'Successfully updated.'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'message': 'Failed to update.', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def update_accounts(self, request):
+        """
+        View for updating user information
+        :param request: Request object
+        :return: Response object
+        """
+        user = request.user
+
+        password = request.data.get('password')
+
+        try:
+            if LoginSerializer(data={'username': user.username, 'password': password}).is_valid():
+                user.password = request.data.get('new_password')
+                user.save()
+                return Response({'message': 'Successfully updated.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Failed to update.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'Failed to update. Exception happend.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -225,9 +288,10 @@ class PublicCommunityViews(viewsets.ViewSet):
         :param community_id: Community id
         :return: Response object
         """
+        print(community_id)
 
         # Validation of community_id parameter
-        if community_id is None or is_valid_uuid(community_id):
+        if community_id is None or not is_valid_uuid(community_id):
             return Response({'message': 'Community id is required.'}, status=status.HTTP_400_BAD_REQUEST)
         elif not Community.objects.filter(id=community_id).exists():
             return Response({'message': 'Community not found.'}, status=status.HTTP_404_NOT_FOUND)
