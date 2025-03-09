@@ -858,21 +858,53 @@ export function DashboardImportCommunity() {
                 onChange={handleInputChange}
                 row
               >
-                <FormControlLabel 
-                  value="discord" 
-                  control={<Radio />} 
-                  label="Discord" 
-                />
-                <FormControlLabel 
-                  value="vk" 
-                  control={<Radio />} 
-                  label="Vkontakte" 
-                />
-                <FormControlLabel 
-                  value="telegram" 
-                  control={<Radio />} 
-                  label="Telegram" 
-                />
+
+      <List sx={{
+        minWidth: 240,
+        '--List-gap': '0.5rem',
+        '--ListItem-paddingY': '1rem',
+        '--ListItem-radius': '8px',
+        '--ListItemDecorator-size': '32px',}}>
+            <ListItem variant="outlined">
+              <div>
+                <FormLabel>Telegram</FormLabel>
+                <FormHelperText>Cross-platform messaging app with a focus on speed and security, 
+                  it is super-fast, simple and free.</FormHelperText>
+              </div>
+              <Radio
+                overlay
+                value='telegram'
+                sx={{ flexGrow: 1, flexDirection: 'row-reverse'}}
+              />
+
+            </ListItem>
+            <ListItem variant="outlined">
+              <div>
+                <FormLabel>Vkontakte</FormLabel>
+                <FormHelperText>Russia social network, the largest social network in Russia.</FormHelperText>
+              </div>
+              <Radio
+                overlay
+                value='vk'
+                sx={{ flexGrow: 1, flexDirection: 'row-reverse'}}
+              />
+
+            </ListItem>
+            <ListItem variant="outlined">
+              <div>
+                <FormLabel>Discord</FormLabel>
+                <FormHelperText>Free online platform, what support calls and messages. For Gamers.</FormHelperText>
+              </div>
+              <Radio
+                overlay
+                value='discord'
+                sx={{ flexGrow: 1, flexDirection: 'row-reverse'}}
+              />
+
+            </ListItem>
+
+
+      </List>
               </RadioGroup>
             </FormControl>
 
@@ -1356,7 +1388,7 @@ export function DashboardControlAccount() {
     bgcolor: 'background.level0',
     borderRadius: 'lg',
     '&:hover': {
-      borderColor: 'primary.300',
+      borderColor: 'background.level2',
     },
     '&:focus-within': {
       borderColor: 'background.level2',
@@ -1369,8 +1401,6 @@ export function DashboardControlAccount() {
     px: 2,
     fontSize: 'sm',
     fontWeight: 'md',
-    border: '1px solid',
-    borderColor: 'neutral.300',
     transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
     '&::placeholder': {
       color: 'neutral.500',
@@ -1524,6 +1554,15 @@ export function DashboardControlAccount() {
                 Cancel
               </Button>
             </Box>
+          </Box>
+        </TabPanel>
+        <TabPanel value={1}>
+          <Box sx={{ p: 3 }}>
+            <Typography level="title-lg" sx={{ mb: 3 }}>
+              Security information
+            </Typography>
+            <Button sx={{mr: 1}} variant='soft' size="lg">Change Email</Button>
+            <Button m={1} variant='soft' size="lg">Change Password</Button>
           </Box>
         </TabPanel>
         <TabPanel value={2}>    
