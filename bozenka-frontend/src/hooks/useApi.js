@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import CommunityApiClient from '../api/CommunityApiClient';
+import { method } from 'lodash';
 
 export const useApi = () => {
     const { accessToken, refreshToken, updateTokens, logout } = useAuth();
@@ -11,10 +12,11 @@ export const useApi = () => {
     const handleRequest = useCallback(async (requestFunc) => {
         try {
             // First attempt with current access token
+            console.log("Trying to make request")
             const response = await requestFunc(accessToken);
             return response;
         } catch (error) {
-            if (error.message === 'Token expired' && refreshToken) {
+            if (error.message === 'Request failed with status 401' && refreshToken) {
                 try {
                     // Try to refresh the token
                     const newTokens = await apiClient.refreshAuthToken(refreshToken);
@@ -34,8 +36,7 @@ export const useApi = () => {
     }, [accessToken, refreshToken, updateTokens, logout, apiClient]);
 
     const makeAuthenticatedRequest = useCallback(async (endpoint, options = {}) => {
-        return handleRequest(token => 
-            apiClient.makeRequest(endpoint, token, options)
+        return handleRequest(token => (apiClient.makeRequest(endpoint, token, options))
         );
     }, [handleRequest, apiClient]);
 
@@ -45,9 +46,11 @@ export const useApi = () => {
         register: apiClient.register.bind(apiClient),
         getPrivateCommunities: () => 
             makeAuthenticatedRequest('/private/communities/'),
+        getPrivateCommmunity: (communityId) =>
+            makeAuthenticatedRequest(`/private/communities/${communityId}/`),
         updateCommunityBaseInformation: (communityId, updatedData) => 
             makeAuthenticatedRequest(
-                `/private/communities/${communityId}/update_community_base_information/`,
+                `/private/communities/${communityId}/update/base`,
                 {
                     method: 'POST',
                     body: JSON.stringify({ updated_data: updatedData })
@@ -58,6 +61,18 @@ export const useApi = () => {
                 `/private/communities/${communityId}/delete_community/`,
                 { method: 'GET' }
             ),
+        getAccountInfo: () => makeAuthenticatedRequest(
+            '/private/user/account/',
+            { method: 'GET' }
+        ),
+        updateAccountInfo: (updatedData) =>
+            makeAuthenticatedRequest(
+                '/private/user/account/update',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({updatedData: updatedData})
+                }
+            )
         // Add other API methods as needed
     };
 
