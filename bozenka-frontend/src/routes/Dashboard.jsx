@@ -1,6 +1,6 @@
 // React related components
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Some React Router magic
 import { Outlet, Link, useLocation } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 // MUI Joy UI controls
+import CircularProgress from '@mui/joy/CircularProgress';
 import {FormControl, FormLabel, FormHelperText, List, ListItem, ListSubheader} from '@mui/joy';
 import Card from '@mui/joy/Card';
 import Input from '@mui/joy/Input';
@@ -68,6 +69,7 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import LinkIcon from '@mui/icons-material/Link';
 import AlternateEmailRoundedIcon from '@mui/icons-material/AlternateEmailRounded';
+import EditIcon from '@mui/icons-material/Edit';
 import SecurityIcon from '@mui/icons-material/SecurityRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
@@ -81,6 +83,7 @@ import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRou
 // Authorization
 import { useAuth } from '../context/AuthContext';
 import { useApi } from '../hooks/useApi';
+import CommunityApiClient from '../api/CommunityApiClient';
 
 
   
@@ -157,6 +160,37 @@ export function DashboardLayout(){
 
   const location = useLocation();
 
+  const api = useApi();
+  const [accountInfo, setAccountInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      if (isMounted && !accountInfo) {
+        try {
+          const info = await api.getAccountInfo();
+          if (isMounted) {
+            setAccountInfo(info);
+          }
+        } catch (error) {
+          console.error('Failed to fetch account info:', error);
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }
+      }
+    }
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [api, accountInfo]);
+
+
+
   // Buttons for the dashboard, made to speed up the editing buttons list &
   // localization in future.
   const buttons = {
@@ -190,6 +224,9 @@ export function DashboardLayout(){
 
     // Authorization
     const {logout} = useAuth();
+
+
+
 
     // Active item styles
     const activeItemStyles = {
@@ -236,21 +273,24 @@ export function DashboardLayout(){
           }}
         >
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2, p: 1}}>
-              <Avatar
-                src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
-                size="lg"
-              />
-              <Box>
-                <Typography level="h5" element="h5" fontWeight='bold'>
-                  Welcome, user.
-                </Typography>
-                <Typography color='neutral' level="body-xs">
-            Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
-          </Typography>     
-                <Typography level="body-xs">
-                  Have a nice day!
-                </Typography>
-              </Box>
+        {loading ? (
+                  <CircularProgress size="sm" />
+                ) : (
+              <>
+              {accountInfo.icon ? <Avatar src={`http://localhost:8000${accountInfo.icon}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
+               <Box>
+                  <>
+                    <Typography level="h5" element="h5" fontWeight='bold'>
+                      Welcome, {accountInfo?.display_name || accountInfo?.username || 'user'}
+                    </Typography>
+                    <Typography color='neutral' level="body-xs">
+                      {accountInfo?.email}
+                    </Typography>     
+                    <Typography level="body-xs">
+                      Have a nice day!
+                    </Typography>
+                  </>
+              </Box></>)}
         </Box>
         <Box sx={{px: 0.8}}>
         <List
@@ -376,8 +416,6 @@ export function DashboardLayout(){
 export function DashboardHomepage() {
   const [loading, setLoading] = React.useState(false);
   const [selectedPeriod, setSelectedPeriod] = React.useState('week');
-
-
   
   const data = [
     {
@@ -968,398 +1006,650 @@ export function DashboardImportCommunity() {
 * @returns {JSX.Element} - The rendered component.
 */
 export function DashboardControlCommunity() {
+  // State management
   const [tabIndex, setTabIndex] = React.useState(0);
+  const [selectedCommunity, setSelectedCommunity] = React.useState(null);
+  const [selectedCommunityInfo, setSelectedCommunityInfo] = React.useState(null);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editForm, setEditForm] = React.useState({
+    name: '',
+    description: '',
+    short_description: ''
+  });
 
-  // Sample data for communities
-  const communities = [
-    { id: 1, name: "Community Alpha", avatar: "A" },
-    { id: 2, name: "Community Beta", avatar: "B" },
-    { id: 3, name: "Community Gamma", avatar: "C" },
-    { id: 4, name: "Community Delta", avatar: "D" },
-  ];
+    // Memoize the form data to prevent re-renders when not needed
+    const editFormData = useMemo(() => ({
+      name: editForm.name,
+      description: editForm.description,
+      short_description: editForm.short_description
+    }), [editForm]);
+  
+    // Memoize form handlers
+    const handleNameChange = useMemo(
+      () => (e) => setEditForm({ ...editForm, name: e.target.value }),
+      [editForm]
+    );
+  
+    const handleDescriptionChange = useMemo(
+      () => (e) => setEditForm({ ...editForm, description: e.target.value }),
+      [editForm]
+    );
+  
+    const handleShortDescChange = useMemo(
+      () => (e) => setEditForm({ ...editForm, short_description: e.target.value }),
+      [editForm]
+    );
+  
+  
+  const api = useApi();
+  const [privateCommunities, setPrivateCommunities] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Data fetching effect
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      if (isMounted && !privateCommunities) {
+        try {
+          const info = await api.getPrivateCommunities();
+          if (isMounted) {
+            setPrivateCommunities(info);
+            if (info.length > 0) {
+              setSelectedCommunity(info[0]);
+              const communityInfo = await api.getPrivateCommmunity(info[0].id);
+              setSelectedCommunityInfo(communityInfo);
+              setEditForm({
+                name: communityInfo.community_info.name,
+                description: communityInfo.community_info.description,
+                short_description: communityInfo.community_info.short_description
+              });
+            }
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('Failed to fetch communities list:', error);
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }
+      }
+    }
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [api, privateCommunities]);
+
+  // Event handlers
+  const handleCommunitySelect = async(community) => {
+    try {
+      const community_detailed = await api.getPrivateCommmunity(community.id);
+      setSelectedCommunity(community);
+      setSelectedCommunityInfo(community_detailed);
+      setEditForm({
+        name: community_detailed.community_info.name,
+        description: community_detailed.community_info.description,
+        short_description: community_detailed.community_info.short_description
+      });
+    } catch (error) {
+      console.error('Failed to fetch community details:', error);
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      await api.updateCommunityBaseInformation(selectedCommunity.id, editForm);
+      const updated = await api.getPrivateCommmunity(selectedCommunity.id);
+      setSelectedCommunityInfo(updated);
+      setIsEditing(false);
+      const updatedCommunities = await api.getPrivateCommunities();
+      setPrivateCommunities(updatedCommunities);
+      setCo
+    } catch (error) {
+      console.error('Failed to update community:', error);
+    }
+  };
+
+  // Filter communities based on search
+  const filteredCommunities = privateCommunities ? privateCommunities.filter(community =>
+    community.name.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
+
+  // Component sections
+  const GeneralTabContent = () => (
+    <>
+      {isEditing ? (
+        <Box sx={{ p: 2 }}>
+        <FormControl sx={{ mb: 2, width: '100%' }}>
+          <FormLabel>Community Name</FormLabel>
+          <Input
+            value={editFormData.name}
+            onChange={handleNameChange}
+          />
+        </FormControl>
+        <FormControl sx={{ mb: 2, width: '100%' }}>
+          <FormLabel>Short Description</FormLabel>
+          <Input
+            value={editFormData.short_description}
+            onChange={handleShortDescChange}
+          />
+        </FormControl>
+        <FormControl sx={{ mb: 2, width: '100%' }}>
+          <FormLabel>Full Description</FormLabel>
+          <TextArea
+            minRows={3}
+            value={editFormData.description}
+            onChange={handleDescriptionChange}
+          />
+        </FormControl>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={handleEditSubmit} color="primary">Save</Button>
+          <Button onClick={() => setIsEditing(false)} variant="outlined">Cancel</Button>
+        </Box>
+      </Box>
+      ) : (
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography level="body-xs">
+              {selectedCommunityInfo.community_info.description}
+            </Typography>
+            <Button 
+              startDecorator={<EditIcon />}
+              onClick={() => setIsEditing(true)}
+              size="sm"
+            >
+              Edit
+            </Button>
+          </Box>
+          <Grid container spacing={2} sx={{ my: 2 }}>
+            {[
+              {
+                label: 'Members',
+                value: selectedCommunityInfo?.community_info?.members_count || 0,
+                icon: <PersonIcon />,
+                color: 'primary'
+              },
+              {
+                label: 'Engagement',
+                value: '100%',
+                icon: <TrendingUpRoundedIcon />,
+                color: 'success'
+              },
+              {
+                label: 'Last Active',
+                value: '100pm',
+                icon: <CalendarMonthRoundedIcon />,
+                color: 'warning'
+              }
+            ].map((stat, index) => (
+              <Grid xs={12} md={3} key={index}>
+                <Card variant='outlined' sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Avatar color={stat.color}>
+                      {stat.icon}
+                    </Avatar>
+                    <Box>
+                      <Typography level="body-xs">{stat.label}</Typography>
+                      <Typography level="h4">{stat.value}</Typography>
+                    </Box>
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      )}
+    </>
+  );
+
+  const PostsTabContent = () => (
+    <Box sx={{ p: 2 }}>
+      <Grid container spacing={1}>
+        {selectedCommunityInfo?.posts?.map((post, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+            <Box my={0.5}>
+              <Card sx={{ height: '100%' }}>
+                <Typography level="title-lg" sx={{marginBottom: -1}}>
+                  {post.text}
+                </Typography>
+                <Typography level="body-sm">
+                  {post.text}
+                </Typography>
+                <Box>
+                  <Typography 
+                    startDecorator={<CalendarMonthRoundedIcon />} 
+                    sx={{m: 0.2}} 
+                    level="body-xs"
+                  >
+                    Posted at {new Date(post.created_at).toLocaleString()}
+                  </Typography>
+                  <Chip 
+                    variant="soft" 
+                    startDecorator={<OpenInNewIcon />} 
+                    color="primary" 
+                    size="md" 
+                    sx={{borderRadius: 'sm', m: 0.2}}
+                  >
+                    {post.source}
+                  </Chip>
+                  <Chip 
+                    variant="soft" 
+                    startDecorator={<VisibilityRoundedIcon />} 
+                    color="primary" 
+                    size="md" 
+                    sx={{borderRadius: 'sm', m: 0.2}}
+                  >
+                    {post.views} views
+                  </Chip>
+                </Box>
+              </Card>
+            </Box>
+          </Grid>
+        ))}
+        {(!selectedCommunityInfo?.posts || selectedCommunityInfo.posts.length === 0) && (
+          <Grid item xs={12}>
+            <Typography level="body-lg" textAlign="center">
+              No posts available
+            </Typography>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
+
+  // Main render
   return (
     <>
-          {/* Center Content */}
-    <Breadcrumbs 
-          size="sm"
-          separator={ <KeyboardArrowRightIcon/>}>
-        <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}} >
-          <Typography sx={{}}>
-            Dashboard
-          </Typography>
-        </Link>
-          <Typography sx={{mt: 0, color: 'primary.plainColor'}}>Manage Communities</Typography>
-      </Breadcrumbs>
-    
-        <Box my={2} px={1}>
-          <Typography level="h2">Manage Communities</Typography>
-          <Typography level="body-md" color="neutral">
-            Oversee and optimize your community spaces
-          </Typography>
-        </Box>
-      <Stack  direction={{ xs: 'column-reverse', md: 'row' }}  spacing={1} >
-        <Card sx={{ 
-          width: {xs: '95%', md: '70%'}, p: 3,
-          minWidth: '70%', 
-                  maxHeight: 'auto'
-          
-          }}>
-
-          <Box sx={{
-            display: 'flex', 
-            flexDirection: 'row',
-            
-          }}> 
-            
-            <Avatar size="lg" src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90" />
-            <Box ml={1}>
-              <Typography level="title-lg"
-                  sx={{marginBottom: 0}}>
-                    Community
-              </Typography>
-              <Box sx={{display: 'flex', flexDirection: 'row'}}>
-                <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
-                  100 Members
-                </Typography>
-                <Typography 
-                  startDecorator={<CalendarMonthRoundedIcon/>}
-                  level="body-xs">
-                    Created on 9th September, 1999
-                </Typography>
-              </Box>
-              <Typography color='neutral' level="body-xs">
-                Total growth: <Typography 
-                                color="success" 
-                                level="body-xs" 
-                                startDecorator={<TrendingUpRoundedIcon/>}> 
-                                50% from last day 
-                  </Typography>
-              </Typography>
-
-              <Box>
-                {/* There should be tags of community */}
-                <Chip 
-                  variant="soft"
-                  color='primary' 
-                  size='sm' 
-                  startDecorator={<CalendarMonthRoundedIcon/>} 
-                  sx={{borderRadius: 'sm', m: 0.5}}>
-                            Tag 1
-                </Chip>
-                <Chip
-                 variant="soft"
-                 color='primary' 
-                 size='sm' 
-                 startDecorator={<CalendarMonthRoundedIcon/>} 
-                 sx={{borderRadius: 'sm', m: 0.5}}>
-                            Tag 2
-                </Chip>
-            </Box>
-          </Box>
-        </Box>
-        {/* Tab System */}
-        <Tabs value={tabIndex}
-              onChange={(event, value) => setTabIndex(value)}
-              sx={{
-                borderRadius: 'md',
-                          [`& .${tabClasses.root}`]: {
-                            zIndex: 1,
-                            transition: 'transform 0.2s ease, background-color 0.2s ease',
-                            mx: 0.5,
-                            paddingLeft: 1,
-                            paddingRight: 1,
-                            height: 0.1,
-                            borderTopLeftRadius: '5px',
-                            borderTopRightRadius: '5px',
-                            '&:hover': {
-                              transform: 'scale(1.05)',
-                              
-                            },
-                            '&[aria-selected="true"]': {
-                              bgcolor: 'primary.softBgColor',
-                              color: 'primary.softColor',
-                              transition: 'all 0.5 ease'
-
-                            },
-                          },
-              }}>
-          <TabList>
-            <Tab>
-              <HomeRoundedIcon sx={{fontSize: 20}} />
-              <Typography level='title-sm'>
-                General
-              </Typography>
-            </Tab>
-            <Tab>
-              <SettingsRoundedIcon sx={{fontSize: 20}} />
-              <Typography level='title-sm'>
-                Settings
-              </Typography>
-            </Tab>
-            <Tab>
-              <DnsRoundedIcon sx={{fontSize: 20}} />
-              <Typography level='title-sm'>
-                Platforms
-              </Typography>
-            </Tab>
-            <Tab>
-              <QueryStatsRoundedIcon sx={{fontSize: 20}} />
-              <Typography level='title-sm'>
-                Stats
-              </Typography>
-            </Tab>
-            <Tab>
-              <MailRoundedIcon sx={{fontSize: 20}} />
-              <Typography level='title-sm'>
-                Posts
-              </Typography>
-            </Tab>
-          </TabList>
-          <TabPanel value={0} sx={{maxHeight: '200px', overflowY: 'auto'}}>
-            <Typography level='body-xs'>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Obcaecati delectus perferendis modi eaque consequuntur accusamus. Maiores architecto sequi natus eaque consectetur neque veritatis ipsa cum hic soluta. Id, temporibus vel? Quisquam, quisquam!
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <Breadcrumbs size="sm" separator={<KeyboardArrowRightIcon/>}>
+            <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}}>
+              <Typography>Dashboard</Typography>
+            </Link>
+            <Typography sx={{mt: 0, color: 'primary.plainColor'}}>
+              Manage Communities
             </Typography>
-                          {/* Quick Stats */}
-                          <Grid container spacing={2} sx={{ my: 2 }}>
-                {[
-                  {
-                    label: 'Members',
-                    value: 100,
-                    icon: <PeopleRoundedIcon />,
-                    color: 'primary'
-                  },
-                  {
-                    label: 'Engagement',
-                    value: '100%',
-                    icon: <TrendingUpRoundedIcon />,
-                    color: 'success'
-                  },
-                  {
-                    label: 'Last Active',
-                    value: '100pm',
-                    icon: <CalendarMonthRoundedIcon />,
-                    color: 'warning'
-                  }
-                ].map((stat) => (
-                  <Grid xs={12} md={3} >
-                    <Card variant='outlined' sx={{ p: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Avatar color={stat.color}>
-                          {stat.icon}
-                        </Avatar>
-                        <Box>
-                          <Typography level="body-xs">{stat.label}</Typography>
-                          <Typography level="h4">{stat.value}</Typography>
-                        </Box>
-                      </Box>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-        
-          </TabPanel>
-          <TabPanel value={1} >
-          <FormControl sx={{my: 1}}>
-            <AccordionGroup
-                  color="neutral"
-                  size="sm"
-                
+          </Breadcrumbs>
+
+          <Box my={2} px={1}>
+            <Typography level="h2">Manage Communities</Typography>
+            <Typography level="body-md" color="neutral">
+              Oversee and optimize your community spaces
+            </Typography>
+          </Box>
+
+          <Stack direction={{ xs: 'column-reverse', md: 'row' }} spacing={1}>
+            <Card sx={{ 
+              width: {xs: '95%', md: '70%'}, 
+              p: 3,
+              minWidth: '70%', 
+              maxHeight: 'auto'
+            }}>
+              <Box sx={{
+                display: 'flex', 
+                flexDirection: 'row',
+              }}> 
+                {selectedCommunityInfo.community_info.icon ? 
+                  <Avatar src={`http://localhost:8000${selectedCommunityInfo.community_info.icon}`}/> : 
+                  <Avatar>{selectedCommunityInfo?.community_info.name?.[0]}</Avatar>
+                }
+                <Box ml={1}>
+                  <Typography level="title-lg" sx={{marginBottom: 0}}>
+                    {selectedCommunityInfo.community_info.name}
+                  </Typography>
+                  <Box sx={{display: 'flex', flexDirection: 'row'}}>
+                    <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
+                      {selectedCommunityInfo.community_info.members_count} members
+                    </Typography>
+                    <Typography 
+                      startDecorator={<CalendarMonthRoundedIcon/>}
+                      level="body-xs"
+                    >
+                      Created on {new Date(selectedCommunity.creation_date).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                  <Typography color='neutral' level="body-xs">
+                    Total growth: 
+                    <Typography 
+                      color="success" 
+                      level="body-xs" 
+                      startDecorator={<TrendingUpRoundedIcon/>}
+                    > 
+                      50% from last day 
+                    </Typography>
+                  </Typography>
+                  <Box>
+                    {selectedCommunityInfo.community_info.tags.map(tag => (
+                      <Chip 
+                        key={tag.id}
+                        variant="soft"
+                        color='primary'
+                        size='sm' 
+                        startDecorator={
+                          <Typography
+                            component="span"
+                            sx={{ 
+                              fontFamily: 'Material Icons',
+                              fontSize: '14px',
+                              color: 'inherit',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            {tag.icon}
+                          </Typography>
+                        } 
+                        sx={{borderRadius: 'sm', m: 0.5}}
+                      >
+                        {tag.name}
+                      </Chip>
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
+
+              <Tabs 
+                value={tabIndex}
+                onChange={(event, value) => setTabIndex(value)}
                 sx={{
-                    borderRadius: 'md',
-                    
-        [`& .${accordionClasses.root}`]: {
-            marginTop: '0.5rem',
-            transition: '0.2s ease, background-color 0.4 ease, transform 0.2 ease',
-            '& button:not([aria-expanded="true"])': {
-              transition: '0.2s ease',
-              paddingBottom: '0.625rem',
-            },
-            '& button:hover': {
-              background: 'transparent'
-            },
-            
-            '& button:active': {
-                backgroundColor: 'background.level1',
-                borderRadius: 'md'
-            }
-          }
+                  borderRadius: 'md',
+                  [`& .${tabClasses.root}`]: {
+                    zIndex: 1,
+                    transition: 'transform 0.2s ease, background-color 0.2s ease',
+                    mx: 0.5,
+                    paddingLeft: 1,
+                    paddingRight: 1,
+                    height: 0.1,
+                    borderTopLeftRadius: '5px',
+                    borderTopRightRadius: '5px',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                    },
+                    '&[aria-selected="true"]': {
+                      bgcolor: 'primary.softBgColor',
+                      color: 'primary.softColor',
+                      transition: 'all 0.5 ease'
+                    },
+                  },
                 }}
-                variant="plain"
-                transition="0.2s">
-                {/* Filters for communtites */}
+              >
+                <TabList>
+                  <Tab>
+                    <HomeRoundedIcon sx={{fontSize: 20}} />
+                    <Typography level='title-sm'>General</Typography>
+                  </Tab>
+                  <Tab>
+                    <SettingsRoundedIcon sx={{fontSize: 20}} />
+                    <Typography level='title-sm'>Settings</Typography>
+                  </Tab>
+                  <Tab>
+                    <DnsRoundedIcon sx={{fontSize: 20}} />
+                    <Typography level='title-sm'>Platforms</Typography>
+                  </Tab>
+                  <Tab>
+                    <QueryStatsRoundedIcon sx={{fontSize: 20}} />
+                    <Typography level='title-sm'>Stats</Typography>
+                  </Tab>
+                  <Tab>
+                    <MailRoundedIcon sx={{fontSize: 20}} />
+                    <Typography level='title-sm'>Posts</Typography>
+                  </Tab>
+                </TabList>
 
-                <Accordion>
-                    <AccordionSummary>
-                        <Avatar color="primary">
-                          <PeopleRoundedIcon sx={{fontSize: 24}} />
-                        </Avatar>
-                        <ListItemContent>
+                <TabPanel value={0} sx={{maxHeight: '200px', overflowY: 'auto'}}>
+                  <GeneralTabContent />
+                </TabPanel>
+
+                <TabPanel value={1}>
+                  <FormControl sx={{my: 1}}>
+                    <AccordionGroup
+                      color="neutral"
+                      size="sm"
+                      sx={{
+                        borderRadius: 'md',
+                        [`& .${accordionClasses.root}`]: {
+                          marginTop: '0.5rem',
+                          transition: '0.2s ease, background-color 0.4 ease, transform 0.2 ease',
+                          '& button:not([aria-expanded="true"])': {
+                            transition: '0.2s ease',
+                            paddingBottom: '0.625rem',
+                          },
+                          '& button:hover': {
+                            background: 'transparent'
+                          },
+                          '& button:active': {
+                            backgroundColor: 'background.level1',
+                            borderRadius: 'md'
+                          }
+                        }
+                      }}
+                      variant="plain"
+                      transition="0.2s"
+                    >
+                      <Accordion>
+                        <AccordionSummary>
+                          <Avatar color="primary">
+                            <PersonIcon sx={{fontSize: 24}} />
+                          </Avatar>
+                          <ListItemContent>
                             <Typography level="title-md">Features for Members</Typography>
-                            <Typography level="body-sm">Change experience for Members of your community </Typography>
-                        </ListItemContent>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                     <List sx={{my: 1}}>
-                      <ListItem>
-                        <ListItemContent>
-                        <Checkbox label="Allow to chat with Neural GPT models" size='sm' my={0} p={0} />
-                        <FormHelperText>Members of your community will use command /conversations to chat with Neural GPT models and ask questions using Bozenka.</FormHelperText>
-                        </ListItemContent>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemContent>
-                          <Checkbox label="Allow to generate images using Bozenka" size='sm' />
-                          <FormHelperText>Members of your community will use command /imagine to start generation of images using diffusion neural models</FormHelperText>
-                        </ListItemContent>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemContent>
-                          <Checkbox label="Enable custom welcome messages from Bozenka" size='sm' />
-                          <FormHelperText>Bozenka will met new joined members with own custom message :)</FormHelperText>
-                        </ListItemContent>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemContent>
-                          <Checkbox label="Enable bridges from different social platforms." size='sm' />
-                          <FormHelperText>Bozenka will duplicate some messages of your community from one social platform in other channels of other social platform</FormHelperText>
-                        </ListItemContent>
-                      </ListItem>
-                      </List>
-                    </AccordionDetails>
-                </Accordion>
-                <Accordion>
-                    <AccordionSummary>
-                        <Avatar color="primary">
-                          <AccessibilityNewRoundedIcon sx={{fontSize: 24}}/>
-                        </Avatar>
-                        <ListItemContent>
+                            <Typography level="body-sm">
+                              Change experience for Members of your community
+                            </Typography>
+                          </ListItemContent>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <List sx={{my: 1}}>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Allow to chat with Neural GPT models" size='sm' my={0} p={0} />
+                                <FormHelperText>
+                                  Members of your community will use command /conversations to chat with Neural GPT models and ask questions using Bozenka.
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Allow to generate images using Bozenka" size='sm' />
+                                <FormHelperText>
+                                  Members of your community will use command /imagine to start generation of images using diffusion neural models
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Enable custom welcome messages from Bozenka" size='sm' />
+                                <FormHelperText>
+                                  Bozenka will met new joined members with own custom message :)
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Enable bridges from different social platforms." size='sm' />
+                                <FormHelperText>
+                                  Bozenka will duplicate some messages of your community from one social platform in other channels of other social platform
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion>
+                        <AccordionSummary>
+                          <Avatar color="primary">
+                            <AccessibilityNewRoundedIcon sx={{fontSize: 24}}/>
+                          </Avatar>
+                          <ListItemContent>
                             <Typography level="title-md">Features for Administration</Typography>
-                            <Typography level="body-sm">Improve your commmunity administration experience by this features.</Typography>
+                            <Typography level="body-sm">
+                              Improve your commmunity administration experience by this features.
+                            </Typography>
+                          </ListItemContent>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <List sx={{my: 1}}>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Enable statistics" size='sm' />
+                                <FormHelperText>
+                                  Bozenka will collect statistics to show it on your dashboard and community control page
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Enable Knowledge Library" size='sm' />
+                                <FormHelperText>
+                                  Bozenka will give abillity to create Knowledge Library, where you can publish your tutorials and rules of your community.
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                            <ListItem>
+                              <ListItemContent>
+                                <Checkbox label="Enable Moderation" size='sm' />
+                                <FormHelperText>
+                                  Bozenka will be able to ban, mute and kick users by your decision and decision of your administration
+                                </FormHelperText>
+                              </ListItemContent>
+                            </ListItem>
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+                    </AccordionGroup>
+                  </FormControl>
+                </TabPanel>
+
+                <TabPanel value={2}>
+                  <List>
+                    {selectedCommunityInfo?.connection_data?.map((response, index) => (
+                      <ListItem 
+                        key={index}
+                        sx={{
+                          borderRadius: 'lg', 
+                          p: 1, 
+                          my: 1
+                        }} 
+                        variant='outlined'
+                      >
+                        <ListItemDecorator sx={{m: 1}}>
+                          <LinkIcon sx={{fontSize: 40}}/>
+                        </ListItemDecorator>
+                        <ListItemContent>
+                          <Typography level="title-md">
+                            {response.platform}
+                          </Typography>
+                          <Box sx={{display: 'flex', flexDirection: 'row'}}>
+                            <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
+                              {response.members_count} Members
+                            </Typography>
+                            <Typography 
+                              startDecorator={<CalendarMonthRoundedIcon/>}
+                              mr={1}
+                              level="body-xs"
+                            >
+                              Created on {new Date(response.creation_date).toLocaleDateString()}
+                            </Typography>
+                          </Box>
+                          <Typography 
+                            level="body-xs"
+                            startDecorator={<AlternateEmailRoundedIcon mr={0}/>}
+                          >
+                            {response.name}
+                          </Typography>
                         </ListItemContent>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <List sx={{my: 1}}>
-                        <ListItem>
-                          <ListItemContent>
-                            <Checkbox label="Enable statistics" size='sm' />
-                            <FormHelperText>Bozenka will collect statistics to show it on your dashboard and community control page</FormHelperText>
-                          </ListItemContent>
-                        </ListItem>
-                        <ListItem>
-                          <ListItemContent>
-                            <Checkbox label="Enable Knowledge Library" size='sm' />
-                            <FormHelperText>Bozenka will give abillity to create Knowledge Library, where you can publish your tutorials and rules of your community.</FormHelperText>
-                          </ListItemContent>
-                        </ListItem>
-                        <ListItem>
-                         <ListItemContent>
-                            <Checkbox label="Enable Moderation" size='sm' />
-                            <FormHelperText>Bozenka will be able to ban, mute and kick users by your decision and decision of your administration</FormHelperText>
-                          </ListItemContent>
-                        </ListItem>
-                      </List>
-                    </AccordionDetails>
-                </Accordion>
-            </AccordionGroup>
-            </FormControl>
-            
-          </TabPanel>
-          <TabPanel value={2}>
-                <List>
-                  <ListItem sx={{
-                    borderRadius: 'lg', 
-                    p: 1, my: 1}} 
-                  variant='outlined'>
-                    <ListItemDecorator sx={{m: 1}}>
-                      <LinkIcon sx={{fontSize: 40}}/>
-                    </ListItemDecorator>
-                    <ListItemContent>
-                      <Typography level="title-md">
-                        Telegram
-                      </Typography>
-                      <Box sx={{display: 'flex', flexDirection: 'row'}}>
-                        <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
-                          100 Members
-                        </Typography>
-                        <Typography 
-                          startDecorator={<CalendarMonthRoundedIcon/>}
-                          mr={1}
-                          level="body-xs">
-                          Created on 9th September, 1999
-                        </Typography>
-                      </Box>
-                      <Typography 
-                          level="body-xs"
-                          startDecorator={<AlternateEmailRoundedIcon mr={0}/>}
-                        >
-                          testingname
-                      </Typography>
-                    </ListItemContent>
-                    <IconButton sx={{mr: 2, transition: 'all 0.3s ease'}}>
-                      <DeleteRoundedIcon/>
-                    </IconButton>
-                  </ListItem>
-                
-                  
-                </List>
-          </TabPanel>
-          <TabPanel value={3} >
-          <TestChart sx={{height: 10}} data={data} displayData={displayData} />
-          </TabPanel>
-          <TabPanel value={4}>
-            </TabPanel>
-        </Tabs>
-      </Card>
+                        <IconButton sx={{mr: 2, transition: 'all 0.3s ease'}}>
+                          <DeleteRoundedIcon/>
+                        </IconButton>
+                      </ListItem>
+                    ))}
+                    {(!selectedCommunityInfo?.connection_data || selectedCommunityInfo.connection_data.length === 0) && (
+                                  <Typography level="body-lg" textAlign="center">
+                                  No connections available
+                                </Typography>
+                    )}
+                  </List>
+                </TabPanel>
 
-      {/* Community List on the Right */}
-      <Card sx={{
-        p: 2,
-        width: { xs: '97%', md: '250px' },
-        maxHeight: { xs: '300px', md: 'auto' },
-        overflowY: 'auto'
-      }}>
-        <Box sx={{ position: 'sticky', 
-                    top: 0, 
-                    bgcolor: 'background.surface', 
-                    zIndex: 2,
-                    p: 1
-        }}>
-          <Typography level="title-lg" mb={1}>
-            Your Communities
-          </Typography>    
-          <Input
-              size="sm"
-              placeholder="Search communities..."
-              startDecorator={<SearchIcon />}
-              sx={{ mb: 2 }}
-            />   
-        </Box>
+                <TabPanel value={3}>
+                  <TestChart sx={{height: 10}} data={data} displayData={displayData} />
+                </TabPanel>
 
-        <List>
-          {communities.map((community) => (
-            <ListItem key={community.id}>
-              <ListItemButton sx={{my: 0.1, borderRadius: 'md', 
-                transition: 'background 0.3s ease'
+                <TabPanel value={4}>
+                  <PostsTabContent />
+                </TabPanel>
+              </Tabs>
+            </Card>
+
+            <Card sx={{
+              p: 2,
+              width: { xs: '97%', md: '250px' },
+              maxHeight: { xs: '300px', md: 'auto' },
+              overflowY: 'auto'
+            }}>
+              <Box sx={{ 
+                position: 'sticky', 
+                top: 0, 
+                bgcolor: 'background.surface', 
+                zIndex: 2,
+                p: 1
               }}>
-                <ListItemDecorator>
-                  <Avatar>{community.avatar}</Avatar>
-                </ListItemDecorator>
-                <ListItemContent sx={{mx: 1}}>
-                  <Typography level='title-md'>
-                    {community.name}
-                  </Typography>
-                  <Typography level='body-xs'>
-                    {community.name}
-                  </Typography>
-                </ListItemContent>
-                </ListItemButton>
-            </ListItem>
-            
-          ))}
-        </List>
-      </Card>
-    </Stack>
+                <Typography level="title-lg" mb={1}>
+                  Your Communities
+                </Typography>
+                <Input
+                  size="sm"
+                  placeholder="Search communities..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  startDecorator={<SearchIcon />}
+                  sx={{ mb: 2 }}
+                />
+              </Box>
+              <List>
+                {filteredCommunities.map((community) => (
+                  <ListItem key={community.id}>
+                    <ListItemButton
+                      sx={{ 
+                        my: 0.1, 
+                        borderRadius: 'md', 
+                        transition: 'background 0.3s ease',
+                        '&:hover': {
+                          bgcolor: 'background.level1'
+                        },
+                        ...(selectedCommunity?.id === community.id && {
+                          bgcolor: 'background.level2'
+                        })
+                      }}
+                      onClick={() => handleCommunitySelect(community)}
+                    >
+                      <ListItemDecorator>
+                        {community.icon ? 
+                          <Avatar src={`http://localhost:8000${community.icon}`}/> : 
+                          <Avatar>{community?.name?.[0]}</Avatar>
+                        }
+                      </ListItemDecorator>
+                      <ListItemContent sx={{ mx: 1 }}>
+                        <Typography level='title-md'>
+                          {community.name}
+                        </Typography>
+                        <Typography level='body-xs'>
+                          {community.short_description}
+                        </Typography>
+                      </ListItemContent>
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Card>
+          </Stack>
+        </>
+      )}
     </>
   );
 }
@@ -1369,26 +1659,42 @@ export function DashboardControlCommunity() {
 * React component (Page) for controlling the account in dashboard.
 * @returns {JSX.Element} - The rendered component.
 */
+
 export function DashboardControlAccount() {
-
-  // Current active tab ???
   const [activeTab, setActiveTab] = React.useState(0);
+  const api = useApi();
+  const [accountInfo, setAccountInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Base URL for avatar
+  const BASE_URL = 'http://127.0.0.1:8000';
 
-  // Mock user profile data, being replaced in future
-  const userProfile = {
-    name: "John Doe",
-    email: "john@example.com",
-    avatar: "https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90",
-    role: "Community Manager",
-    joinDate: "September 2023",
-    bio: "Passionate about building and growing online communities",
-    socialLinks: {
-      telegram: "@johndoe",
-      vk: '@johndoe',
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      if (isMounted && !accountInfo) {
+        try {
+          const info = await api.getAccountInfo();
+          if (isMounted) {
+            setAccountInfo(info);
+            console.log(info);
+          }
+        } catch (error) {
+          console.error('Failed to fetch account info:', error);
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }
+      }
     }
-  };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [api, accountInfo]);
 
-  // Styles for inputs.
+  // Styles for inputs
   const inputStyles = {
     width: '100%',
     '--Input-focusedThickness': '1px',
@@ -1420,7 +1726,20 @@ export function DashboardControlAccount() {
     },
   };
 
+  if (loading) {
+    return <CircularProgress />;
+  }
 
+  // Get avatar URL or fallback to default
+  const getAvatarUrl = () => {
+    if (!accountInfo?.image) return null;
+    return `${BASE_URL}${accountInfo.image}`;
+  };
+
+  // Get display name with fallbacks
+  const getDisplayName = () => {
+    return accountInfo?.display_name || accountInfo?.username || 'Anonymous User';
+  };
 
   return (
     <Box sx={{ py: 2, px: { xs: 2, md: 4 } }}>
@@ -1435,7 +1754,7 @@ export function DashboardControlAccount() {
         }}
       >
         <Avatar
-          src={userProfile.avatar}
+          src={getAvatarUrl()}
           size="xs"
           sx={{ width: 120, height: 120 }}
         />
@@ -1444,21 +1763,16 @@ export function DashboardControlAccount() {
             display: 'flex', 
             justifyContent: {md: 'space-between', xs: 'center'},
             alignItems: 'flex-start',
-            
             textAlign: {xs: 'center', md: 'left'},
             mb: 2,
           }}>
-            <Box sx={{
-            }}>
-              <Typography level="h3">{userProfile.name}</Typography>
+            <Box>
+              <Typography level="h3">{getDisplayName()}</Typography>
               <Typography level="body-sm" color="neutral">
-                {userProfile.role}
+                {accountInfo?.status || 'No status set'}
               </Typography>
             </Box>
           </Box>
-          <Typography level="body-md" sx={{ mb: 2 }}>
-            {userProfile.bio}
-          </Typography>
         </Box>
       </Card>
 
@@ -1473,18 +1787,15 @@ export function DashboardControlAccount() {
             mx: 0.5,
             paddingLeft: 1,
             paddingRight: 1,
-            
             borderTopLeftRadius: '5px',
             borderTopRightRadius: '5px',
             '&:hover': {
               transform: 'scale(1.05)',
-              
             },
             '&[aria-selected="true"]': {
               bgcolor: 'primary.softBgColor',
               color: 'primary.softColor',
               transition: 'all 0.5 ease'
-
             },
           },
         }}
@@ -1527,11 +1838,24 @@ export function DashboardControlAccount() {
             <Grid container spacing={3}>
               <Grid xs={12} md={6}>
                 <FormControl>
-                  <FormLabel>Full Name</FormLabel>
-                  <Input sx={inputStyles} 
-                          startDecorator={<PersonIcon/>}
-                          placeholder="Enter your name (can be not real)"
-                          defaultValue={userProfile.name} />
+                  <FormLabel>Username</FormLabel>
+                  <Input 
+                    sx={inputStyles} 
+                    startDecorator={<PersonIcon/>}
+                    placeholder="Enter your username"
+                    defaultValue={accountInfo?.username}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid xs={12} md={6}>
+                <FormControl>
+                  <FormLabel>Display Name</FormLabel>
+                  <Input 
+                    sx={inputStyles} 
+                    startDecorator={<PersonIcon/>}
+                    placeholder="Enter your display name"
+                    defaultValue={accountInfo?.display_name}
+                  />
                 </FormControl>
               </Grid>
               <Grid xs={12} md={6}>
@@ -1541,13 +1865,18 @@ export function DashboardControlAccount() {
                     startDecorator={<MailRoundedIcon/>}
                     placeholder="Enter your email"
                     sx={inputStyles}
-                    defaultValue={userProfile.email} />
+                    defaultValue={accountInfo?.email}
+                  />
                 </FormControl>
               </Grid>
               <Grid xs={12}>
                 <FormControl>
-                  <FormLabel>Bio</FormLabel>
-                  <TextArea sx={inputStyles} defaultValue={userProfile.bio} />
+                  <FormLabel>Status</FormLabel>
+                  <TextArea 
+                    sx={inputStyles} 
+                    placeholder="Set your status"
+                    defaultValue={accountInfo?.status}
+                  />
                 </FormControl>
               </Grid>
             </Grid>
