@@ -15,6 +15,7 @@ class User(AbstractUser):
     display_name = models.CharField(max_length=30, null=True, blank=True, unique=False)
     password = models.CharField(max_length=128, null=False)
     image = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    status = models.CharField(max_length=50, null=True, blank=True, default="No status there is yet")
 
 
 class Tag(models.Model):
@@ -84,6 +85,48 @@ class Community(models.Model):
     class Meta:
         verbose_name = _("Community")
         verbose_name_plural = _("Communities")
+
+
+class CommunityConnection(models.Model):
+    """
+    Connection of community on social platform
+    """
+
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.CASCADE,
+        verbose_name=_("Community")
+    )
+
+    platform = models.TextField(
+        blank=False,
+        null=False,
+        verbose_name=_("Platform of connection")
+    )
+
+    name = models.TextField(
+        blank=False,
+        null=False,
+        verbose_name=_("Name of Connection")
+    )
+    creation_date = models.DateTimeField(
+        verbose_name=_("Creation date"),
+        auto_now_add=True,
+        editable=False,
+    )
+
+    link = models.URLField(
+        blank=False,
+        null=False,
+        verbose_name=_("Link of Connection")
+    )
+
+    members_count = models.IntegerField(
+        blank=False,
+        null=False,
+        verbose_name=_("Count of Members on Connection")
+    )
+
 
 
 class CommunityGrowth(models.Model):

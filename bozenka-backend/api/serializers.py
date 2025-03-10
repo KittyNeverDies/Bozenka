@@ -4,9 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import User, Community, Tag, CommunityGrowth, CommunityER, Post, CommunityManager, LatestPostView, \
-    SocialLink
-
-
+    SocialLink, CommunityConnection
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -53,7 +51,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'display_name', 'image')
+        fields = ('id', 'username', 'email', 'display_name', 'image', 'status')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -78,6 +76,15 @@ class PublicCommunitySerializer(serializers.ModelSerializer):
                   'creation_date',
                   'tags', 'icon', 'members_count')
 
+
+
+class CommunityConnectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for connections between communities.
+    """
+    class Meta:
+        model = CommunityConnection
+        fields = ('platform', 'name', 'link', 'members_count', 'creation_date')
 
 
 class PrivateCommunitySerializer(serializers.ModelSerializer):

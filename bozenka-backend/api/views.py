@@ -5,10 +5,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Community, Tag, CommunityGrowth, CommunityER, CommunityManager, SocialLink, Post, LatestPostView
+from .models import Community, Tag, CommunityGrowth, CommunityER, CommunityManager, SocialLink, Post, LatestPostView, \
+    CommunityConnection
 from .serializers import RegisterSerializer, LoginSerializer, PublicCommunitySerializer, TagSerializer, \
     CommunityGrowthSerializer, CommunityERSerializer, CommunityManagerSerializer, PostSerializer, SocialLinkSerializer, \
-    LatestPostViewSerializer, UserSerializer
+    LatestPostViewSerializer, UserSerializer, CommunityConnectionSerializer
 
 
 class AuthViews(viewsets.ViewSet):
@@ -80,7 +81,7 @@ class AccountViews(viewsets.ModelViewSet):
     ViewsSet for accessing user account information of bozenka platform.
     Gives ability to get information about user with authentication.
     """
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def account(self, request) -> Response:
@@ -117,7 +118,7 @@ class AccountViews(viewsets.ModelViewSet):
             return Response({'message': 'Failed to update.', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
-    def update_accounts(self, request):
+    def update_password(self, request):
         """
         View for updating user information
         :param request: Request object
@@ -182,9 +183,63 @@ class PrivateCommunityViews(viewsets.ViewSet):
         """
         user = request.user
         managers_roles = CommunityManager.objects.filter(user=user)
-        communities = [PublicCommunitySerializer(manager_role.community) for manager_role in managers_roles]
+        communities = [PublicCommunitySerializer(manager_role.community).data for manager_role in managers_roles]
 
         return Response(communities, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def community(self, request, community_id=None) -> Response:
+        """
+        View for getting community.
+        :param request: Request object
+        :return: Response object
+        """
+        print(community_id)
+
+        # Validation of community_id parameter
+        if community_id is None or not is_valid_uuid(community_id):
+            return Response({'message': 'Community id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not Community.objects.filter(id=community_id).exists():
+            return Response({'message': 'Community not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        community = Community.objects.get(id=community_id)
+
+        # Get all data about community to show it.
+        growth_stats = CommunityGrowth.objects.filter(community=community).order_by('-date')
+        er_stats = CommunityER.objects.filter(community=community).order_by('-date')
+        managers = CommunityManager.objects.filter(community=community)
+        social_links = SocialLink.objects.filter(community=community)
+        posts = Post.objects.filter(community=community).order_by('-created_at')
+        latest_post_views = LatestPostView.objects.filter(community=community, post=posts[0]) if posts else []
+        connection = CommunityConnection.objects.filter(community=community)
+
+        # Format data for response
+        growth_data = [CommunityGrowthSerializer(stat).data for stat in growth_stats]
+        er_data = [CommunityERSerializer(stat).data for stat in er_stats]
+        managers_data = [CommunityManagerSerializer(manager).data for manager in managers]
+        social_links_data = [SocialLinkSerializer(social_link).data for social_link in social_links]
+        posts_data = [PostSerializer(post).data for post in posts]
+        latest_post_views_data = [LatestPostViewSerializer(latest_post_view).data
+                                  for latest_post_view in latest_post_views]
+        connection_data = [CommunityConnectionSerializer(connection).data for connection in connection]
+
+
+        serializer = PublicCommunitySerializer(community)
+        community_data = {
+            'community_info': serializer.data,
+            'growth_stats': growth_data,
+            'er_stats': er_data,
+            'managers': managers_data,
+            'social_links': social_links_data,
+            'posts': posts_data,
+            'latest_post_views': latest_post_views_data,
+            'connection_data': connection_data,
+
+        }
+
+        return Response(community_data, status=status.HTTP_200_OK)
+
+
 
     @action(detail=False, methods=['post'])
     def update_community_base_information(self, request, community_id=None) -> Response | None:
@@ -195,7 +250,7 @@ class PrivateCommunityViews(viewsets.ViewSet):
         """
         user = request.user
 
-        if community_id is None or is_valid_uuid(community_id):
+        if community_id is None or not is_valid_uuid(community_id):
             return Response({'message': 'Community id is required.'}, status=status.HTTP_400_BAD_REQUEST)
         elif not Community.objects.filter(id=community_id).exists():
             return Response({'message': 'Community not found.'}, status=status.HTTP_404_NOT_FOUND)
@@ -288,7 +343,6 @@ class PublicCommunityViews(viewsets.ViewSet):
         :param community_id: Community id
         :return: Response object
         """
-        print(community_id)
 
         # Validation of community_id parameter
         if community_id is None or not is_valid_uuid(community_id):

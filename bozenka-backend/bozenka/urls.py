@@ -16,13 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 
-from api.views import PublicCommunityViews, TagViews, AuthViews, PrivateCommunityViews
+from api.views import PublicCommunityViews, TagViews, AuthViews, PrivateCommunityViews, AccountViews
 
 urlpatterns = [
     # Administration
@@ -34,14 +34,23 @@ urlpatterns = [
     path('communities/<str:community_id>/', PublicCommunityViews.as_view({'get': 'retrieve'}), name='community_detail'),
     path('tags/', TagViews.as_view({'get': 'list'}), name='tags'),
     path('private/communities/', PrivateCommunityViews.as_view({'get': 'communities'}), name='private_communities'),
+    path('private/communities/<str:community_id>/', PrivateCommunityViews.as_view({'get': 'community'}), name='private_community_detail'),
     path('private/communities/<str:community_id>/update/base', PrivateCommunityViews.as_view({'post': 'update_community_base_information'}),
          name='private_community_update'),
     path('private/communities/<str:community_id>/delete/',
          PrivateCommunityViews.as_view({'post': 'delete_community'}), name='private_community_delete'),
 
+    # Authenticated user operations
+    path('private/user/account/', AccountViews.as_view({'get': 'account'}), name='private_user'),
+    path('private/user/account/update', AccountViews.as_view({'post': 'update_accounr'}), name='private_user_update'),
+    path('private/user/account/update_password', AccountViews.as_view({'post': 'update_password'}), name='private_user_password'),
+
     # Authentication
     path('auth/register', AuthViews.as_view({'post': 'register'}), name='auth_register'),
     path('auth/login', AuthViews.as_view({'post': 'login'}), name='auth_login'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 ]
