@@ -52,7 +52,7 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
     er: er_stats?.[index]?.er || 0, // Match ER with corresponding date
   }));
 
-  // Display data configuration (mapped from server data)
+  // Display data configuration (should be mapped from server data)
   const displayData = {
     members: {
       title: "The number of community members",
@@ -68,7 +68,7 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
     }
   };
 
-  // Icons configuration (mapped from server data)
+  // Icons configuration (not mapped from server data)
   const icons = {
     members: <PeopleRoundedIcon />,
     views: <VisibilityRoundedIcon />,
@@ -207,7 +207,9 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
       </TabList>
       <Card sx={{marginTop: 2, paddingBottom: 6, height: '100%'}}>
         <TabPanel value={0}>
-          {community_description}
+          <Typography>
+            {community_description}
+          </Typography>
         </TabPanel>
         <TabPanel value={1}>
           <Typography level='h2' sx={{mb: 2}}>
