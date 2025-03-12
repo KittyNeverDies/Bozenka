@@ -3,6 +3,7 @@ from uuid import UUID
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Community, Tag, CommunityGrowth, CommunityER, CommunityManager, SocialLink, Post, LatestPostView, \
@@ -382,6 +383,21 @@ class PublicCommunityViews(viewsets.ViewSet):
         }
 
         return Response(community_data, status=status.HTTP_200_OK)
+
+
+class ServerStatusView(APIView):
+    """
+    APIView for checking server status
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        """
+        Get method for checking server status
+        :param request: Request object
+        :return: Response object
+        """
+        return Response({'message': 'Server is up and running.'}, status=status.HTTP_200_OK)
 
 
 class TagViews(viewsets.ViewSet):
