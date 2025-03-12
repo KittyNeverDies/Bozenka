@@ -160,3 +160,11 @@ dmypy.json
 **/migrations/**
 !**/migrations
 !**/migrations/__init__.py
+
+
+# Ignore backend static and media folders
+bozenka-backend/static/
+bozenka-backend/media/
+
+# Ignore SQL database
+bozenka-backend/db.sqlite3
