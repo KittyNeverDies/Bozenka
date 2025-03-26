@@ -1,21 +1,20 @@
-
 // src/hooks/useApi.js
-import { useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
-import CommunityApiClient from '../api/CommunityApiClient';
-import { method } from 'lodash';
+import {useCallback} from 'react';
+import {useAuth} from '../context/AuthContext';
+import BaseClientAPI from '../api/BaseClientAPI.js';
 
 export const useApi = () => {
     const { accessToken, refreshToken, updateTokens, logout } = useAuth();
-    const apiClient = new CommunityApiClient();
+    const apiClient = new BaseClientAPI();
 
     const handleRequest = useCallback(async (requestFunc) => {
         try {
             // First attempt with current access token
             console.log("Trying to make request")
-            const response = await requestFunc(accessToken);
-            return response;
+            return await requestFunc(accessToken);
         } catch (error) {
+            console.log("log out")
+            logout();
             if (error.message === 'Request failed with status 401' && refreshToken) {
                 try {
                     // Try to refresh the token
@@ -23,32 +22,32 @@ export const useApi = () => {
                     updateTokens(newTokens.access_token, newTokens.refresh_token);
 
                     // Retry the request with new token
-                    const response = await requestFunc(newTokens.access_token);
-                    return response;
+                    return await requestFunc(newTokens.access_token);
                 } catch (refreshError) {
                     // If refresh fails, log out the user
                     logout();
                     throw new Error('Session expired. Please login again.');
                 }
             }
+
             throw error;
         }
-    }, [accessToken, refreshToken, updateTokens, logout, apiClient]);
+    }, [accessToken, refreshToken, updateTokens, logout]);
 
     const makeAuthenticatedRequest = useCallback(async (endpoint, options = {}) => {
         return handleRequest(token => (apiClient.makeRequest(endpoint, token, options))
         );
-    }, [handleRequest, apiClient]);
+    }, [handleRequest]);
 
     // Wrap API methods with authentication
     const api = {
         login: apiClient.login.bind(apiClient),
         register: apiClient.register.bind(apiClient),
-        getPrivateCommunities: () => 
+        getPrivateCommunities: () =>
             makeAuthenticatedRequest('/private/communities/'),
-        getPrivateCommmunity: (communityId) =>
+        getPrivateCommunity: (communityId) =>
             makeAuthenticatedRequest(`/private/communities/${communityId}/`),
-        updateCommunityBaseInformation: (communityId, updatedData) => 
+        updateCommunityBaseInformation: (communityId, updatedData) =>
             makeAuthenticatedRequest(
                 `/private/communities/${communityId}/update/base`,
                 {
@@ -56,7 +55,7 @@ export const useApi = () => {
                     body: JSON.stringify({ updated_data: updatedData })
                 }
             ),
-        deleteCommunity: (communityId) => 
+        deleteCommunity: (communityId) =>
             makeAuthenticatedRequest(
                 `/private/communities/${communityId}/delete_community/`,
                 { method: 'GET' }
