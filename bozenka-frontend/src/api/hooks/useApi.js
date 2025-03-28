@@ -1,7 +1,7 @@
 // src/hooks/useApi.js
 import {useCallback} from 'react';
-import {useAuth} from '../context/AuthContext';
-import BaseClientAPI from '../api/BaseClientAPI.js';
+import {useAuth} from '../contexts/AuthContext.jsx';
+import BaseClientAPI from '../BaseClientAPI.js';
 
 export const useApi = () => {
     const { accessToken, refreshToken, updateTokens, logout } = useAuth();

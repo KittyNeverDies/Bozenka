@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { useApi } from './useApi.js';
 
 
 export const useAuthForm = (formType = 'login') => {
@@ -94,12 +94,17 @@ export const useAuthForm = (formType = 'login') => {
                 ? await api.login(formData.username, formData.password)
                 : await api.register(formData.username, formData.email, formData.password);
 
-            if (response.success) {
-                // Use AuthContext login function to securely store tokens
-                login(response.access_token, response.refresh_token);
-                
-                console.error(login)
+            if (response.error) {
+                setAlert({
+                    message: response.error,
+                    type: 'danger',
+                    useWaitAnimation: false,
+                    open: true
+                });
+                return;
+            }
 
+            if (response.success) {
                 setAlert({
                     message: `${formType === 'login' ? 'Login' : 'Registration'} successful! Redirecting...`,
                     type: 'success',
@@ -111,8 +116,14 @@ export const useAuthForm = (formType = 'login') => {
                 setTimeout(() => {
                     navigate('/dashboard');
                 }, 2000);
+                setTimeout(() => {
+                    login(response.access_token, response.refresh_token);
+                }, 1000)
+                // Use AuthContext login function to securely store tokens
+
             }
-        } catch (error) {
+        }
+        catch (error) {
             setAlert({
                 message: `${formType === 'login' ? 'Login' : 'Registration'} failed. Please try again.`,
                 type: 'danger',
