@@ -1,6 +1,6 @@
 // React related components
 import * as React from 'react';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 // Some React Router magic
 import { Outlet, Link, useLocation } from 'react-router-dom';
@@ -11,6 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // MUI Joy UI controls
 import CircularProgress from '@mui/joy/CircularProgress';
 import {FormControl, FormLabel, FormHelperText, List, ListItem, ListSubheader} from '@mui/joy';
+import Snackbar from '@mui/joy/Snackbar';
 import Card from '@mui/joy/Card';
 import Input from '@mui/joy/Input';
 import Box from '@mui/joy/Box';
@@ -24,9 +25,6 @@ import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab, { tabClasses } from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
-import Stepper from '@mui/joy/Stepper';
-import Step from '@mui/joy/Step';
-import StepIndicator from '@mui/joy/StepIndicator';
 import Accordion, { accordionClasses } from '@mui/joy/Accordion';
 import AccordionDetails from '@mui/joy/AccordionDetails';
 import AccordionGroup from '@mui/joy/AccordionGroup'; 
@@ -34,17 +32,14 @@ import AccordionSummary from '@mui/joy/AccordionSummary';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import Chip from '@mui/joy/Chip';
 import ListItemContent from '@mui/joy/ListItemContent';
-import AspectRatio from '@mui/joy/AspectRatio';
 import IconButton from '@mui/joy/IconButton';
 import Sheet from '@mui/joy/Sheet';
 import ListItemButton from '@mui/joy/ListItemButton';
 import Breadcrumbs from '@mui/joy/Breadcrumbs';
 import RadioGroup from '@mui/joy/RadioGroup';
 import Radio from '@mui/joy/Radio';
-import { FormControlLabel } from '@mui/material';
 import Checkbox from '@mui/joy/Checkbox';
-import TextArea from '@mui/joy/TextArea'; 
-
+import Textarea from '@mui/joy/Textarea';
 
 // Our own controls
 import TestChart from '../components/GrowthChart';
@@ -78,12 +73,15 @@ import MailRoundedIcon from '@mui/icons-material/MailRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
+import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRounded';
 
 // Authorization
-import { useAuth } from '../context/AuthContext';
-import { useApi } from '../hooks/useApi';
-import CommunityApiClient from '../api/CommunityApiClient';
+import { useAuth } from '../api/contexts/AuthContext.jsx';
+import { useApi } from '../api/hooks/useApi.js';
+import BaseClientAPI from '../api/BaseClientAPI.js';
+import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 
 
   
@@ -163,7 +161,10 @@ export function DashboardLayout(){
   const api = useApi();
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: ''
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -176,6 +177,10 @@ export function DashboardLayout(){
           }
         } catch (error) {
           console.error('Failed to fetch account info:', error);
+          setSnackbar({
+            open: true,
+            message: `Failed to fetch account info. Please try again later. ${error.message}`
+          });
         } finally {
           if (isMounted) {
             setLoading(false);
@@ -188,6 +193,14 @@ export function DashboardLayout(){
       isMounted = false;
     };
   }, [api, accountInfo]);
+
+  const handleSnackbarClose = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false
+    });
+  };
+
 
 
 
@@ -277,7 +290,7 @@ export function DashboardLayout(){
                   <CircularProgress size="sm" />
                 ) : (
               <>
-              {accountInfo.icon ? <Avatar src={`http://localhost:8000${accountInfo.icon}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
+              {accountInfo.icon ? <Avatar src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.icon}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
                <Box>
                   <>
                     <Typography level="h5" element="h5" fontWeight='bold'>
@@ -389,6 +402,17 @@ export function DashboardLayout(){
         <ColorModeToggle />
       </Box>
       </Box>
+        <Snackbar
+            variant="solid"
+            color="danger"
+            open={snackbar.open}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            startDecorator={<ErrorOutlinedIcon />}
+            autoHideDuration={6000}
+        >
+          {snackbar.message}
+        </Snackbar>
     </Sheet>
     )}
 
@@ -598,7 +622,7 @@ export function DashboardHomepage() {
       </Card>
       </Box>
       {/* Recent Activity Section */}
-      <Card sx={{mx: 3, width: 'auto', height: {'xs': 200, md: 'auto'}}}>
+      <Card sx={{mx: 3, width: 'auto', my: 2, height: {'xs': 200, md: 'auto'}}}>
         <Typography level="title-lg" sx={{ mb: 2 }}>
           Recent Activity
         </Typography>
@@ -793,7 +817,7 @@ export function DashboardCreateCommunity() {
 
             <FormControl>
               <FormLabel>Description</FormLabel>
-              <TextArea
+              <Textarea
                 name="description"
                 value={communityData.description}
                 onChange={handleInputChange}
@@ -1041,23 +1065,57 @@ export function DashboardControlCommunity() {
       [editForm]
     );
   
-  
+    
+  // Styles for inputs
+  const inputStyles = {
+    width: '100%',
+    '--Input-focusedThickness': '1px',
+    bgcolor: 'background.level0',
+    borderRadius: 'lg',
+    '&:hover': {
+      borderColor: 'background.level2',
+    },
+    '&:focus-within': {
+      borderColor: 'background.level2',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+    mb: 2,
+    py: 1,
+    px: 2,
+    fontSize: 'sm',
+    fontWeight: 'md',
+    transition: 'box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out',
+    '&::placeholder': {
+      color: 'neutral.500',
+      fontStyle: 'italic',
+    },
+    '&:disabled': {
+      bgcolor: 'neutral.100',
+      color: 'neutral.400',
+      cursor: 'not-allowed',
+    },
+  };
+    
   const api = useApi();
   const [privateCommunities, setPrivateCommunities] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Data fetching effect
+  // Data fetching
   useEffect(() => {
+
     let isMounted = true;
     const fetchData = async () => {
       if (isMounted && !privateCommunities) {
+        console.log("Fetching private communities...");
         try {
           const info = await api.getPrivateCommunities();
           if (isMounted) {
             setPrivateCommunities(info);
             if (info.length > 0) {
               setSelectedCommunity(info[0]);
-              const communityInfo = await api.getPrivateCommmunity(info[0].id);
+              const communityInfo = await api.getPrivateCommunity(info[0].id);
               setSelectedCommunityInfo(communityInfo);
               setEditForm({
                 name: communityInfo.community_info.name,
@@ -1085,7 +1143,7 @@ export function DashboardControlCommunity() {
   // Event handlers
   const handleCommunitySelect = async(community) => {
     try {
-      const community_detailed = await api.getPrivateCommmunity(community.id);
+      const community_detailed = await api.getPrivateCommunity(community.id);
       setSelectedCommunity(community);
       setSelectedCommunityInfo(community_detailed);
       setEditForm({
@@ -1101,7 +1159,7 @@ export function DashboardControlCommunity() {
   const handleEditSubmit = async () => {
     try {
       await api.updateCommunityBaseInformation(selectedCommunity.id, editForm);
-      const updated = await api.getPrivateCommmunity(selectedCommunity.id);
+      const updated = await api.getPrivateCommunity(selectedCommunity.id);
       setSelectedCommunityInfo(updated);
       setIsEditing(false);
       const updatedCommunities = await api.getPrivateCommunities();
@@ -1121,27 +1179,32 @@ export function DashboardControlCommunity() {
   const GeneralTabContent = () => (
     <>
       {isEditing ? (
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 2, height: '100%' }}>
         <FormControl sx={{ mb: 2, width: '100%' }}>
           <FormLabel>Community Name</FormLabel>
           <Input
+            startDecorator={<BadgeRoundedIcon/>}
             value={editFormData.name}
             onChange={handleNameChange}
+            sx={inputStyles}
           />
         </FormControl>
         <FormControl sx={{ mb: 2, width: '100%' }}>
           <FormLabel>Short Description</FormLabel>
           <Input
+            startDecorator={<DescriptionRoundedIcon/>}
             value={editFormData.short_description}
             onChange={handleShortDescChange}
+            sx={inputStyles}
           />
         </FormControl>
         <FormControl sx={{ mb: 2, width: '100%' }}>
           <FormLabel>Full Description</FormLabel>
-          <TextArea
+          <Textarea
             minRows={3}
             value={editFormData.description}
             onChange={handleDescriptionChange}
+            sx={inputStyles}
           />
         </FormControl>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -1400,7 +1463,7 @@ export function DashboardControlCommunity() {
                   </Tab>
                 </TabList>
 
-                <TabPanel value={0} sx={{maxHeight: '200px', overflowY: 'auto'}}>
+                <TabPanel value={0} sx={{maxHeight: '1000px', overflowY: 'auto'}}>
                   <GeneralTabContent />
                 </TabPanel>
 
@@ -1488,7 +1551,7 @@ export function DashboardControlCommunity() {
                           <ListItemContent>
                             <Typography level="title-md">Features for Administration</Typography>
                             <Typography level="body-sm">
-                              Improve your commmunity administration experience by this features.
+                              Improve your community administration experience by this features.
                             </Typography>
                           </ListItemContent>
                         </AccordionSummary>
@@ -1605,10 +1668,11 @@ export function DashboardControlCommunity() {
                 <Input
                   size="sm"
                   placeholder="Search communities..."
+                  
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   startDecorator={<SearchIcon />}
-                  sx={{ mb: 2 }}
+                  sx={inputStyles}
                 />
               </Box>
               <List>
@@ -1872,7 +1936,7 @@ export function DashboardControlAccount() {
               <Grid xs={12}>
                 <FormControl>
                   <FormLabel>Status</FormLabel>
-                  <TextArea 
+                  <Textarea 
                     sx={inputStyles} 
                     placeholder="Set your status"
                     defaultValue={accountInfo?.status}
