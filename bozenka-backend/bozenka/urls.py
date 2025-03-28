@@ -57,20 +57,19 @@ urlpatterns = [
     path('private/user/account/update', AccountViews.as_view({'post': 'update_account'}), name='private_user_update'),
     path('private/user/account/update_password', AccountViews.as_view({'post': 'update_password'}), name='private_user_password'),
 
-
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Status view
     path('status/', ServerStatusView.as_view(), name='status_view'),
 
-    # Scheme
+    # Schemas view
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
 if settings.DEBUG:
+    # Handle static files during development
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
