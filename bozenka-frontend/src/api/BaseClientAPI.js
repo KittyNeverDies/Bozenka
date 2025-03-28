@@ -1,22 +1,21 @@
 /**
  * Class representing a Community API client.
  */
-class CommunityApiClient {
+class BaseClientAPI {
     /**
      * Create a CommunityApiClient.
      * @param {string} [baseUrl='http://localhost:8000'] - The base URL for the API.
      * @param {boolean} [useMockData=false] - Whether to use mock data for testing.
      */
-    constructor(baseUrl = 'http://localhost:8000', useMockData = false) {
-        // Basic data
+    constructor(baseUrl = import.meta.env.REACT_APP_API_URL || 'http://localhost:8000',
+                useMockData = false) {
         this.baseUrl = baseUrl;
         this.useMockData = useMockData;
-        this.refreshToken = null;
 
         // Rate limiting
         this.requestCount = 0;
         this.requestLimit = 100;
-        this.requestResetTime = Date.now() + 60000; // 1 minute window
+        this.requestResetTime = Date.now() + 60000;
     }
 
     /**
@@ -44,7 +43,6 @@ class CommunityApiClient {
             }
 
             const data = await response.json();
-
             return {
                 success: true,
                 message: data.message,
@@ -53,7 +51,7 @@ class CommunityApiClient {
             };
         } catch (error) {
             console.error('Login failed:', error);
-            throw error;
+            return { error: error.message };
         }
     }
 
@@ -83,7 +81,6 @@ class CommunityApiClient {
             }
 
             const data = await response.json();
-
             return {
                 success: true,
                 message: data.message,
@@ -92,7 +89,7 @@ class CommunityApiClient {
             };
         } catch (error) {
             console.error('Registration failed:', error);
-            throw error;
+            return { error: error.message };
         }
     }
 
@@ -110,17 +107,13 @@ class CommunityApiClient {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    refresh: refreshToken
-                })
+                body: JSON.stringify({ refresh: refreshToken })
             });
 
-
-            const data = await response.json();
-            return data;
+            return await response.json();
         } catch (error) {
             console.error('Token refresh failed:', error);
-            throw error;
+            return { error: error.message };
         }
     }
 
@@ -144,19 +137,18 @@ class CommunityApiClient {
     /**
      * Make a request to the API.
      * @param {string} endpoint - The API endpoint.
+     * @param {string} [authToken=null] - Authorization token
      * @param {Object} [options={}] - The request options.
-     * @param {number} [retryCount=3] - The number of times to retry the request.
      * @returns {Promise<Object>} - A promise that resolves to the response data.
      */
-    async makeRequest(endpoint,  authToken = null, options = {}, retryCount = 3) {
+    async makeRequest(endpoint, authToken = null, options = {}) {
         if (this.useMockData) {
             return this.getMockResponse(endpoint);
         }
 
-        this.checkRateLimit();
-
         try {
-            // Add authorization header if token exists
+            this.checkRateLimit();
+
             const headers = {
                 'Content-Type': 'application/json',
                 ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
@@ -168,22 +160,14 @@ class CommunityApiClient {
                 headers
             });
 
-            // Handle 401 Unauthorized - Token expired
-            if (response.status === 401 && retryCount > 0) {
-                await this.refreshAuthToken();
-                return this.makeRequest(endpoint, options, retryCount - 1);
-            }
-
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`);
             }
 
             return await response.json();
         } catch (error) {
-            if (retryCount > 0) {
-                return this.makeRequest(endpoint, options, retryCount - 1);
-            }
-            throw error;
+            console.error('Request failed:', error);
+            return { error: error.message };
         }
     }
 
@@ -202,7 +186,7 @@ class CommunityApiClient {
      */
     async getCommunity(communityId) {
         if (!communityId) {
-            throw new Error('Community ID is required');
+            return { error: 'Community ID is required' };
         }
         return this.makeRequest(`/communities/${communityId}/`);
     }
@@ -234,10 +218,14 @@ class CommunityApiClient {
      * @returns {Promise<Object>} - A promise that resolves to the response data.
      */
     async updateCommunityBaseInformation(communityId, updatedData, authToken) {
-        return this.makeRequest(`/private/communities/${communityId}/update_community_base_information/`, authToken, {
-            method: 'POST',
-            body: JSON.stringify({ updated_data: updatedData })
-        });
+        return this.makeRequest(
+            `/private/communities/${communityId}/update_community_base_information/`,
+            authToken,
+            {
+                method: 'POST',
+                body: JSON.stringify({ updated_data: updatedData })
+            }
+        );
     }
 
     /**
@@ -247,10 +235,12 @@ class CommunityApiClient {
      * @returns {Promise<Object>} - A promise that resolves to the response data.
      */
     async deleteCommunity(communityId, authToken) {
-        return this.makeRequest(`/private/communities/${communityId}/delete_community/`, authToken, {
-            method: 'GET'
-        });
+        return this.makeRequest(
+            `/private/communities/${communityId}/delete_community/`,
+            authToken,
+            { method: 'GET' }
+        );
     }
 }
 
-export default CommunityApiClient;
+export default BaseClientAPI;
