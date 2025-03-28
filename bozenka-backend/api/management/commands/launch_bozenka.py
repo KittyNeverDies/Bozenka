@@ -13,11 +13,17 @@ class Command(BaseCommand):
     help = 'Run Django server with bots'
 
     def handle(self, *args, **kwargs):
+        """
+        Handle command execution
+        """
+        
+        # Configure logging
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             datefmt='%m/%d/%Y %I:%M:%S %p',
             stream=sys.stdout
+            
         )
 
         # Load environment variables
@@ -27,9 +33,13 @@ class Command(BaseCommand):
         try:
             asyncio.run(self.run_all())
         except KeyboardInterrupt:
-            logging.info("We got Keyboard Interrupt error, probably due to CTRL+C, server shutting down or intervention to proccess")
+            logging.error("We got Keyboard Interrupt error, probably due to CTRL+C, server shutting down or intervention to proccess")
 
     async def launch_instances(self) -> None:
+        """
+        Launch instances of Bozenka.
+        Currently VK, Discord and Telegram bots.
+        """
         features = get_list_of_features()
 
         discord_task = asyncio.create_task(launch_discord_bot_instance(features))
@@ -39,6 +49,9 @@ class Command(BaseCommand):
         await asyncio.wait([telegram_task, vk_task, discord_task])
 
     async def run_server(self):
+        """
+        Run the Django server
+        """
         config = uvicorn.Config(
             "bozenka.asgi:application",
             host="127.0.0.1",  # Use localhost instead of 0.0.0.0
@@ -49,6 +62,9 @@ class Command(BaseCommand):
         await server.serve()
 
     async def run_all(self):
+        """
+        Run both the server and bots instances
+        """
         # Create tasks for both the server and bots
         server_task = asyncio.create_task(self.run_server())
         bots_task = asyncio.create_task(self.launch_instances())
