@@ -1,5 +1,6 @@
 // React stuff
 import * as React from 'react';
+import {useEffect, useState} from "react";
 import {Link} from 'react-router-dom';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -12,10 +13,7 @@ import Typography from '@mui/joy/Typography';
 import Tooltip from '@mui/joy/Tooltip';
 import IconButton from '@mui/joy/IconButton';
 import Drawer from '@mui/joy/Drawer';
-import Stack from '@mui/joy/Stack';
-import Button from '@mui/joy/Button';
 import Sheet from '@mui/joy/Sheet';
-import Divider from '@mui/joy/Divider';
 import ListItem from '@mui/joy/ListItem';
 import Chip from '@mui/joy/Chip';
 import ListItemButton from '@mui/joy/ListItemButton';
@@ -24,7 +22,6 @@ import ListSubheader from '@mui/joy/ListSubheader';
 import Avatar from '@mui/joy/Avatar';
 import ListItemDecorator from "@mui/joy/ListItemDecorator";
 import List from '@mui/joy/List';
-import { Radio, RadioGroup } from '@mui/joy';
 
 // Material UI icons
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
@@ -47,32 +44,93 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 // Our elements
 import ColorModeToggle from './ColorModeToggle';
+import {useApi} from "../api/hooks/useApi.js";
+import {useAuth} from "../api/contexts/AuthContext.jsx";
+import CircularProgress from "@mui/joy/CircularProgress";
+
 
 /**
  * @description A functional component that renders header for all pages.
  * @returns {JSX.Element}
  */
 export default function JoyHeader() {
-  /**
-  * @description Header for all pages in Joy UI Style.
-  * @type {JSX.Element}
-  */
+    /**
+    * @description Header for all pages in Joy UI Style.
+    * @type {JSX.Element}
+    */
+    const [openDrawer, setOpenDrawer] = React.useState(false);
+    const location = useLocation(); // Import useLocation from react-router-dom
+    const isDashboard = location.pathname.includes('/dashboard');
+    const isMobile = useMediaQuery('@media (max-width:1000px)'); // Use MUI's useMediaQuery
 
-  const [openDrawer, setOpenDrawer] = React.useState(false);
-  const location = useLocation(); // Import useLocation from react-router-dom
-  const isDashboard = location.pathname.includes('/dashboard');
-  const isMobile = useMediaQuery('@media (max-width:1000px)'); // Use MUI's useMediaQuery
+    const [loading, setLoading] = useState(true);
 
-  const toggleDrawer = (isOpen) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-    setOpenDrawer(isOpen);
-  };
+    const {isAuthenticated, logout} = useAuth();
 
-  
-  // Dashboard navigation buttons (moved from Dashboard.jsx)
-  const buttons = {
+    // Everything is need for getting account info;
+    const api = useApi();
+    const [accountInfo, setAccountInfo] = useState(null);
+
+
+    // Get current route path
+    const currentPath = location.pathname;
+
+    // Active item styles
+    const activeItemStyles = {
+        borderLeft: '2px solid',
+        '&:hover': {
+            backgroundColor: 'primary.softHoverBg',
+        },
+        '& .MuiListItemDecorator-root': {
+            color: 'primary.main',
+        },
+        '& .MuiTypography-root': {
+            color: 'primary.main',
+            fontWeight: 600,
+        }
+    };
+
+    // Common button styles
+    const buttonStyles = {
+        transition: 'all 0.2s ease',
+        my: 0.4,
+        '&.Mui-selected': activeItemStyles
+    };
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchData = async () => {
+            if (isMounted && !accountInfo) {
+                try {
+                    const info = await api.getAccountInfo();
+                    if (isMounted) {
+                        setAccountInfo(info);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch account info:', error);
+                } finally {
+                    if (isMounted) {
+                        setLoading(false);
+                    }
+                }
+            }
+        }
+        fetchData();
+        return () => {
+            isMounted = false;
+        };
+    }, [api, accountInfo]);
+
+    const toggleDrawer = (isOpen) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        setOpenDrawer(isOpen);
+    };
+
+
+    // Dashboard navigation buttons (moved from Dashboard.jsx)
+    const buttons = {
     'Communities': [
       {
         head: 'Manage communities',
@@ -95,19 +153,17 @@ export default function JoyHeader() {
         icon: <SettingsRoundedIcon />
       },
     ]
-  };
+    };
 
-  return (
+    return (
     <>
-    
-    {/* 
-        Joy header content.
-    */}
+
+    {/* Joy header content. */}
     <Box
       sx={{
         display: 'flex',
         height: '100%',
-        justifyContent: 'space-between', // Distribute space between logo and icons
+        justifyContent: 'space-between',
         textAlign: "center",
         alignItems: 'center',
         p: 2,
@@ -120,9 +176,7 @@ export default function JoyHeader() {
         zIndex: 1100,
       }}
     >
-
-      
-      {/* 
+      {/*
         Bozenka logotype
       */}
 
@@ -131,52 +185,17 @@ export default function JoyHeader() {
           Bozenka
         </Typography>
       </Link>
-
-      
-      {/* 
+      {/*
         Box of login & communities button
       */}
-      <Box sx={{ display: 'flex', alignItems: 'center' 
+      <Box sx={{ display: 'flex', alignItems: 'center'
       }}>
-
-      {/* 
-          Menu button
-
-                    <Tooltip title="Menu" color='primary' variant="soft" size="md" sx={{
-            boxShadow: 'none',
-            fontWeight: 'bold'                                                 
-          }}>
-            <IconButton
-            sx={{
-              transition: 'transform 0.2s ease, background-color 0.2s ease',
-              m: 0.5,
-              marginRight: 1.2,
-              '&:hover': {
-                transform: 'scale(1.05)',
-                bgcolor: 'primary.lightBg',
-                borderRadius: '',
-              },
-              '&:active': {
-                transform: 'scale(1.20)'
-              }
-            }}  
-            onClick={toggleLoginDrawer(true)} variant="plain">
-              <MenuIcon />
-            </IconButton>
-          </Tooltip>
-        */}
-
-        {
-          /* 
-            Menu button
-          */
-        }
-        {(!isDashboard && !isMobile || isMobile) && (
+          {(((!isDashboard && !isMobile) || isMobile) && isAuthenticated) && (
           <Tooltip title="Menu" color='primary' variant="soft" size="md" sx={{
             boxShadow: 'none',
             fontWeight: 'bold'
           }}>
-            <IconButton onClick={toggleDrawer(true)} 
+            <IconButton onClick={toggleDrawer(true)}
                 sx={{
                   transition: 'transform 0.2s ease, background-color 0.2s ease',
                   m: 0.5,
@@ -194,10 +213,11 @@ export default function JoyHeader() {
             </IconButton>
           </Tooltip>
        )}
-        {/* 
+        {/*
           Login button
         */}
-        <Tooltip title="Login" color='primary' variant="soft" size="md" sx={{
+
+          {!isAuthenticated && (<Tooltip title="Login" color='primary' variant="soft" size="md" sx={{
             boxShadow: 'none',
             fontWeight: 'bold'
           }}
@@ -217,15 +237,15 @@ export default function JoyHeader() {
               transform: 'scale(1.20)'
             }
             }}
-          
+
           variant="plain">
             <InputRoundedIcon/>
           </IconButton>
           </Link>
-        </Tooltip>
+        </Tooltip>)}
 
-        
-        {/* 
+
+        {/*
           Communities button
         */}
         <Tooltip title="Communities" color='primary' variant="soft" size="md" sx={{
@@ -233,7 +253,7 @@ export default function JoyHeader() {
             fontWeight: 'bold'
           }}>
           <Link to='/communities'>
-          <IconButton onClick={() => {}} 
+          <IconButton onClick={() => {}}
             sx={{
             transition: 'transform 0.2s ease, background-color 0.2s ease',
             m: 0.5,
@@ -253,13 +273,13 @@ export default function JoyHeader() {
         </Tooltip>
       </Box>
     </Box>
-    {/* 
+    {/*
        Drawer, that opens on menu button click.
     */}
-    
+
     <Drawer open={openDrawer} onClose={toggleDrawer(false)}>
 
-     
+
     <Sheet
               role="presentation"
               onClick={toggleDrawer(false)}
@@ -271,83 +291,81 @@ export default function JoyHeader() {
           }}
         >
         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2, p: 1}}>
-              <Avatar
-                src="https://images.unsplash.com/photo-1507833423370-a126b89d394b?auto=format&fit=crop&w=90"
-                size="lg"
-              />
-              <Box>
-                <Typography level="h5" element="h5" fontWeight='bold'>
-                  Welcome, user.
-                </Typography>
-                <Typography color='neutral' level="body-xs">
-            Total growth: <Typography color="success" level="body-xs" startDecorator={<TrendingUpRoundedIcon/>}> 50% from last day </Typography>
-          </Typography>     
-                <Typography level="body-xs">
-                  Have a nice day!
-                </Typography>
-              </Box>
+            {loading ? (
+                <CircularProgress size="sm" />
+            ) : (
+                <>
+                    {accountInfo.icon ? <Avatar src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.icon}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
+                    <Box>
+                        <>
+                            <Typography level="h5" element="h5" fontWeight='bold'>
+                                Welcome, {accountInfo?.display_name || accountInfo?.username || 'user'}
+                            </Typography>
+                            <Typography color='neutral' level="body-xs">
+                                {accountInfo?.email}
+                            </Typography>
+                            <Typography level="body-xs">
+                                Have a nice day!
+                            </Typography>
+                        </>
+                    </Box></>)}
         </Box>
         <Box sx={{px: 0.8}}>
-        <List
-              size="sm"
-              sx={{
-                '--ListItem-radius': '8px',
-                '--ListItemDecorator-size': '32px',
-              }}
-            >
-          <Link to="/dashboard/">
-          <ListItem key='home' sx={{
-                                my: 0.4,
-                              }} >
-                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
-                  <ListItemDecorator> 
-                    <HomeRoundedIcon /> 
-                  </ListItemDecorator>
-                  <ListItemContent>
-                      <Typography level='title-xs'>
-                          Home
-                      </Typography>
-                      <Typography level='body-xs'>
-                          Overivew of your Dashboard.
-                     </Typography>
-                   </ListItemContent>
-                  </ListItemButton>
-            </ ListItem>
-
+            <List
+                size="sm"
+                sx={{
+                    '--ListItem-radius': '8px',
+                    '--ListItemDecorator-size': '32px',
+                }}
+            >            <Link to="/dashboard/" style={{ textDecoration: 'none' }}>
+                <ListItem>
+                    <ListItemButton
+                        selected={currentPath === '/dashboard/'}
+                        sx={buttonStyles}
+                    >
+                        <ListItemDecorator>
+                            <HomeRoundedIcon />
+                        </ListItemDecorator>
+                        <ListItemContent>
+                            <Typography level='title-xs'>Home</Typography>
+                            <Typography level='body-xs'>Overview of your Dashboard</Typography>
+                        </ListItemContent>
+                    </ListItemButton>
+                </ListItem>
             </Link>
-          {Object.keys(buttons).map((button) => (
-            <ListItem nested>
-              <ListSubheader>
-                  {button}
-              </ListSubheader>
-              <List>
-              {buttons[button].map( (btn) => (
-                            <Link to={btn.destination}>
-                              <ListItem key={btn.head} sx={{
-                                my: 0.4,
-                              }} variant='plain'>
-                                <ListItemButton sx={{transition: '0.2s ease background-color'}}>
-                                  <ListItemDecorator>
-                                    {btn.icon}
-                                  </ListItemDecorator>
-                                  <ListItemContent>
-                                    <Typography level='title-xs'>
-                                    {btn.head}
-                                    </Typography>
-                                    <Typography level='body-xs'>
-                                    {btn.description}
-                                    </Typography>
-                                    </ListItemContent>
-                                </ListItemButton>
-                            </ListItem>
-                          </Link>
-              ))}
-              </List>
-              </ListItem>
-          ))}
-      </List>
+
+
+                {Object.entries(buttons).map(([section, items]) => (
+                    <ListItem nested key={section}>
+                        <ListSubheader>{section}</ListSubheader>
+                        <List>
+                            {items.map((item) => (
+                                <Link
+                                    key={item.destination}
+                                    to={item.destination}
+                                    style={{ textDecoration: 'none' }}
+                                >
+                                    <ListItem>
+                                        <ListItemButton
+                                            selected={currentPath === item.destination}
+                                            sx={buttonStyles}
+                                        >
+                                            <ListItemDecorator>{item.icon}</ListItemDecorator>
+                                            <ListItemContent>
+                                                <Typography level='title-xs'>{item.head}</Typography>
+                                                <Typography level='body-xs'>{item.description}</Typography>
+                                            </ListItemContent>
+                                        </ListItemButton>
+                                    </ListItem>
+                                </Link>
+                            ))}
+                        </List>
+                    </ListItem>
+                ))}
+
+            </List>
       <Box sx={{ display: 'flex', gap: 1, mt: 2}}>
-            
+
         <IconButton
           variant="soft"
           color="primary"
@@ -377,19 +395,20 @@ export default function JoyHeader() {
         </IconButton>
         <IconButton
           variant="soft"
+          onClick={() => logout()}
           sx={{
             minWidth: 40,
             minHeight: 40,
             borderRadius: '50%',
           }}
         >
-          <LogoutRoundedIcon/>  
+          <LogoutRoundedIcon/>
         </IconButton>
         <ColorModeToggle />
       </Box>
       </Box>
     </Sheet>
     </Drawer>
-  </>
-  );
+    </>
+    );
 }
