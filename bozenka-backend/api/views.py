@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,6 +22,25 @@ class AuthViews(viewsets.ViewSet):
     """
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        description='Register a new user at bozenka platform',
+        responses={
+            201: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'},
+                    'refresh_token': {'type': 'string'},
+                    'access_token': {'type': 'string'}
+                }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'},
+                }
+            }
+        }
+    )
     @action(detail=False, methods=['post'])
     def register(self, request) -> Response:
         """
@@ -51,7 +72,20 @@ class AuthViews(viewsets.ViewSet):
         # Handle errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+    @extend_schema(
+        description='Login into account on bozenka platform',
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'},
+                    'refresh_token': {'type': 'string'},
+                    'access_token': {'type': 'string'}
+                }
+            },
+            400: {'type': 'object'}
+        }
+    )
     @action(detail=False, methods=['post'])
     def login(self, request) -> Response:
         """
@@ -84,6 +118,13 @@ class AccountViews(viewsets.ModelViewSet):
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        methods=['get'],
+        responses={
+            200: UserSerializer
+        },
+        description='Get authenticated user account information'
+    )
     @action(detail=False, methods=['get'])
     def account(self, request) -> Response:
         """
@@ -95,6 +136,14 @@ class AccountViews(viewsets.ModelViewSet):
 
         return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        request=UserSerializer,
+        responses={
+            200: {'message': 'Successfully updated.'},
+            400: {'message': 'Failed to update.'},
+        },
+        methods=['post'],
+    )
     @action(detail=False, methods=['post'])
     def update_account(self, request):
         """
@@ -116,7 +165,7 @@ class AccountViews(viewsets.ModelViewSet):
             return Response({'message': 'Successfully updated.'}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({'message': 'Failed to update.', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Failed to update.'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
     def update_password(self, request):
@@ -174,6 +223,12 @@ class PrivateCommunityViews(viewsets.ViewSet):
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        responses={
+            200: PublicCommunitySerializer(many=True),
+        },
+        description='Get list of communities where user is manager'
+    )
     @action(detail=False, methods=['get'])
     def communities(self, request) -> Response:
         """
@@ -188,6 +243,46 @@ class PrivateCommunityViews(viewsets.ViewSet):
 
         return Response(communities, status=status.HTTP_200_OK)
 
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='community_id',
+                type=str,
+                location=OpenApiParameter.PATH,
+                description='UUID of the community',
+                required=True
+            ),
+        ],
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'community_info': {'type': 'object'},
+                    'growth_stats': {'type': 'array'},
+                    'er_stats': {'type': 'array'},
+                    'managers': {'type': 'array'},
+                    'social_links': {'type': 'array'},
+                    'posts': {'type': 'array'},
+                    'latest_post_views': {'type': 'array'},
+                    'connection_data': {'type': 'array'}
+                }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            404: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            }
+        },
+        description='Get detailed community information'
+    )
     @action(detail=False, methods=['get'])
     def community(self, request, community_id=None) -> Response:
         """
@@ -241,7 +336,50 @@ class PrivateCommunityViews(viewsets.ViewSet):
         return Response(community_data, status=status.HTTP_200_OK)
 
 
-
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='community_id',
+                type=str,
+                location=OpenApiParameter.PATH,
+                description='UUID of the community',
+                required=True
+            ),
+        ],
+        request={
+            'type': 'object',
+            'properties': {
+                'updated_data': {'type': 'object'}
+            }
+        },
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            403: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            404: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            }
+        },
+        description='Update community base information'
+    )
     @action(detail=False, methods=['post'])
     def update_community_base_information(self, request, community_id=None) -> Response | None:
         """
@@ -276,6 +414,44 @@ class PrivateCommunityViews(viewsets.ViewSet):
 
         return Response({'message': 'Community updated successfully.'}, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='community_id',
+                type=str,
+                location=OpenApiParameter.PATH,
+                description='UUID of the community',
+                required=True
+            ),
+        ],
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            403: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            404: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            }
+        },
+        description='Delete a community if user is an owner of the community.'
+    )
     @action(detail=False, methods=['post'])
     def delete_community(self, request, community_id) -> Response:
         """
@@ -325,6 +501,13 @@ class PublicCommunityViews(viewsets.ViewSet):
     """
     permission_classes = [permissions.AllowAny]
 
+
+    @extend_schema(
+        responses={
+            200: [PublicCommunitySerializer],
+        },
+        description='Get list of communities currently available at Bozenka platform.'
+    )
     @action(detail=False, methods=['get'])
     def list(self, request) -> Response:
         """
@@ -336,6 +519,44 @@ class PublicCommunityViews(viewsets.ViewSet):
         serializer = PublicCommunitySerializer(communities, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='community_id',
+                type=str,
+                location=OpenApiParameter.PATH,
+                description='UUID of the community',
+                required=True
+            ),
+        ],
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'community_info': {'type': 'object'},
+                    'growth_stats': {'type': 'array'},
+                    'er_stats': {'type': 'array'},
+                    'managers': {'type': 'array'},
+                    'social_links': {'type': 'array'},
+                    'posts': {'type': 'array'},
+                    'latest_post_views': {'type': 'array'}
+                }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            },
+            404: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            }
+        },
+        description='Get detailed public community information'
+    )
     @action(detail=True, methods=['get'])
     def retrieve(self, request, community_id=None) -> Response:
         """
@@ -391,6 +612,17 @@ class ServerStatusView(APIView):
     """
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string'}
+                }
+            }
+        },
+        description='Check backend availability status of Bozenka'
+    )
     def get(self, request):
         """
         Get method for checking server status
@@ -407,6 +639,9 @@ class TagViews(viewsets.ViewSet):
     """
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+
+    )
     @action(detail=False, methods=['get'])
     def list(self, request) -> Response:
         """
