@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+
+# Exposing port what we need
+EXPOSE 5173
+
+# Create npm run command
+CMD ["npm", "run", "dev", "--", "--host"]

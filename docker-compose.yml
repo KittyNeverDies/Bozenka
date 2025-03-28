@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  bozenka-frontend:
+    build: ./bozenka-frontend
+    container_name: bozenka-frontend
+    ports:
+      - "5173:5173" # Vite default dev port is 5173, but here we use Nginx at port 80
+    depends_on:
+      - bozenka-backend
+
+  bozenka-backend:
+    build: ./bozenka-backend
+    container_name: bozenka-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=bozenka.settings
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./bozenka-backend:/app # Optional, only if you want changes to reflect instantly
