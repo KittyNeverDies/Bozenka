@@ -9,38 +9,31 @@ import Button from '@mui/joy/Button';
 import Card from '@mui/joy/Card';
 import Typography from '@mui/joy/Typography';
 import Box from '@mui/joy/Box';
-import { Breadcrumbs } from '@mui/joy';
+import {Breadcrumbs, Snackbar} from '@mui/joy';
 import Grid from '@mui/joy/Grid';
 import CircularProgress from '@mui/joy/CircularProgress';
 import Icon from '@mui/material/Icon';
 
 // Material UI icons
 import InfoIcon from '@mui/icons-material/Info';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelIcon from '@mui/icons-material/Cancel';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import SchoolIcon from '@mui/icons-material/School';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-import CodeIcon from '@mui/icons-material/Code';
-import BrushIcon from '@mui/icons-material/Brush';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+
+
 
 // Own elements.
 import FiltersCard from '../components/FiltersCard';
 import CommunityCard from '../components/CommunityCard';
 
 // Api
-import CommunityApiClient from '../api/CommunityApiClient';
+import BaseClientAPI from '../api/BaseClientAPI.js';
 
 /**
 * @description A community search page
 * @type {JSX.Element}
 */
-
 function CommunitiesSearch() {
     const [communities, setCommunities] = useState([]);
     const [filteredCommunities, setFilteredCommunities] = useState([]);
@@ -50,10 +43,17 @@ function CommunitiesSearch() {
     const [availableTags, setAvailableTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
 
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: ''
+    });
+
+
+
     // Fetch tags and communities on mount
     useEffect(() => {
         const fetchData = async () => {
-            const api = new CommunityApiClient();
+            const api = new BaseClientAPI();
             try {
                 // Fetch both tags and communities in parallel
                 const [tagsResponse, communitiesResponse] = await Promise.all([
@@ -61,11 +61,20 @@ function CommunitiesSearch() {
                     api.getCommunities()
                 ]);
 
+                if (tagsResponse?.error || communitiesResponse?.error) {
+                    throw new Error(tagsResponse?.error || communitiesResponse?.error);
+                }
+
                 setAvailableTags(tagsResponse);
                 setCommunities(communitiesResponse);
                 setFilteredCommunities(communitiesResponse);
             } catch (error) {
                 console.error('Failed to fetch data:', error);
+                setSnackbar({
+                    open: true,
+                    message: `Failed to load communities. Please try again later. ${error.message}`
+                });
+
             } finally {
                 setLoading(false);
             }
@@ -73,6 +82,15 @@ function CommunitiesSearch() {
 
         fetchData();
     }, []);
+
+
+    const handleSnackbarClose = () => {
+        setSnackbar({
+            ...snackbar,
+            open: false
+        });
+    };
+
 
     // Handle tag selection
     const handleTagSelect = useCallback((tag) => {
@@ -92,7 +110,7 @@ function CommunitiesSearch() {
 
         // First filter by selected tags if any
         if (selectedTags.length > 0) {
-            filtered = communities.filter(community => 
+            filtered = communities.filter(community =>
                 selectedTags.every(selectedTag =>
                     community.tags.some(tag => tag.id === selectedTag.id)
                 )
@@ -105,7 +123,7 @@ function CommunitiesSearch() {
             filtered = filtered.filter(community => {
                 const titleMatch = (community.name || "").toLowerCase().includes(searchTermLower);
                 const descriptionMatch = (community.short_description || "").toLowerCase().includes(searchTermLower);
-                const tagsMatch = community.tags?.some(tag => 
+                const tagsMatch = community.tags?.some(tag =>
                     (tag.name || "").toLowerCase().includes(searchTermLower)
                 ) || false;
 
@@ -149,7 +167,7 @@ function CommunitiesSearch() {
         <>
             <Box sx={{ p: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                    <FiltersCard 
+                    <FiltersCard
                         availableTags={availableTags}
                         selectedTags={selectedTags}
                         onTagSelect={handleTagSelect}
@@ -180,14 +198,14 @@ function CommunitiesSearch() {
                             }}
                             endDecorator={
                                 (searchTerm || selectedTags.length > 0) && (
-                                    <Button 
-                                        variant='soft' 
+                                    <Button
+                                        variant='soft'
                                         sx={{
-                                            borderRadius: 'sm', 
-                                            px: 2, 
+                                            borderRadius: 'sm',
+                                            px: 2,
                                             py: 0.5,
-                                        }} 
-                                        startDecorator={<CancelIcon />} 
+                                        }}
+                                        startDecorator={<CancelIcon />}
                                         onClick={handleClearAll}
                                     >
                                         Clear All
@@ -231,7 +249,7 @@ function CommunitiesSearch() {
                         )}
 
                         {/* Communities grid */}
-                        <div 
+                        <div
                             style={{
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
@@ -252,7 +270,7 @@ function CommunitiesSearch() {
                                     <CommunityCard
                                         key={community.id}
                                         id={community.id}
-                                        avatarSrc={`http://localhost:8000${community.icon}`}
+                                        avatarSrc={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${community.icon}`}
                                         menuItems={[
                                             { icon: <OpenInNewIcon />, label: 'Discord' },
                                             { icon: <OpenInNewIcon />, label: 'Telegram' },
@@ -269,6 +287,18 @@ function CommunitiesSearch() {
                         </div>
                     </Box>
                 </Box>
+                <Snackbar
+                    variant="solid"
+                    color="danger"
+                    open={snackbar.open}
+                    onClose={handleSnackbarClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    startDecorator={<ErrorOutlinedIcon />}
+                    autoHideDuration={6000}
+                >
+                    {snackbar.message}
+                </Snackbar>
+
             </Box>
         </>
     );
