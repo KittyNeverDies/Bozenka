@@ -3,7 +3,7 @@ import JoyHeader from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 
 // Hooks of Bozenka
-import { useAuth } from './context/AuthContext.jsx'
+import { useAuth } from './api/contexts/AuthContext.jsx'
 
 // Pages for routing
 import HomePage from "./routes/Homepage.jsx"; 
@@ -23,26 +23,24 @@ import {
 } from './routes/Dashboard.jsx';
 
 // Other imports
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import '@fontsource/inter';
+
+
 
 const AuthorizedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated)
     return <Navigate to="/login" state={{ from: window.location.pathname }} replace />;
-  }
-
   return children;
 }
 
 const UnauthorizedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
-  if (isAuthenticated) {
+  if (isAuthenticated)
     return <Navigate to="/dashboard" state={{ from: window.location.pathname }} replace />;
-  }
-
   return children;
 }
 
