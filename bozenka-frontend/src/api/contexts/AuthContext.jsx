@@ -1,5 +1,5 @@
 
-// src/contexts/AuthContext.js
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
 const AuthContext = createContext(null);
@@ -11,9 +11,6 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!localStorage.getItem('accessToken')
     }));
 
-    function checkAuthState(){
-        console.log(authState);
-    }
 
     const login = useCallback((accessToken, refreshToken) => {
         localStorage.setItem('accessToken', accessToken);
