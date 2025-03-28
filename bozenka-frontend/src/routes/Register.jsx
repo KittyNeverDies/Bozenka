@@ -18,7 +18,7 @@ import Grid from '@mui/joy/Grid';
 
 
 // AuthForm hook for simplifing 
-import { useAuthForm } from '../hooks/useAuthForm';
+import { useAuthForm } from '../api/hooks/useAuthForm.js';
 
 
 // Icons from MUI
@@ -132,7 +132,7 @@ function RegisterPage () {
             </Box>
           )}
         
-        <Card sx={{ p: 4, backgroundColor: 'background.body', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
+        <Card sx={{ p: 4, boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
 
@@ -202,7 +202,7 @@ function RegisterPage () {
         </Card>
       </Box>
     );
-};
+}
 
 export default RegisterPage;
 

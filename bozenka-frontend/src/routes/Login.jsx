@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Box, Button, Input, Typography, Card, Grid } from '@mui/joy';
 import LinearProgress from '@mui/joy/LinearProgress';
 import Alert from '@mui/joy/Alert';
-import { useAuthForm } from '../hooks/useAuthForm';
+import { useAuthForm } from '../api/hooks/useAuthForm.js';
 
 // Icons
 import MailRoundedIcon from '@mui/icons-material/MailRounded';
@@ -125,7 +125,7 @@ function LoginPage() {
               <Typography variant="h2" level="h4" sx={{ fontWeight: 'bold', color: 'text.primary', fontSize: '1.75rem' }}>
                 Login
               </Typography>
-              <Typography level='body-sm'sx={{ mb: 3 }}>
+              <Typography level='body-sm' sx={{ mb: 3 }}>
                 Login into account here, to work with unified community management.
               </Typography>
             </Grid>
@@ -167,6 +167,6 @@ function LoginPage() {
         </Card>
       </Box>
     );
-};  
+}
 export default LoginPage;
 
