@@ -57,6 +57,7 @@ urlpatterns = [
     path('private/user/account/update', AccountViews.as_view({'post': 'update_account'}), name='private_user_update'),
     path('private/user/account/update_password', AccountViews.as_view({'post': 'update_password'}), name='private_user_password'),
 
+    # Refres access token
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Status view

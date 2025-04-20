@@ -1,10 +1,15 @@
 import asyncio
 import logging
 import sys
+
 import uvicorn
+
 from django.core.management.base import BaseCommand
 from dotenv import load_dotenv
-from features import get_list_of_features
+
+from api.utils.naming import naming_utils
+from features import get_list_of_features, register_features
+
 from social.dsc import launch_discord_bot_instance
 from social.vkontakte import launch_vk_bot_instance
 from social.telegram import launch_telegram_bot_instance
@@ -28,6 +33,9 @@ class Command(BaseCommand):
 
         # Load environment variables
         load_dotenv()
+
+        # Register features
+        register_features(naming_utils=naming_utils)
 
         # Run both the server and bots
         try:

@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from django.contrib.auth import logout
+from django.contrib.sessions.models import Session
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, permissions, status
@@ -9,10 +11,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Community, Tag, CommunityGrowth, CommunityER, CommunityManager, SocialLink, Post, LatestPostView, \
-    CommunityConnection
+    CommunityConnection, Feature
 from .serializers import RegisterSerializer, LoginSerializer, PublicCommunitySerializer, TagSerializer, \
     CommunityGrowthSerializer, CommunityERSerializer, CommunityManagerSerializer, PostSerializer, SocialLinkSerializer, \
-    LatestPostViewSerializer, UserSerializer, CommunityConnectionSerializer
+    LatestPostViewSerializer, UserSerializer, CommunityConnectionSerializer, SessionSerializer
 
 
 class AuthViews(viewsets.ViewSet):
@@ -167,6 +169,9 @@ class AccountViews(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'message': 'Failed to update.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+
+    )
     @action(detail=False, methods=['post'])
     def update_password(self, request):
         """
@@ -188,6 +193,21 @@ class AccountViews(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'message': 'Failed to update. Exception happend.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema()
+    @action(detail=False, methods=['post'])
+    def logout(self, request):
+        """
+        View for logging out of account
+        :param request: Request object
+        :return: Response object
+        """
+        refresh_token = request.data.get('refresh_token')
+
+        if not refresh_token:
+            return Response({'message': 'Failed to logout.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        logout(request)
+        RefreshToken(refresh_token).blacklist()
 
 
 def is_valid_uuid(uuid_to_test: str, version: int = 4) -> bool:
@@ -209,12 +229,6 @@ def is_valid_uuid(uuid_to_test: str, version: int = 4) -> bool:
     except ValueError:
         return False
 
-class UserViews(viewsets.ViewSet):
-    """
-    ViewsSet for accessing user of bozenka platform.
-    Gives ability to get information about user without authentication.
-    """
-    permission_classes = [permissions.IsAuthenticated]
 
 class PrivateCommunityViews(viewsets.ViewSet):
     """
@@ -480,6 +494,22 @@ class PrivateCommunityViews(viewsets.ViewSet):
 
         return Response({'message': 'Community deleted successfully.'}, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'])
+    def get_list_of_features(self, request, community_id=None):
+        """
+        View for getting features list of community
+        :param request: Request object
+        :param community_id: Community id
+        :return: Response object
+        """
+
+        community = Community.objects.get(id=community_id)
+
+        if community is None:
+            return Response({'message': 'Community not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        list_of_features = Feature.objects.filter(community=community)
+
 
     @action(detail=False, methods=['post'])
     def edit_enabled_features(self, request, community_id=None):
@@ -640,7 +670,10 @@ class TagViews(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
 
     @extend_schema(
-
+        responses={
+            200: TagSerializer(many=True),
+        },
+        description='Get list of all tags'
     )
     @action(detail=False, methods=['get'])
     def list(self, request) -> Response:

@@ -8,7 +8,23 @@ class BasicFeature:
 
     settings_name = "Example name of setting"
     settings_description = "Example description of setting"
-    setting_database_row = None
+
+    settings_options = [
+        # How does this work?
+        # 'name' - Name of settings, used in API
+        # 'displayName' - Name, which will be displayed at user's dashboard
+        # 'type' - What value does it store (Can be text, choice or bool)
+        # 'description' - Description of setting, displayed on dashboard
+        # 'default' - Default value, what will be used for setting
+        {
+            "name": "1234",
+            "displayName": "How it works?",
+            "type": "bool", # Choice, text, or bool
+            "description": "Example",
+            "default": False,
+            "choices": [True, False],
+        }
+    ]
 
     platforms_available: dict[str: list | str | dict] = {
         "telegram": {

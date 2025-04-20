@@ -1,10 +1,17 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.sessions.models import Session
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import User, Community, Tag, CommunityGrowth, CommunityER, Post, CommunityManager, LatestPostView, \
-    SocialLink, CommunityConnection
+    SocialLink, CommunityConnection, Feature, FeatureSettings, Category
+
+
+class SessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Session
+        fields = ['session_key', 'session_data', 'expire_date']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -91,7 +98,49 @@ class PrivateCommunitySerializer(serializers.ModelSerializer):
     pass
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for categories of features.
+    """
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "name",
+            "description",
+            "icon"
+        )
 
+class FeatureSerializer(serializers.ModelSerializer):
+    """
+    Serializer for features information.
+    """
+    category = CategorySerializer()
+    class Meta:
+        model = Feature
+        fields = (
+            "id",
+            "name",
+            "description",
+            "enabled",
+            "category",
+        )
+
+class FeatureSettingsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for feature settings.
+    """
+    feature = FeatureSerializer()
+    class Meta:
+        model = FeatureSettings
+        fields = (
+            "id",
+            "name",
+            "description",
+            "feature",
+            "enabled",
+            "settings_data"
+        )
 
 
 class CommunityGrowthSerializer(serializers.ModelSerializer):

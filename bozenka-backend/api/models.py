@@ -87,6 +87,84 @@ class Community(models.Model):
         verbose_name_plural = _("Communities")
 
 
+class Category(models.Model):
+    """
+    Category for grouping features (e.g., 'admin', 'moderation', etc.)
+    """
+    name = models.CharField(
+        verbose_name=_('Category name'),
+        max_length=50,
+        unique=True
+    )
+    description = models.TextField(
+        verbose_name=_('Category description'),
+        null=True, blank=True
+    )
+    icon = models.CharField(
+        verbose_name=_('Category icon'),
+        max_length=50,
+        default='folder'  # Default material icon name
+    )
+
+
+class Feature(models.Model):
+    name = models.CharField(
+        verbose_name=_('Feature name'),
+        max_length=50
+    )
+    description = models.TextField(
+        verbose_name=_('Feature description'),
+        null=True, blank=True
+    )
+    enabled = models.BooleanField(
+        default=False,
+        verbose_name=_('Feature globally enabled by default or not'),
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name=_('Feature category')
+    )
+    feature_class = models.CharField(
+        max_length=255,
+        help_text=_('Full path to feature implementation class')
+    )
+    options = models.JSONField(
+        default=dict,
+        verbose_name=_('Feature options, for API'),
+    )
+
+
+class FeatureSettings(models.Model):
+    """
+    Stores per-community feature settings
+    """
+    feature = models.ForeignKey(Feature, on_delete=models.CASCADE)
+    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    settings_data = models.JSONField(
+        default=dict,
+        help_text=_('Feature-specific settings')
+    )
+    enabled = models.BooleanField(
+        default=feature,
+        verbose_name=_('Feature enabled for community'),
+    )
+
+    def save(self, *args, **kwargs):
+        """
+        Save the feature settings
+        :param args: Arguments
+        :param kwargs: Kwargs
+        """
+        if self.enabled is None:
+            self.enabled = self.feature.enabled
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ('feature', 'community')
+
+
 class CommunityConnection(models.Model):
     """
     Connection of community on social platform
@@ -126,7 +204,6 @@ class CommunityConnection(models.Model):
         null=False,
         verbose_name=_("Count of Members on Connection")
     )
-
 
 
 class CommunityGrowth(models.Model):
@@ -281,6 +358,3 @@ class LatestPostView(models.Model):
     class Meta:
         verbose_name = _("Latest post views record")
         verbose_name_plural = _("Latest post views records")
-
-
-
