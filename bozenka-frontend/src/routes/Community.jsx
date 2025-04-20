@@ -15,6 +15,7 @@ import ListItemContent from '@mui/joy/ListItemContent';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import Stack from '@mui/joy/Stack';
 import Typography from '@mui/joy/Typography';
+import CircularProgress from "@mui/joy/CircularProgress";
 
 // MUI Icons
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
@@ -28,10 +29,11 @@ import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
 // Our componenets
 import CommunitySegmentedInfo from '../components/CommunitySegmentedInfo';
-import CommunityApiClient from '../api/CommunityApiClient';
+import BaseClientAPI from '../api/BaseClientAPI.js';
+
 
 // React Router
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 
 /**
@@ -54,7 +56,7 @@ function Community() {
     // Fetch tags and communities on mount
     React.useEffect(() => {
         const fetchData = async () => {
-            const api = new CommunityApiClient();
+            const api = new BaseClientAPI();
             try {
                 // Fetch both tags and communities in parallel
                 const communityInfo = await api.getCommunity(params.id)
@@ -88,7 +90,10 @@ function Community() {
     };
 
     if (loading) {
-        return <Typography>Loading...</Typography>;
+        return <>
+            <CircularProgress size="sm" />
+            <Typography>Loading...</Typography>
+        </>
     }
 
     return (
@@ -124,7 +129,7 @@ function Community() {
                   </Box>
                 <Card>
                     <Avatar 
-                        src={`http://127.0.0.1:8000${community.community_info?.icon}`} // Using optional chaining
+                        src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${community.community_info?.icon}`} // Using optional chaining
                         variant='outlined'
                     />
                     <Box>
@@ -173,22 +178,20 @@ function Community() {
                         Links
                     </Typography>
                     <List>
-                        {community.social_links.map((connection) =>
+                        {community.social_links.map((connection, index) =>
                         (
                         <Link to={connection.link}>
-                            <ListItem sx={{margin: 0.2}}>
-                            <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                                <ListItemDecorator>
-                                <OpenInNewIcon /></ListItemDecorator>
-                                <ListItemContent>connection.platform</ListItemContent>
-                                <KeyboardArrowRight />
-                            </ListItemButton>
+                            <ListItem sx={{margin: 0.2}} key={index}>
+                                <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                                    <ListItemDecorator>
+                                        <OpenInNewIcon />
+                                    </ListItemDecorator>
+                                    <ListItemContent>{connection.platform}</ListItemContent>
+                                    <KeyboardArrowRight />
+                                </ListItemButton>
                             </ListItem>
                             </Link>
                         ))}
-
-                        
-                        {/* Add your social links here based on community.social_links */}
                     </List>
                 </Card>)}
                 { community.managers && (<Card sx={{marginTop: 2}} size='sm'>
@@ -197,26 +200,24 @@ function Community() {
                     </Typography>
                     
                     <List>
-                        {/* String(val).charAt(0).toUpperCase() + String(val).slice(1) */}
-                        {community.managers.map((manager) => (<ListItem sx={{margin: 0.2}}>
-                        <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
-                            <ListItemDecorator>
-                              <Avatar size="md" src={`http://localhost:8000${manager.avatar}`} variant='outlined' />
-                            </ListItemDecorator>
-                            <ListItemContent sx={{ml: 1.5}}>
-                                <Typography level="title-sm">{manager.user.display_name ? manager.user.display_name : manager.user.username}</Typography>
-                                <Typography level="body-sm">{String(manager.status).charAt(0).toUpperCase() + String(manager.status).slice(1)} </Typography>
-                            </ListItemContent>
-                            <KeyboardArrowRight />
-                          </ListItemButton>
+                        {community.managers.map((manager, index) => (<ListItem key={index} sx={{margin: 0.2}}>
+
+                                <ListItemButton sx={{borderRadius: 'sm', transition: 'background-color 0.2s ease'}}>
+                                    <ListItemDecorator>
+                                    <Avatar size="md" src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${manager.avatar}`} variant='outlined' />
+                                    </ListItemDecorator>
+                                    <ListItemContent sx={{ml: 1.5}}>
+                                        <Typography level="title-sm">{manager.user.display_name ? manager.user.display_name : manager.user.username}</Typography>
+                                        <Typography level="body-sm">{String(manager.status).charAt(0).toUpperCase() + String(manager.status).slice(1)} </Typography>
+                                    </ListItemContent>
+                                    <KeyboardArrowRight />
+                                </ListItemButton>
                       </ListItem>))}
-                        {/* Add your contacts list here based on community.managers */}
                     </List>
                 </Card>)}
-                {/* Rest of the component remains the same */}
             </Stack>
             <CommunitySegmentedInfo 
-                community_description={community.description}
+                community_description={community.community_info.description}
                 growth_stats={community.growth_stats}
                 er_stats={community.er_stats}
                 sx={{flex: 1}} 
