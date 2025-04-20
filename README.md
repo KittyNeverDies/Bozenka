@@ -57,12 +57,17 @@ For a better understanding of our workflow, please refer to the following overvi
         - [x] Manage account \
             Manage account (change password, email and etc)
         - [ ] Connection with Backend (Started)
-            - [ ] Cookies
-                After authorization of user, we should store all information about him in cookie
-            - [ ] Api Calls
+            - [x] Basic Api Calls \
                 Basic implementation of calls to api, to get true information, not place holders.
-            - [ ] Caching
-                Use Redis storage for caching information, what wee get.
+                - [x] Get basic information \
+                    Right now we can get information about communities easily.
+                - [x] Authorization \
+                    Registration and getting into account is working properly. There still can be some improvements.
+                - [ ] Features managment
+            - [ ] Caching \
+                Use Redis storage for caching information, what we get.
+
+            
 - [Backend](bozenka-backend/):
     - [x] Database Models (Refactors in future) \
         Has been writen first after creation of new bozenka project

@@ -24,7 +24,7 @@ class TestFeature(BasicFeature):
         except TypeError:
             # But not all the types is supported to be copied so need to handle it
             await message.answer("Nice try!")
-
+    
     async def dsc_hello_handler(ctx):
         await ctx.respond("Hey!")
 

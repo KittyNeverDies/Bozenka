@@ -46,7 +46,7 @@ def get_project_tree(directory='.', exclude_dirs=None, prefix=''):
 def generate_readme():
     """Generate README.md content with the project structure."""
     # Get the project tree structure
-    project_structure = get_project_tree()
+    project_structure = get_project_tree(directory='..')
     print(project_structure)
     # Create README content with project tree
     readme_content = "# Project Structure\n\n"
