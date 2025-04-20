@@ -138,12 +138,14 @@ const displayData = {
     shortTitle: "Number of members",
     description: "Total number of communities members.",
     icon: <PeopleRoundedIcon/>,
+    color: 'success',
   },
   views: {
     title: "Views of the posts from all communities at this date.",
     shortTitle: "Views of the posts",
     description: "Total growth of number of views on posts at this date.",
     icon: <VisibilityRoundedIcon/>,
+    color: 'neutral'
   }
 
 }
@@ -1447,7 +1449,7 @@ export function DashboardControlCommunity() {
                   </Tab>
                   <Tab>
                     <SettingsRoundedIcon sx={{fontSize: 20}} />
-                    <Typography level='title-sm'>Settings</Typography>
+                    <Typography level='title-sm'>Features</Typography>
                   </Tab>
                   <Tab>
                     <DnsRoundedIcon sx={{fontSize: 20}} />
@@ -1455,7 +1457,7 @@ export function DashboardControlCommunity() {
                   </Tab>
                   <Tab>
                     <QueryStatsRoundedIcon sx={{fontSize: 20}} />
-                    <Typography level='title-sm'>Stats</Typography>
+                    <Typography level='title-sm'>Statistics</Typography>
                   </Tab>
                   <Tab>
                     <MailRoundedIcon sx={{fontSize: 20}} />
