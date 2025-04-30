@@ -76,6 +76,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRounded';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 // Authorization
 import { useAuth } from '../api/contexts/AuthContext.jsx';
@@ -138,14 +139,14 @@ const displayData = {
     shortTitle: "Number of members",
     description: "Total number of communities members.",
     icon: <PeopleRoundedIcon/>,
-    color: 'success',
+    color: '#85ccff',
   },
   views: {
     title: "Views of the posts from all communities at this date.",
     shortTitle: "Views of the posts",
     description: "Total growth of number of views on posts at this date.",
     icon: <VisibilityRoundedIcon/>,
-    color: 'neutral'
+      color: "#4b45d7"
   }
 
 }
@@ -292,7 +293,7 @@ export function DashboardLayout(){
                   <CircularProgress size="sm" />
                 ) : (
               <>
-              {accountInfo.icon ? <Avatar src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.icon}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
+              {accountInfo.image ? <Avatar src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.image}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
                <Box>
                   <>
                     <Typography level="h5" element="h5" fontWeight='bold'>
@@ -523,12 +524,14 @@ export function DashboardHomepage() {
       shortTitle: "Number of members",
       description: "Total number of communities members.",
       icon: <PeopleRoundedIcon/>,
+      color: '#85ccff',
     },
     views: {
       title: "Views of the posts from all communities at this date.",
       shortTitle: "Views of the posts",
       description: "Total growth of number of views on posts at this date.",
       icon: <VisibilityRoundedIcon/>,
+      color: "#4b45d7"
     }
   
   }
@@ -1218,7 +1221,7 @@ export function DashboardControlCommunity() {
         <>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography level="body-xs">
-              {selectedCommunityInfo.community_info.description}
+              {selectedCommunityInfo?.community_info.description}
             </Typography>
             <Button 
               startDecorator={<EditIcon />}
@@ -1324,12 +1327,15 @@ export function DashboardControlCommunity() {
     </Box>
   );
 
+  console.log(filteredCommunities)
+
   // Main render
   return (
     <>
       {loading ? (
         <CircularProgress />
       ) : (
+
         <>
           <Breadcrumbs size="sm" separator={<KeyboardArrowRightIcon/>}>
             <Link to='..' style={{color: 'var(--joy-palette-text-tertiary)'}}>
@@ -1352,29 +1358,31 @@ export function DashboardControlCommunity() {
               width: {xs: '95%', md: '70%'}, 
               p: 3,
               minWidth: '70%', 
-              maxHeight: 'auto'
+              maxHeight: 'auto',
             }}>
+              {selectedCommunityInfo ? 
+              <>
               <Box sx={{
                 display: 'flex', 
                 flexDirection: 'row',
               }}> 
-                {selectedCommunityInfo.community_info.icon ? 
+                {selectedCommunityInfo?.community_info?.icon ? 
                   <Avatar src={`http://localhost:8000${selectedCommunityInfo.community_info.icon}`}/> : 
                   <Avatar>{selectedCommunityInfo?.community_info.name?.[0]}</Avatar>
                 }
                 <Box ml={1}>
                   <Typography level="title-lg" sx={{marginBottom: 0}}>
-                    {selectedCommunityInfo.community_info.name}
+                    {selectedCommunityInfo?.community_info.name}
                   </Typography>
                   <Box sx={{display: 'flex', flexDirection: 'row'}}>
                     <Typography startDecorator={<PersonIcon/>} mr={1} level="body-xs">
-                      {selectedCommunityInfo.community_info.members_count} members
+                      {selectedCommunityInfo?.community_info.members_count} members
                     </Typography>
                     <Typography 
                       startDecorator={<CalendarMonthRoundedIcon/>}
                       level="body-xs"
                     >
-                      Created on {new Date(selectedCommunity.creation_date).toLocaleDateString()}
+                      Created on {new Date(selectedCommunity?.creation_date).toLocaleDateString()}
                     </Typography>
                   </Box>
                   <Typography color='neutral' level="body-xs">
@@ -1388,7 +1396,7 @@ export function DashboardControlCommunity() {
                     </Typography>
                   </Typography>
                   <Box>
-                    {selectedCommunityInfo.community_info.tags.map(tag => (
+                    {selectedCommunityInfo?.community_info.tags.map(tag => (
                       <Chip 
                         key={tag.id}
                         variant="soft"
@@ -1649,6 +1657,12 @@ export function DashboardControlCommunity() {
                   <PostsTabContent />
                 </TabPanel>
               </Tabs>
+              </>
+              :
+                    <Typography level="body-lg" textAlign="center" sx={{p: 5}}>
+                      Please, select a community from your list
+                    </Typography>
+              }
             </Card>
 
             <Card sx={{
@@ -1677,6 +1691,7 @@ export function DashboardControlCommunity() {
                   sx={inputStyles}
                 />
               </Box>
+              { filteredCommunities ? 
               <List>
                 {filteredCommunities.map((community) => (
                   <ListItem key={community.id}>
@@ -1702,16 +1717,21 @@ export function DashboardControlCommunity() {
                       </ListItemDecorator>
                       <ListItemContent sx={{ mx: 1 }}>
                         <Typography level='title-md'>
-                          {community.name}
+                          {community?.name}
                         </Typography>
                         <Typography level='body-xs'>
-                          {community.short_description}
+                          {community?.short_description}
                         </Typography>
                       </ListItemContent>
                     </ListItemButton>
                   </ListItem>
                 ))}
-              </List>
+              </List> : 
+              <>
+                <Typography>0_o</Typography>
+                <Typography>There is quite empty</Typography>
+              </>
+              }
             </Card>
           </Stack>
         </>
@@ -1731,9 +1751,7 @@ export function DashboardControlAccount() {
   const api = useApi();
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  // Base URL for avatar
-  const BASE_URL = 'http://127.0.0.1:8000';
+
 
   useEffect(() => {
     let isMounted = true;
@@ -1799,7 +1817,7 @@ export function DashboardControlAccount() {
   // Get avatar URL or fallback to default
   const getAvatarUrl = () => {
     if (!accountInfo?.image) return null;
-    return `${BASE_URL}${accountInfo.image}`;
+    return `${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.image}`;
   };
 
   // Get display name with fallbacks
