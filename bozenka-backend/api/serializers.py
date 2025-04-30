@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from .models import User, Community, Tag, CommunityGrowth, CommunityER, Post, CommunityManager, LatestPostView, \
-    SocialLink, CommunityConnection, Feature, FeatureSettings, Category
+    SocialLink, CommunityConnection, Feature, FeatureSetting, Category
 
 
 class SessionSerializer(serializers.ModelSerializer):
@@ -126,15 +126,17 @@ class FeatureSerializer(serializers.ModelSerializer):
             "category",
         )
 
-class FeatureSettingsSerializer(serializers.ModelSerializer):
+class FeatureSettingSerializer(serializers.ModelSerializer):
     """
     Serializer for feature settings.
     """
     feature = FeatureSerializer()
+    community = PrivateCommunitySerializer()
     class Meta:
-        model = FeatureSettings
+        model = FeatureSetting
         fields = (
             "id",
+            "community",
             "name",
             "description",
             "feature",
