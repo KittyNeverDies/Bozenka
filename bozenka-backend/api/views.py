@@ -11,10 +11,11 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Community, Tag, CommunityGrowth, CommunityER, CommunityManager, SocialLink, Post, LatestPostView, \
-    CommunityConnection, Feature
+    CommunityConnection, Feature, FeatureSetting
 from .serializers import RegisterSerializer, LoginSerializer, PublicCommunitySerializer, TagSerializer, \
     CommunityGrowthSerializer, CommunityERSerializer, CommunityManagerSerializer, PostSerializer, SocialLinkSerializer, \
-    LatestPostViewSerializer, UserSerializer, CommunityConnectionSerializer, SessionSerializer
+    LatestPostViewSerializer, UserSerializer, CommunityConnectionSerializer, SessionSerializer, FeatureSerializer, \
+    FeatureSettingSerializer
 
 
 class AuthViews(viewsets.ViewSet):
@@ -320,7 +321,7 @@ class PrivateCommunityViews(viewsets.ViewSet):
         managers = CommunityManager.objects.filter(community=community)
         social_links = SocialLink.objects.filter(community=community)
         posts = Post.objects.filter(community=community).order_by('-created_at')
-        latest_post_views = LatestPostView.objects.filter(community=community, post=posts[0]) if posts else []
+        latest_post_views = LatestPostView.objects.filter(post=posts[0]) if posts else []
         connection = CommunityConnection.objects.filter(community=community)
 
         # Format data for response
@@ -502,26 +503,70 @@ class PrivateCommunityViews(viewsets.ViewSet):
         :param community_id: Community id
         :return: Response object
         """
-
         community = Community.objects.get(id=community_id)
 
         if community is None:
             return Response({'message': 'Community not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        list_of_features = Feature.objects.filter(community=community)
+        list_of_features = FeatureSerializer(Feature.objects.all(), many=True)
+        list_of_settings = FeatureSettingSerializer(FeatureSetting.objects.filter(community=community), many=True)
 
+        return Response(
+            {
+                'features_list': list_of_features.data,
+                'applied_settings': list_of_settings.data
+            }
+        )
 
     @action(detail=False, methods=['post'])
-    def edit_enabled_features(self, request, community_id=None):
+    def edit_features(self, request, community_id=None):
         """
         View for editing enabled features of community
         :param request: Request object
         :param community_id: Community id
         :return: Response object
         """
-        pass
+        community = Community.objects.get(id=community_id)
 
-    # More features will be added here
+        if not community:
+            return Response({'message': 'Community not found.'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+
+        edited = request.data.get('edited_features')
+
+        if not edited:
+            return Response({'message': 'No features to edit.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        for feature in edited:
+            feature_id = feature.get("id")
+            enabled = feature.get("enabled")
+            settings_data = feature.get("settings_data")
+
+            feature = Feature.objects.get(id=feature_id)
+
+            if not feature:
+                continue
+
+            feature_setting, created = FeatureSetting.objects.get_or_create(
+                community=community,
+                feature=feature,
+                defaults={
+                    'enabled': enabled if enabled else feature.enabled,
+                    'settings_data': settings_data if settings_data else feature.default_setting_data
+                }
+            )
+
+            if not created:
+                if enabled is not None:
+                    feature_setting.enabled = enabled
+                if settings_data is not None:
+                    feature_setting.settings_data = settings_data
+
+                feature_setting.save()
+
+        return Response({'message': 'Features edited successfully.'}, status=status.HTTP_200_OK)
 
 
 class PublicCommunityViews(viewsets.ViewSet):
@@ -610,7 +655,7 @@ class PublicCommunityViews(viewsets.ViewSet):
         managers = CommunityManager.objects.filter(community=community)
         social_links = SocialLink.objects.filter(community=community)
         posts = Post.objects.filter(community=community).order_by('-created_at')
-        latest_post_views = LatestPostView.objects.filter(community=community, post=posts[0]) if posts else []
+        latest_post_views = LatestPostView.objects.filter(post=posts[0]) if posts else []
 
         # Format data for response
         growth_data = [CommunityGrowthSerializer(stat).data for stat in growth_stats]
@@ -682,7 +727,7 @@ class TagViews(viewsets.ViewSet):
         :param request: Request object
         :return: Response object
         """
-        communities = Tag.objects.all()
-        serializer = TagSerializer(communities, many=True)
+        tags = Tag.objects.all()
+        serializer = TagSerializer(tags, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
