@@ -43,53 +43,15 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
 
-  const theme = useTheme();
-
-  
-  const data = [
-    {
-      name: "03.09",
-      views: 4000,
-      members: 2400,
-      amt: 2400,
-    },
-    {
-      name: "04.09",
-      views: 3500,
-      members: 3000,
-      amt: 2210,
-    },
-    {
-      name: "05.09",
-      views: 2000,
-      members: 9800,
-      amt: 2290,
-    },
-    {
-      name: "06.09",
-      views: 2780,
-      members: 3900,
-      amt: 2000,
-    },
-    {
-      name: "07.09",
-      views: 1890,
-      members: 1000,
-      amt: 2181,
-    },
-    {
-      name: "08.09",
-      views: 2300,
-      members: 3800,
-      amt: 2500,
-    },
-    {
-      name: "09.09",
-      views: 3490,
-      members: 4300,
-      amt: 2100,
-  }];
-
+  // Data for stats visualization (mapped from growth_stats and er_stats)
+  // Will be 100% reworked in future
+  const data = growth_stats.map((stat, index) => ({
+    name: stat.date,
+    views: stat.views || 0, // If views are in growth_stats
+    members: stat.members_count || 0,
+    amt: stat.members_count || 0,
+    er: er_stats?.[index]?.er || 0, // Match ER with corresponding date
+  }));
 
   // Display data configuration (should be mapped from server data)
   const displayData = {
