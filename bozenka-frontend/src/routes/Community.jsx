@@ -149,7 +149,7 @@ function Community() {
                             level="body-xs">
                             Created on {new Date(community.community_info?.creation_date).toLocaleDateString()}
                         </Typography>
-                        <Typography level="body-sm">{community.community_info?.description || 'No description provided'}</Typography>
+                        <Typography level="body-sm">{community.community_info?.short_description || 'No description provided'}</Typography>
                     </Box>
                 </Card>
                 <Card sx={{marginTop: 2}}>
@@ -220,6 +220,7 @@ function Community() {
                 community_description={community.community_info.description}
                 growth_stats={community.growth_stats}
                 er_stats={community.er_stats}
+                posts={community.posts}
                 sx={{flex: 1}} 
             />
         </Box>
