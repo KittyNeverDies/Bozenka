@@ -47,17 +47,22 @@ urlpatterns = [
     # Get users private communities
     path('private/communities/', PrivateCommunityViews.as_view({'get': 'communities'}), name='private_communities'),
     path('private/communities/<str:community_id>/', PrivateCommunityViews.as_view({'get': 'community'}), name='private_community_detail'),
+
+    # Manage community
     path('private/communities/<str:community_id>/update/base', PrivateCommunityViews.as_view({'post': 'update_community_base_information'}),
          name='private_community_update'),
     path('private/communities/<str:community_id>/delete/',
          PrivateCommunityViews.as_view({'post': 'delete_community'}), name='private_community_delete'),
+    path('private/communities/<str:community_id>/update/features/',
+         PrivateCommunityViews.as_view({'post': 'edit_features'}), name='private_community_update_features'),
+    path('privalte/communities/<str:community_id>/features/', PrivateCommunityViews.as_view({'get': 'get_list_of_features'}), name='private_community_features'),
 
     # Authenticated user operations
     path('private/user/account/', AccountViews.as_view({'get': 'account'}), name='private_user'),
     path('private/user/account/update', AccountViews.as_view({'post': 'update_account'}), name='private_user_update'),
     path('private/user/account/update_password', AccountViews.as_view({'post': 'update_password'}), name='private_user_password'),
 
-    # Refres access token
+    # Refresh access token
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Status view
