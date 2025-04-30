@@ -129,13 +129,17 @@ class Feature(models.Model):
         max_length=255,
         help_text=_('Full path to feature implementation class')
     )
+    default_setting_data = models.JSONField(
+        default=dict,
+        verbose_name=_('Default settings data')
+    )
     options = models.JSONField(
         default=dict,
         verbose_name=_('Feature options, for API'),
     )
 
 
-class FeatureSettings(models.Model):
+class FeatureSetting(models.Model):
     """
     Stores per-community feature settings
     """
@@ -158,6 +162,9 @@ class FeatureSettings(models.Model):
         """
         if self.enabled is None:
             self.enabled = self.feature.enabled
+
+        if self.settings_data is None:
+            self.settings_data = self.feature.default_setting_data
 
         super().save(*args, **kwargs)
 
