@@ -43,14 +43,53 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
 
-  // Data for stats visualization (mapped from growth_stats and er_stats)
-  const data = growth_stats.map((stat, index) => ({
-    name: stat.date,
-    views: stat.views || 0, // If views are in growth_stats
-    members: stat.members_count || 0,
-    amt: stat.members_count || 0,
-    er: er_stats?.[index]?.er || 0, // Match ER with corresponding date
-  }));
+  const theme = useTheme();
+
+  
+  const data = [
+    {
+      name: "03.09",
+      views: 4000,
+      members: 2400,
+      amt: 2400,
+    },
+    {
+      name: "04.09",
+      views: 3500,
+      members: 3000,
+      amt: 2210,
+    },
+    {
+      name: "05.09",
+      views: 2000,
+      members: 9800,
+      amt: 2290,
+    },
+    {
+      name: "06.09",
+      views: 2780,
+      members: 3900,
+      amt: 2000,
+    },
+    {
+      name: "07.09",
+      views: 1890,
+      members: 1000,
+      amt: 2181,
+    },
+    {
+      name: "08.09",
+      views: 2300,
+      members: 3800,
+      amt: 2500,
+    },
+    {
+      name: "09.09",
+      views: 3490,
+      members: 4300,
+      amt: 2100,
+  }];
+
 
   // Display data configuration (should be mapped from server data)
   const displayData = {
@@ -59,12 +98,14 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
       shortTitle: "Number of members",
       description: "Total number of community members.",
       icon: <PeopleRoundedIcon />,
+      color: theme.palette.primary[500],
     },
     views: {
       title: "Views of the posts",
       shortTitle: "Views of the posts",
       description: "Total growth of number of views on posts.",
       icon: <VisibilityRoundedIcon />,
+      color: theme.palette.success[500]
     }
   };
 
@@ -227,16 +268,13 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
                 <Box my={0.5}>
                 <Card sx={{ height: '100%' }}>
                 
-                  <Typography level="title-lg" sx={{marginBottom: -1}}>
-                    {post.text}
-                  </Typography>
                   <Typography level="body-sm">
                     {post.text}
                   </Typography>
                   
                   <Box>
                     <Typography startDecorator={<CalendarMonthRoundedIcon />} sx={{m: 0.2}} level="body-xs">
-                      Posted at {post.created_at}
+                      Posted at {new Date(post.created_at).toLocaleDateString()}
                     </Typography>
                     <Chip variant="soft" startDecorator={<OpenInNewIcon />} color="primary" size="md" sx={{borderRadius: 'sm', m: 0.2}}>
                       {post.source}
