@@ -20,8 +20,11 @@ Current state - 79% of basic realisation
 
 
 > [!IMPORTANT]
-> Bozenka project has been changed it's goal to create solution for managing communities, automating moderation, and allowing users to interact with LLM and other AI models, which should be safe, transparent & open to community, easy to edit and understand, and scalable enough to add new features and maintain them in the future
+> The Bozenka project has been changed it's goal to create solution for managing communities, automating moderation, and allowing users to interact with LLM and other AI models, which should be safe, transparent & open to community, easy to edit and understand, and scalable enough to add new features and maintain them in the future
 
+> [!IMPORTANT]
+> Bozenka project is currently under active development. Some features are not yet functional. We do not recommend deploying Bozenka on your server at this time until the prototype-zero release. \
+> **For developers:** Instead of PostgreSQL, we are currently using SQLite3 in the backend for faster development and testing.
 
 > [!WARNING]  
 > We are currently migrating from our old codebase to a new one. Current results isn't release & bozenka is still in development. To find out what updates are happening with Bozenka, subscribe to the Bozo development channel on Telegram. 
