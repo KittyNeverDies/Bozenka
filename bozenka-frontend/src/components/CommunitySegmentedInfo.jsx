@@ -43,6 +43,8 @@ function CommunitySegmentedInfo({community_description, growth_stats, er_stats, 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const tabListRef = React.useRef(null);
 
+  const theme = useTheme();
+  
   // Data for stats visualization (mapped from growth_stats and er_stats)
   // Will be 100% reworked in future
   const data = growth_stats.map((stat, index) => ({
