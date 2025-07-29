@@ -13,7 +13,7 @@
 
 [Telegram Channel](https://t.me/bozodevelopment/) | [Website](https://kittyneverdies.github.io/Bozenka/) (UI  is outdated)
 
-Current state - 79% of basic realisation
+Current state - 79% of basic realisation, not in prodcution yet.
 
 </div>
 
