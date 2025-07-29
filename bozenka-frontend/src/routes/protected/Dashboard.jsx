@@ -621,7 +621,7 @@ export function DashboardHomepage() {
           </Box>
         ) : (
           <Box sx={{}}>
-            <TestChart sx={{height: 10}} data={data} displayData={displayData} />
+            <DynamicChart sx={{height: 10}} data={data} displayData={displayData} />
             </Box>
         )}
       </Card>
@@ -1650,7 +1650,7 @@ export function DashboardControlCommunity() {
                 </TabPanel>
 
                 <TabPanel value={3}>
-                  <TestChart sx={{height: 10}} data={data} displayData={displayData} />
+                  <DynamicChart sx={{height: 10}} data={data} displayData={displayData} />
                 </TabPanel>
 
                 <TabPanel value={4}>
