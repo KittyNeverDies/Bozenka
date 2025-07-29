@@ -11,8 +11,20 @@
 ### Backend part of project
 </div>
 
+## Developemnt
 
+To launch backend, run:
 
+```shell
+manage.py launch_bozenka
+```
+
+To launch for test instances, run:
+```shell
+manage.py launch_instances
+```
+
+## Project structure
 ```
 bozenka-backend/
 ├── bozenka/
