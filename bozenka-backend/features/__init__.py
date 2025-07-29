@@ -56,7 +56,7 @@ def register_features(naming_utils: dict) -> None:
     for django
     :return: Nothing
     """
-    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
     categories = [
         d for d in os.listdir(current_dir)
