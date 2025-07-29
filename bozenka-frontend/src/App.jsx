@@ -6,12 +6,12 @@ import Footer from './components/Footer.jsx';
 import { useAuth } from './api/contexts/AuthContext.jsx'
 
 // Pages for routing
-import HomePage from "./routes/Homepage.jsx"; 
-import CommunitiesSearch from './routes/Communities.jsx';
-import LoginPage from './routes/Login.jsx';
-import Community from './routes/Community.jsx';
-import RegisterPage from './routes/Register.jsx';
-import Page404 from './routes/404.jsx';
+import HomePage from "./routes/public/Homepage.jsx"; 
+import CommunitiesSearch from './routes/public/Communities.jsx';
+import LoginPage from './routes/public/Login.jsx';
+import Community from './routes/public/Community.jsx';
+import RegisterPage from './routes/public/Register.jsx';
+import Page404 from './routes/public/404.jsx';
 import {
   DashboardHomepage, 
   DashboardBuildCommunity,
@@ -20,7 +20,7 @@ import {
   DashboardControlAccount,
   DashboardCreateCommunity,
   DashboardImportCommunity
-} from './routes/Dashboard.jsx';
+} from './routes/protected/Dashboard.jsx';
 
 // Other imports
 import { Routes, Route, Navigate } from 'react-router-dom';

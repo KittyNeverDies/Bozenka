@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Box, Button, Input, Typography, Card, Grid } from '@mui/joy';
 import LinearProgress from '@mui/joy/LinearProgress';
 import Alert from '@mui/joy/Alert';
-import { useAuthForm } from '../api/hooks/useAuthForm.js';
+import { useAuthForm } from 'src/api/hooks/useAuthForm.js';
 
 // Icons
 import MailRoundedIcon from '@mui/icons-material/MailRounded';

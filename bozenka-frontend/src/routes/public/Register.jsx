@@ -18,7 +18,7 @@ import Grid from '@mui/joy/Grid';
 
 
 // AuthForm hook for simplifing 
-import { useAuthForm } from '../api/hooks/useAuthForm.js';
+import { useAuthForm } from 'src/api/hooks/useAuthForm.js';
 
 
 // Icons from MUI

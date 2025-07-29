@@ -28,8 +28,8 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 
 // Our componenets
-import CommunitySegmentedInfo from '../components/CommunitySegmentedInfo';
-import BaseClientAPI from '../api/BaseClientAPI.js';
+import CommunitySegmentedInfo from 'src/components/CommunitySegmentedInfo';
+import BaseClientAPI from 'src/api/BaseClientAPI.js';
 
 
 // React Router

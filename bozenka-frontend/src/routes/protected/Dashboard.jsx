@@ -42,9 +42,9 @@ import Checkbox from '@mui/joy/Checkbox';
 import Textarea from '@mui/joy/Textarea';
 
 // Our own controls
-import TestChart from '../components/GrowthChart';
-import NotificationCenter from '../components/NotificationCenter';
-import ColorModeToggle from '../components/ColorModeToggle';
+import DynamicChart from 'src/components/GrowthChart';
+import NotificationCenter from 'src/components/NotificationCenter';
+import ColorModeToggle from 'src/components/ColorModeToggle';
 
 
 // MUI material theme icons
@@ -79,9 +79,9 @@ import AccessibilityNewRoundedIcon from '@mui/icons-material/AccessibilityNewRou
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 // Authorization
-import { useAuth } from '../api/contexts/AuthContext.jsx';
-import { useApi } from '../api/hooks/useApi.js';
-import BaseClientAPI from '../api/BaseClientAPI.js';
+import { useAuth } from 'src/api/contexts/AuthContext.jsx';
+import { useApi } from 'src/api/hooks/useApi.js';
+import BaseClientAPI from 'src/api/BaseClientAPI.js';
 import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 
 

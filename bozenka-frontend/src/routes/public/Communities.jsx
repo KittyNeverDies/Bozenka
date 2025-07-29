@@ -24,11 +24,11 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 
 // Own elements.
-import FiltersCard from '../components/FiltersCard';
-import CommunityCard from '../components/CommunityCard';
+import FiltersCard from 'src/components/FiltersCard';
+import CommunityCard from 'src/components/CommunityCard';
 
 // Api
-import BaseClientAPI from '../api/BaseClientAPI.js';
+import BaseClientAPI from 'src/api/BaseClientAPI.js';
 
 /**
 * @description A community search page
