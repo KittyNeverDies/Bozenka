@@ -295,7 +295,7 @@ export default function JoyHeader() {
                 <CircularProgress size="sm" />
             ) : (
                 <>
-                    {accountInfo.icon ? <Avatar src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.icon}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
+                    {accountInfo.image ? <Avatar src={`${import.meta.env.REACT_APP_API_URL || 'http://localhost:8000'}${accountInfo.image}`}/> : <Avatar>{accountInfo?.display_name?.[0] || accountInfo?.username?.[0] || 'user'}</Avatar>}
                     <Box>
                         <>
                             <Typography level="h5" element="h5" fontWeight='bold'>
