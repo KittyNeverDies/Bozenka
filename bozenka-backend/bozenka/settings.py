@@ -14,17 +14,22 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from django.conf.global_settings import MEDIA_URL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+load_dotenv(os.path.join(BASE_DIR, '..', '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Change it when you deploy bozenka platform on your device.
-SECRET_KEY = 'django-insecure-xpkji&k-^ez&)#l5371kkjn(^^w@mz5igvc*s=4y70fcvwlxlb'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-default-key-4-django')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Disable if you are deploing bozenka.
@@ -33,7 +38,7 @@ DEBUG = True
 # Don't touch it if you don't know what you're doing.
 AUTH_USER_MODEL = 'api.User'
 
-# Set allowed hosts here
+# Set allowed hosts here in production, when you deploy bozenka.
 ALLOWED_HOSTS = []
 
 # Application definition
